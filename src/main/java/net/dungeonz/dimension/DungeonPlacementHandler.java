@@ -67,6 +67,11 @@ public class DungeonPlacementHandler {
         if (serverWorld.getBlockEntity(((ServerPlayerAccess) serverPlayerEntity).getDungeonPortalBlockPos()) != null) {
             ((DungeonPortalEntity) serverWorld.getBlockEntity(((ServerPlayerAccess) serverPlayerEntity).getDungeonPortalBlockPos())).leaveDungeon(serverPlayerEntity.getUuid());
         }
+        if (((DungeonPortalEntity) serverWorld.getBlockEntity(((ServerPlayerAccess) serverPlayerEntity).getDungeonPortalBlockPos())).getDungeonPlayerCount() == 0) {
+            // Break boss chest and back portal and maybe kill boss
+            // maybe add a leave command
+
+        }
         return new TeleportTarget(Vec3d.of(((ServerPlayerAccess) serverPlayerEntity).getDungeonSpawnBlockPos()).add(0.5, 0, 0.5), Vec3d.ZERO, serverWorld.random.nextFloat() * 360F, 0);
     }
 
@@ -75,8 +80,8 @@ public class DungeonPlacementHandler {
 
         // has to be the template_pool name
         RegistryEntry<StructurePool> registryEntry = registry.entryOf(RegistryKey.of(Registry.STRUCTURE_POOL_KEY, portalEntity.getDungeon().getStructurePoolId()));
-        // has to be the first jigsaw block to generate of, change to dungeonz:spawn
-        generate((ServerWorld) world, portalEntity, portalEntity.getDungeon(), registryEntry, new Identifier("dungeonz:spawn"), 6, pos, false);
+        // has to be the first jigsaw block to generate of
+        generate((ServerWorld) world, portalEntity, portalEntity.getDungeon(), registryEntry, new Identifier("dungeonz:spawn"), 16, pos, false);
     }
 
     private static boolean generate(ServerWorld world, DungeonPortalEntity portalEntity, Dungeon dungeon, RegistryEntry<StructurePool> structurePool, Identifier id, int size, BlockPos pos,
@@ -173,6 +178,7 @@ public class DungeonPlacementHandler {
     public static void fillChestWithLoot(MinecraftServer server, ServerWorld world, BlockPos pos, String lootTableString) {
         LootTable lootTable = server.getLootManager().getTable(new Identifier(lootTableString));
         LootContext.Builder builder = new LootContext.Builder(world).parameter(LootContextParameters.ORIGIN, new Vec3d(pos.getX(), pos.getY(), pos.getZ())).random(world.getRandom().nextLong());
+        ((ChestBlockEntity) world.getBlockEntity(pos)).clear();
         lootTable.supplyInventory((ChestBlockEntity) world.getBlockEntity(pos), builder.build(LootContextTypes.CHEST));
     }
 
