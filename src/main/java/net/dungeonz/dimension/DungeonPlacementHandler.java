@@ -2,7 +2,6 @@ package net.dungeonz.dimension;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
@@ -90,8 +89,8 @@ public class DungeonPlacementHandler {
                 structureTemplateManager, world.getSeed(), new ChunkPos(pos), world, registryEntry -> true);
         Optional<Structure.StructurePosition> optional = StructurePoolBasedGenerator.generate(context, structurePool, Optional.of(id), size, pos, false, Optional.empty(), 128);
         if (optional.isPresent()) {
-            HashMap<Integer, List<BlockPos>> blockIdPosMap = new HashMap<Integer, List<BlockPos>>();
-            List<BlockPos> chestPosList = new ArrayList<BlockPos>();
+            HashMap<Integer, ArrayList<BlockPos>> blockIdPosMap = new HashMap<Integer, ArrayList<BlockPos>>();
+            ArrayList<BlockPos> chestPosList = new ArrayList<BlockPos>();
 
             StructurePiecesCollector structurePiecesCollector = optional.get().generate();
             for (StructurePiece structurePiece : structurePiecesCollector.toList().pieces()) {
@@ -109,7 +108,9 @@ public class DungeonPlacementHandler {
                                 int blockId = Registry.BLOCK.getRawId(world.getBlockState(checkPos).getBlock());
                                 if (dungeon.containsBlockId(blockId)) {
                                     if (!blockIdPosMap.containsKey(blockId)) {
-                                        blockIdPosMap.put(blockId, List.of(checkPos));
+                                        ArrayList<BlockPos> newList = new ArrayList<BlockPos>();
+                                        newList.add(checkPos);
+                                        blockIdPosMap.put(blockId, newList);
                                     } else {
                                         blockIdPosMap.get(blockId).add(checkPos);
                                     }
@@ -145,6 +146,7 @@ public class DungeonPlacementHandler {
                     strengthenMob(mobEntity, dungeon, difficulty, false);
                     dungeon.getBlockIdBlockReplacementMap().get(blockId);
                     mobEntity.refreshPositionAndAngles(list.get(i), 360f * world.getRandom().nextFloat(), 0.0f);
+                    world.spawnEntity(mobEntity);
                 }
             }
         });
@@ -170,9 +172,6 @@ public class DungeonPlacementHandler {
 
     public static void fillChestWithLoot(MinecraftServer server, ServerWorld world, BlockPos pos, String lootTableString) {
         LootTable lootTable = server.getLootManager().getTable(new Identifier(lootTableString));
-
-        System.out.println("FILL LOOT: " + lootTable + " : " + world.getBlockEntity(pos));
-
         LootContext.Builder builder = new LootContext.Builder(world).parameter(LootContextParameters.ORIGIN, new Vec3d(pos.getX(), pos.getY(), pos.getZ())).random(world.getRandom().nextLong());
         lootTable.supplyInventory((ChestBlockEntity) world.getBlockEntity(pos), builder.build(LootContextTypes.CHEST));
     }

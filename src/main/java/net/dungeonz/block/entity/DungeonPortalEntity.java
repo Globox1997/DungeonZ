@@ -21,7 +21,7 @@ public class DungeonPortalEntity extends BlockEntity {
     private List<UUID> dungeonPlayerUUIDs = new ArrayList<UUID>();
     private int maxGroupSize = 0;
     private int cooldown = 0;
-    private HashMap<Integer, List<BlockPos>> blockBlockPosMap = new HashMap<Integer, List<BlockPos>>();
+    private HashMap<Integer, ArrayList<BlockPos>> blockBlockPosMap = new HashMap<Integer, ArrayList<BlockPos>>();
     private List<BlockPos> chestPosList = new ArrayList<BlockPos>();
     private BlockPos bossBlockPos = new BlockPos(0, 0, 0);
 
@@ -45,7 +45,7 @@ public class DungeonPortalEntity extends BlockEntity {
 
         if (nbt.getInt("BlockMapSize") > 0) {
             for (int i = 0; i < nbt.getInt("BlockMapSize"); i++) {
-                List<BlockPos> posList = new ArrayList<>();
+                ArrayList<BlockPos> posList = new ArrayList<>();
                 for (int u = 0; u < nbt.getInt("BlockListSize" + i); u++) {
                     posList.add(new BlockPos(nbt.getInt("BlockPosX" + u), nbt.getInt("BlockPosY" + u), nbt.getInt("BlockPosZ" + u)));
                 }
@@ -77,9 +77,9 @@ public class DungeonPortalEntity extends BlockEntity {
         nbt.putInt("BlockMapSize", this.blockBlockPosMap.size());
         if (this.blockBlockPosMap.size() > 0) {
             int blockCount = 0;
-            Iterator<Entry<Integer, List<BlockPos>>> iterator = this.blockBlockPosMap.entrySet().iterator();
+            Iterator<Entry<Integer, ArrayList<BlockPos>>> iterator = this.blockBlockPosMap.entrySet().iterator();
             while (iterator.hasNext()) {
-                Entry<Integer, List<BlockPos>> entry = iterator.next();
+                Entry<Integer, ArrayList<BlockPos>> entry = iterator.next();
                 nbt.putInt("BlockId" + blockCount, entry.getKey());
                 nbt.putInt("BlockListSize" + blockCount, entry.getValue().size());
                 for (int i = 0; i < entry.getValue().size(); i++) {
@@ -136,11 +136,11 @@ public class DungeonPortalEntity extends BlockEntity {
     }
 
     // Might lead to issues if using "="
-    public void setBlockMap(HashMap<Integer, List<BlockPos>> map) {
+    public void setBlockMap(HashMap<Integer, ArrayList<BlockPos>> map) {
         this.blockBlockPosMap = map;
     }
 
-    public HashMap<Integer, List<BlockPos>> getBlockMap() {
+    public HashMap<Integer, ArrayList<BlockPos>> getBlockMap() {
         return this.blockBlockPosMap;
     }
 

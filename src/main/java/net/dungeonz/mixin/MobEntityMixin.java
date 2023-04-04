@@ -64,8 +64,8 @@ public abstract class MobEntityMixin extends LivingEntity implements BossEntityA
     public void onDeath(DamageSource damageSource) {
         if (!this.world.isClient && this.isDungeonBossEntity) {
             this.world.setBlockState(this.getBlockPos(), BlockInit.DUNGEON_PORTAL.getDefaultState());
-            this.world.setBlockState(this.getBlockPos().up(), Blocks.CHEST.getDefaultState());
-            DungeonPlacementHandler.fillChestWithLoot(this.getServer(), (ServerWorld) world, this.getBlockPos().up(), this.dungeonBossLootTableId);
+            this.world.setBlockState(this.getBlockPos().up(2), Blocks.CHEST.getDefaultState());
+            DungeonPlacementHandler.fillChestWithLoot(this.getServer(), (ServerWorld) world, this.getBlockPos().up(2), this.dungeonBossLootTableId);
 
             List<PlayerEntity> players = this.world.getPlayers(TargetPredicate.createAttackable().setBaseMaxDistance(64.0), this, this.getBoundingBox().expand(64.0, 64.0, 64.0));
             for (int i = 0; i < players.size(); i++) {
