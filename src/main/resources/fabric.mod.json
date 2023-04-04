@@ -9,8 +9,9 @@
     "Zura"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/dungeonz",
+    "sources": "https://github.com/Globox1997/Dungeonz",
+    "issues": "https://github.com/Globox1997/Dungeonz/issues"
   },
   "license": "MIT",
   "icon": "assets/dungeonz/icon.png",
