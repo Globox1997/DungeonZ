@@ -4,7 +4,7 @@ DungeonZ is a mod which adds the basement for creating explorable dungeons.
 
 ### Installation
 
-DungeonZ is a mod built for the [Fabric Loader](https://fabricmc.net/). It requires [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api), [Cloth Config API](https://www.curseforge.com/minecraft/mc-mods/cloth-config) and [LibZ](https://www.curseforge.com/minecraft/mc-mods/libz) to be installed separately; all other dependencies are installed with the mod.
+DungeonZ is a mod built for the [Fabric Loader](https://fabricmc.net/). It requires [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api) to be installed separately; all other dependencies are installed with the mod.
 
 ### License
 
@@ -12,8 +12,8 @@ DungeonZ is licensed under MIT.
 
 ### Datapacks
 
-If you don't know how to create a datapack check out [Data Pack Wiki](https://minecraft.fandom.com/wiki/Data_Pack) website and try to create your first one for the vanilla game.\
-If you know how to create one, the folder path has to be ```data\dungeonz\dungeon\YOURFILE.json```\
+If you don't know how to create a datapack check out [Data Pack Wiki](https://minecraft.fandom.com/wiki/Data_Pack) website and try to create your first one for the vanilla game.
+If you know how to create one, the folder path has to be ```data\dungeonz\dungeon\YOURFILE.json```
 
 ```json
 {
@@ -89,7 +89,7 @@ DungeonZ has an extra field called `"dungeon_type"` which has to be one of the d
 
 ### Advancement
 
-DungeonZ provides a advancement criterion trigger called `dungeonz:dungeon_completion`.\
+DungeonZ provides a advancement criterion trigger called `dungeonz:dungeon_completion`.
 
 ```json
     "criteria": {
