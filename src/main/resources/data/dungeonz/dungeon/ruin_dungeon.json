@@ -1,0 +1,55 @@
+{
+    "dungeon_type": "ruin_dungeon",
+    "difficulty": {
+        "easy": {
+            "mob_modificator": 1.0,
+            "loot_table_ids": [
+                "dungeonz:chests/test_chest_loot"
+            ],
+            "boss_modificator": 3.0,
+            "boss_loot_table_id": "dungeonz:chests/test_chest_loot"
+        },
+        "normal": {
+            "mob_modificator": 1.5,
+            "loot_table_ids": [
+                "dungeonz:chests/test_chest_loot"
+            ],
+            "boss_modificator": 5.0,
+            "boss_loot_table_id": "dungeonz:chests/test_chest_loot"
+        },
+        "hard": {
+            "mob_modificator": 2.0,
+            "loot_table_ids": [
+                "dungeonz:chests/test_chest_loot"
+            ],
+            "boss_modificator": 7.0,
+            "boss_loot_table_id": "dungeonz:chests/test_chest_loot"
+        }
+    },
+    "blocks": {
+        "minecraft:grass_block": {
+            "spawns": [
+                "minecraft:zombie",
+                "minecraft:skeleton"
+            ],
+            "chance": 0.6,
+            "replace": null
+        },
+        "acacia_leaves": {
+            "spawns": [
+                "minecraft:zombie",
+                "minecraft:skeleton"
+            ],
+            "chance": 0.6,
+            "replace": "minecraft:stone"
+        },
+        "minecraft:iron_ore": {
+            "boss_entity": "minecraft:sheep",
+            "replace": null
+        }
+    },
+    "max_group_size": 5,
+    "cooldown": 10000,
+    "dungeon_structure_pool_id": "dungeonz:ruin_dungeon_start",
+    "elytra": false
+}

@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.dungeonz.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "ServerPlayerEntityMixin",
+    "PlayerManagerMixin",
+    "PlayerEntityMixin",
+    "MobEntityMixin"
+  ],
+  "client": [
+    "client.MinecraftClientMixin",
+    "client.IntegratedServerLoaderMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

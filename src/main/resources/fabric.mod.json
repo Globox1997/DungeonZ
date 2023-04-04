@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "dungeonz",
+  "version": "${version}",
+  "name": "DungeonZ",
+  "description": "This mod adds the basement for creating and exploring dungeons",
+  "authors": [
+    "Globox_Z",
+    "Zura"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+  "license": "MIT",
+  "icon": "assets/dungeonz/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.dungeonz.DungeonzMain"
+    ],
+    "client": [
+      "net.dungeonz.DungeonzClient"
+    ]
+  },
+  "mixins": [
+    "dungeonz.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.17",
+    "fabric-api": "*",
+    "minecraft": "1.19.x",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

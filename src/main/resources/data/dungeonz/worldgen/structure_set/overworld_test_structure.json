@@ -1,0 +1,18 @@
+{
+    "structures": [
+        {
+            "structure": "dungeonz:overworld_test_structure",
+            "weight": 1
+        }
+    ],
+    "placement": {
+        "type": "minecraft:random_spread",
+        "salt": 1224466880,
+        "spacing": 2,
+        "separation": 1,
+        "exclusion_zone": {
+            "chunk_count": 10,
+            "other_set": "minecraft:ocean_monuments"
+        }
+    }
+}
