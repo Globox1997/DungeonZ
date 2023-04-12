@@ -15,7 +15,7 @@ import net.minecraft.util.registry.Registry;
 
 public class BlockInit {
 
-    public static final Block DUNGEON_PORTAL = new DungeonPortalBlock(FabricBlockSettings.copy(Blocks.NETHER_PORTAL));
+    public static final Block DUNGEON_PORTAL = new DungeonPortalBlock(FabricBlockSettings.copy(Blocks.END_PORTAL));
 
     public static BlockEntityType<DungeonPortalEntity> DUNGEON_PORTAL_ENTITY;
 

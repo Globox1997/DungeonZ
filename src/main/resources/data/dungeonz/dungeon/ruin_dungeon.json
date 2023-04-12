@@ -33,7 +33,7 @@
                 "minecraft:skeleton"
             ],
             "chance": 0.6,
-            "replace": null
+            "replace": "minecraft:air"
         },
         "acacia_leaves": {
             "spawns": [
@@ -45,6 +45,14 @@
         },
         "minecraft:iron_ore": {
             "boss_entity": "minecraft:sheep",
+            "replace": "minecraft:air"
+        },
+        "minecraft:emerald_ore": {
+            "exit_block": true,
+            "replace": "minecraft:stone_bricks"
+        },
+        "minecraft:diamond_ore": {
+            "boss_loot_block": true,
             "replace": null
         }
     },

@@ -1,0 +1,7 @@
+{
+    "parent": "minecraft:block/cube_all",
+    "textures": {
+        "all": "dungeonz:block/dungeon_portal",
+        "particle": "dungeonz:block/dungeon_portal"
+    }
+}

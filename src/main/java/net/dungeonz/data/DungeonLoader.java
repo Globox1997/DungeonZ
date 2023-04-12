@@ -67,6 +67,8 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                 HashMap<Integer, Float> blockIdEntitySpawnChance = new HashMap<Integer, Float>();
                 HashMap<Integer, Integer> blockIdBlockReplacement = new HashMap<Integer, Integer>();
                 int bossBlockId = -1;
+                int bossLootBlockId = -1;
+                int exitBlockId = -1;
                 EntityType<?> bossEntityType = null;
 
                 while (blockIterator.hasNext()) {
@@ -96,25 +98,35 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                         }
                         bossEntityType = Registry.ENTITY_TYPE.get(new Identifier(specificBlockObject.get("boss_entity").getAsString()));
                         bossBlockId = rawBlockId;
+                    } else if (specificBlockObject.has("exit_block") && specificBlockObject.get("exit_block").getAsBoolean()) {
+                        exitBlockId = rawBlockId;
+                    } else if (specificBlockObject.has("boss_loot_block") && specificBlockObject.get("boss_loot_block").getAsBoolean()) {
+                        bossLootBlockId = rawBlockId;
+                        // blockIdBlockReplacement.put(rawBlockId, -1);
+                        // continue;
+                        // System.out.println("SET BOSS LOOT BLOCK YEJJ " + bossLootBlockId);// DBUSBDÜSUBDUSDBÜISBDÜISBDÜSBDSÜIDVBSÜVDBISVDSZVDPSVDPSVD
+
                     } else {
-                        DungeonzMain.LOGGER.warn("{} has no set spawns or boss entity", blockIterator);
+                        DungeonzMain.LOGGER.warn("{} has no set spawns nor exit block nor boss loot block nor boss entity", blockIterator);
                     }
 
                     if (!specificBlockObject.get("replace").isJsonNull()) {
-                        if (Registry.BLOCK.get(new Identifier(specificBlockObject.get("replace").getAsString())).toString().equals("Block{minecraft:air}")) {
+                        Identifier blockIdentifier = new Identifier(specificBlockObject.get("replace").getAsString());
+                        if (!blockIdentifier.toString().equals("minecraft:air") && Registry.BLOCK.get(blockIdentifier).toString().equals("Block{minecraft:air}")) {
                             DungeonzMain.LOGGER.info("{} is not a valid block identifier", specificBlockObject.get("replace").getAsString());
                         }
-                        blockIdBlockReplacement.put(rawBlockId, Registry.BLOCK.getRawId(Registry.BLOCK.get(new Identifier(specificBlockObject.get("replace").getAsString()))));
+                        blockIdBlockReplacement.put(rawBlockId, Registry.BLOCK.getRawId(Registry.BLOCK.get(blockIdentifier)));
                     } else {
-                        blockIdBlockReplacement.put(rawBlockId, 0);
+                        blockIdBlockReplacement.put(rawBlockId, -1);
                     }
                 }
+                // System.out.println(blockIdBlockReplacement.containsKey(bossLootBlockId) + " ???");
                 if (bossEntityType == null) {
                     DungeonzMain.LOGGER.info("{} has no set boss", data);
                     return;
                 }
                 Dungeon.addDungeon(new Dungeon(dungeonTypeId, blockIdEntityMap, blockIdEntitySpawnChance, blockIdBlockReplacement, difficultyMobModificator, difficultyLootTableIds,
-                        difficultyBossModificator, difficultyBossLootTable, bossEntityType, bossBlockId, maxGroupSize, cooldown, dungeonStructurePoolId));
+                        difficultyBossModificator, difficultyBossLootTable, bossEntityType, bossBlockId, bossLootBlockId, exitBlockId, maxGroupSize, cooldown, dungeonStructurePoolId));
             } catch (Exception e) {
                 DungeonzMain.LOGGER.error("Error occurred while loading resource {}. {}", id.toString(), e.toString());
             }

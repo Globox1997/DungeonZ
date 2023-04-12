@@ -1,10 +1,7 @@
 {
   "variants": {
-    "axis=x": {
-      "model": "dungeonz:block/dungeon_portal_ns"
-    },
-    "axis=z": {
-      "model": "dungeonz:block/dungeon_portal_ew"
+    "": {
+      "model": "dungeonz:block/dungeon_portal"
     }
   }
 }
