@@ -7,7 +7,8 @@
     "ServerPlayerEntityMixin",
     "PlayerManagerMixin",
     "PlayerEntityMixin",
-    "MobEntityMixin"
+    "MobEntityMixin",
+    "SpawnEggItemMixin"
   ],
   "client": [
     "client.MinecraftClientMixin",

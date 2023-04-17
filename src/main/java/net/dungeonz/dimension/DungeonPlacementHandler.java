@@ -2,7 +2,9 @@ package net.dungeonz.dimension;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Optional;
+import java.util.Map.Entry;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -10,12 +12,14 @@ import net.dungeonz.DungeonzMain;
 import net.dungeonz.access.BossEntityAccess;
 import net.dungeonz.access.ServerPlayerAccess;
 import net.dungeonz.block.entity.DungeonPortalEntity;
+import net.dungeonz.block.entity.DungeonSpawnerEntity;
 import net.dungeonz.dungeon.Dungeon;
 import net.dungeonz.init.BlockInit;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.loot.LootTable;
@@ -54,8 +58,8 @@ public class DungeonPlacementHandler {
 
         BlockPos newPos = new BlockPos(0, 0, 0).add(portalPos.getX() * 4, 100, portalPos.getZ());
 
-        System.out.println("ENTER: " + portalPos.getX() + " : " + portalPos.getZ());
-        System.out.println("NEW POS " + newPos);
+        // System.out.println("ENTER: " + portalPos.getX() + " : " + portalPos.getZ());
+        // System.out.println("NEW POS " + newPos);
 
         if (!portalEntity.isDungeonStructureGenerated()) {
             portalEntity.setDungeonStructureGenerated();
@@ -104,6 +108,7 @@ public class DungeonPlacementHandler {
             HashMap<Integer, ArrayList<BlockPos>> blockIdPosMap = new HashMap<Integer, ArrayList<BlockPos>>();
             ArrayList<BlockPos> chestPosList = new ArrayList<BlockPos>();
             ArrayList<BlockPos> exitPosList = new ArrayList<BlockPos>();
+            HashMap<BlockPos, Integer> spawnerPosEntityIdMap = new HashMap<BlockPos, Integer>();
             Block exitBlock = Registry.BLOCK.get(dungeon.getExitBlockId());
             Block bossLootBlock = Registry.BLOCK.get(dungeon.getBossLootBlockId());
 
@@ -122,7 +127,6 @@ public class DungeonPlacementHandler {
                             if (!world.getBlockState(checkPos).isAir()) {
                                 int blockId = Registry.BLOCK.getRawId(world.getBlockState(checkPos).getBlock());
                                 if (dungeon.containsBlockId(blockId)) {
-
                                     if (!blockIdPosMap.containsKey(blockId)) {
                                         ArrayList<BlockPos> newList = new ArrayList<BlockPos>();
                                         newList.add(checkPos);
@@ -138,6 +142,8 @@ public class DungeonPlacementHandler {
                                     exitPosList.add(checkPos);
                                 } else if (world.getBlockState(checkPos).isOf(bossLootBlock)) {
                                     portalEntity.setBossLootBlockPos(checkPos);
+                                } else if (world.getBlockState(checkPos).isOf(BlockInit.DUNGEON_SPAWNER)) {
+                                    spawnerPosEntityIdMap.put(checkPos, ((DungeonSpawnerEntity) world.getBlockEntity(checkPos)).getLogic().getEntityId());
                                 }
                             }
                         }
@@ -148,6 +154,7 @@ public class DungeonPlacementHandler {
             portalEntity.setChestPosList(chestPosList);
             portalEntity.setExitPosList(exitPosList);
             portalEntity.setBlockMap(blockIdPosMap);
+            portalEntity.setSpawnerPosEntityIdMap(spawnerPosEntityIdMap);
             return true;
         }
         return false;
@@ -167,6 +174,8 @@ public class DungeonPlacementHandler {
                 // dungeon.getBlockIdEntitySpawnChanceMap().containsKey(blockId) &&
                 if (dungeon.getBlockIdEntitySpawnChanceMap().get(blockId) <= world.getRandom().nextFloat()) {
                     MobEntity mobEntity = createMob(world, dungeon.getBlockIdEntityMap().get(blockId).get(world.getRandom().nextInt(dungeon.getBlockIdEntityMap().get(blockId).size())));
+                    // hopefully initialize doesn't lead to problems
+                    mobEntity.initialize(world, world.getLocalDifficulty(list.get(i)), SpawnReason.STRUCTURE, null, null);
                     mobEntity.setPersistent();
                     strengthenMob(mobEntity, dungeon, difficulty, false);
                     dungeon.getBlockIdBlockReplacementMap().get(blockId);
@@ -196,11 +205,8 @@ public class DungeonPlacementHandler {
             String lootTableString = dungeon.getDifficultyLootTableIdMap().get(difficulty).get(world.getRandom().nextInt(dungeon.getDifficultyLootTableIdMap().get(difficulty).size()));
             fillChestWithLoot(server, world, portalEntity.getChestPosList().get(i), lootTableString);
         }
-        // already replaced at second line of method except when -1 - NOOO
-        // if (dungeon.getExitBlockId() != -1) {
+
         for (int i = 0; i < portalEntity.getExitPosList().size(); i++) {
-            // dungeon.getBlockIdBlockReplacementMap().get(blockId)
-            // {}
             world.setBlockState(portalEntity.getExitPosList().get(i),
                     dungeon.getBlockIdBlockReplacementMap().containsKey(dungeon.getExitBlockId()) && dungeon.getBlockIdBlockReplacementMap().get(dungeon.getExitBlockId()) != -1
                             ? Registry.BLOCK.get(dungeon.getBlockIdBlockReplacementMap().get(dungeon.getExitBlockId())).getDefaultState()
@@ -213,10 +219,13 @@ public class DungeonPlacementHandler {
                         ? Registry.BLOCK.get(dungeon.getBlockIdBlockReplacementMap().get(dungeon.getBossLootBlockId())).getDefaultState()
                         : Registry.BLOCK.get(dungeon.getBossLootBlockId()).getDefaultState(),
                 3);
-        // world.setBlockState(portalEntity.getBossLootBlockPos(), dungeon.getBlockIdBlockReplacementMap().containsKey(dungeon.getBossLootBlockId()) ? :
-        // Registry.BLOCK.get(dungeon.getBossLootBlockId()).getDefaultState(), 0);
-
-        // }
+        Iterator<Entry<BlockPos, Integer>> iterator = portalEntity.getSpawnerPosEntityIdMap().entrySet().iterator();
+        while (iterator.hasNext()) {
+            Entry<BlockPos, Integer> entry = iterator.next();
+            world.setBlockState(entry.getKey(), BlockInit.DUNGEON_SPAWNER.getDefaultState(), 3);
+            ((DungeonSpawnerEntity) world.getBlockEntity(entry.getKey())).getLogic().setDungeonInfo(dungeon, difficulty,
+                    dungeon.getSpawnerEntityIdMap().containsKey(entry.getValue()) ? dungeon.getSpawnerEntityIdMap().get(entry.getValue()) : 0, Registry.ENTITY_TYPE.get(entry.getValue()));
+        }
     }
 
     public static void fillChestWithLoot(MinecraftServer server, ServerWorld world, BlockPos pos, String lootTableString) {
@@ -242,7 +251,7 @@ public class DungeonPlacementHandler {
         return mobEntity;
     }
 
-    private static void strengthenMob(MobEntity mobEntity, Dungeon dungeon, String difficulty, boolean isBossEntity) {
+    public static void strengthenMob(MobEntity mobEntity, Dungeon dungeon, String difficulty, boolean isBossEntity) {
         double mobHealth = mobEntity.getAttributeValue(EntityAttributes.GENERIC_MAX_HEALTH);
         double mobDamage = 0.0D;
         double mobProtection = 0.0D;

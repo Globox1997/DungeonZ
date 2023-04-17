@@ -74,7 +74,7 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                 while (blockIterator.hasNext()) {
                     String block = blockIterator.next();
                     if (Registry.BLOCK.get(new Identifier(block)).toString().equals("Block{minecraft:air}")) {
-                        DungeonzMain.LOGGER.info("{} is not a valid block identifier", block);
+                        DungeonzMain.LOGGER.warn("{} is not a valid block identifier", block);
                         continue;
                     }
                     int rawBlockId = Registry.BLOCK.getRawId(Registry.BLOCK.get(new Identifier(block)));
@@ -113,20 +113,36 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                     if (!specificBlockObject.get("replace").isJsonNull()) {
                         Identifier blockIdentifier = new Identifier(specificBlockObject.get("replace").getAsString());
                         if (!blockIdentifier.toString().equals("minecraft:air") && Registry.BLOCK.get(blockIdentifier).toString().equals("Block{minecraft:air}")) {
-                            DungeonzMain.LOGGER.info("{} is not a valid block identifier", specificBlockObject.get("replace").getAsString());
+                            DungeonzMain.LOGGER.warn("{} is not a valid block identifier", specificBlockObject.get("replace").getAsString());
                         }
                         blockIdBlockReplacement.put(rawBlockId, Registry.BLOCK.getRawId(Registry.BLOCK.get(blockIdentifier)));
                     } else {
                         blockIdBlockReplacement.put(rawBlockId, -1);
                     }
                 }
-                // System.out.println(blockIdBlockReplacement.containsKey(bossLootBlockId) + " ???");
+
+                JsonObject spawnerObject = data.get("spawner").getAsJsonObject();
+                Iterator<String> spawnerIterator = spawnerObject.keySet().iterator();
+
+                HashMap<Integer, Integer> spawnerEntityIdCountMap = new HashMap<Integer, Integer>();
+
+                while (spawnerIterator.hasNext()) {
+                    String entityString = spawnerIterator.next();
+                    Identifier entityIdentifier = new Identifier(entityString);
+
+                    if (Registry.ENTITY_TYPE.get(entityIdentifier).toString().equals("entity.minecraft.pig")) {
+                        DungeonzMain.LOGGER.warn("{} is not a valid entity identifier", entityString);
+                        continue;
+                    }
+                    spawnerEntityIdCountMap.put(Registry.ENTITY_TYPE.getRawId(Registry.ENTITY_TYPE.get(entityIdentifier)), spawnerObject.get(entityString).getAsInt());
+                }
                 if (bossEntityType == null) {
-                    DungeonzMain.LOGGER.info("{} has no set boss", data);
+                    DungeonzMain.LOGGER.warn("{} has no set boss", data);
                     return;
                 }
-                Dungeon.addDungeon(new Dungeon(dungeonTypeId, blockIdEntityMap, blockIdEntitySpawnChance, blockIdBlockReplacement, difficultyMobModificator, difficultyLootTableIds,
-                        difficultyBossModificator, difficultyBossLootTable, bossEntityType, bossBlockId, bossLootBlockId, exitBlockId, maxGroupSize, cooldown, dungeonStructurePoolId));
+                Dungeon.addDungeon(
+                        new Dungeon(dungeonTypeId, blockIdEntityMap, blockIdEntitySpawnChance, blockIdBlockReplacement, difficultyMobModificator, difficultyLootTableIds, difficultyBossModificator,
+                                difficultyBossLootTable, bossEntityType, bossBlockId, bossLootBlockId, exitBlockId, maxGroupSize, cooldown, dungeonStructurePoolId, spawnerEntityIdCountMap));
             } catch (Exception e) {
                 DungeonzMain.LOGGER.error("Error occurred while loading resource {}. {}", id.toString(), e.toString());
             }

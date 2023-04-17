@@ -23,6 +23,8 @@ public class Dungeon {
     private final HashMap<String, Float> difficultyBossModificator;
     private final HashMap<String, String> difficultyBossLootTable;
 
+    private final HashMap<Integer, Integer> spawnerEntityIdCountMap;
+
     private final EntityType<?> bossEntityType;
     private final int bossBlockId;
     private final int bossLootBlockId;
@@ -37,7 +39,7 @@ public class Dungeon {
     public Dungeon(String dungeonTypeId, HashMap<Integer, List<EntityType<?>>> blockIdEntityMap, HashMap<Integer, Float> blockIdEntitySpawnChance, HashMap<Integer, Integer> blockIdBlockReplacement,
             HashMap<String, Float> difficultyMobModificator, HashMap<String, List<String>> difficultyLootTableIds, HashMap<String, Float> difficultyBossModificator,
             HashMap<String, String> difficultyBossLootTable, EntityType<?> bossEntityType, int bossBlockId, int bossLootBlockId, int exitBlockId, int maxGroupSize, int cooldown,
-            Identifier dungeonStructurePoolId) {
+            Identifier dungeonStructurePoolId, HashMap<Integer, Integer> spawnerEntityIdCountMap) {
         this.dungeonTypeId = dungeonTypeId;
         this.blockIdEntityMap = blockIdEntityMap;
         this.blockIdEntitySpawnChance = blockIdEntitySpawnChance;
@@ -53,6 +55,7 @@ public class Dungeon {
         this.maxGroupSize = maxGroupSize;
         this.cooldown = cooldown;
         this.dungeonStructurePoolId = dungeonStructurePoolId;
+        this.spawnerEntityIdCountMap = spawnerEntityIdCountMap;
     }
 
     public String getDungeonTypeId() {
@@ -89,6 +92,10 @@ public class Dungeon {
 
     public HashMap<String, String> getDifficultyBossLootTableMap() {
         return this.difficultyBossLootTable;
+    }
+
+    public HashMap<Integer, Integer> getSpawnerEntityIdMap() {
+        return this.spawnerEntityIdCountMap;
     }
 
     public EntityType<?> getBossEntityType() {

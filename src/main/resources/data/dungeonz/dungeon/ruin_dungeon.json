@@ -56,6 +56,11 @@
             "replace": null
         }
     },
+    "spawner": {
+        "minecraft:zombie": 10,
+        "minecraft:skeleton": 5,
+        "test": 1
+    },
     "max_group_size": 5,
     "cooldown": 10000,
     "dungeon_structure_pool_id": "dungeonz:ruin_dungeon_start",

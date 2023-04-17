@@ -35,6 +35,8 @@ public class DungeonPortalEntity extends BlockEntity {
     private List<BlockPos> exitPosList = new ArrayList<BlockPos>();
     private BlockPos bossBlockPos = new BlockPos(0, 0, 0);
     private BlockPos bossLootBlockPos = new BlockPos(0, 0, 0);
+    // private List<BlockPos> spawnerPosEntityMap= new ArrayList<BlockPos>();
+    private HashMap<BlockPos, Integer> spawnerPosEntityIdMap = new HashMap<BlockPos, Integer>();
 
     public DungeonPortalEntity(BlockPos pos, BlockState state) {
         super(BlockInit.DUNGEON_PORTAL_ENTITY, pos, state);
@@ -76,6 +78,19 @@ public class DungeonPortalEntity extends BlockEntity {
             this.exitPosList.clear();
             for (int i = 0; i < nbt.getInt("ExitListSize"); i++) {
                 this.exitPosList.add(new BlockPos(nbt.getInt("ExitPosX" + i), nbt.getInt("ExitPosY" + i), nbt.getInt("ExitPosZ" + i)));
+            }
+        }
+        // if (nbt.getInt("SpawnerListSize") > 0) {
+        // this.spawnerPosList.clear();
+        // for (int i = 0; i < nbt.getInt("SpawnerListSize"); i++) {
+        // this.spawnerPosList.add(new BlockPos(nbt.getInt("SpawnerPosX" + i), nbt.getInt("SpawnerPosY" + i), nbt.getInt("SpawnerPosZ" + i)));
+        // }
+        // }
+
+        if (nbt.getInt("SpawnerMapSize") > 0) {
+            this.spawnerPosEntityIdMap.clear();
+            for (int i = 0; i < nbt.getInt("SpawnerListSize"); i++) {
+                this.spawnerPosEntityIdMap.put(new BlockPos(nbt.getInt("SpawnerPosX" + i), nbt.getInt("SpawnerPosY" + i), nbt.getInt("SpawnerPosZ" + i)), nbt.getInt("SpawnerEntityId" + i));
             }
         }
     }
@@ -129,6 +144,27 @@ public class DungeonPortalEntity extends BlockEntity {
                 nbt.putInt("ExitPosX" + i, this.exitPosList.get(i).getX());
                 nbt.putInt("ExitPosY" + i, this.exitPosList.get(i).getY());
                 nbt.putInt("ExitPosZ" + i, this.exitPosList.get(i).getZ());
+            }
+        }
+        // nbt.putInt("SpawnerListSize", this.spawnerPosList.size());
+        // if (this.spawnerPosList.size() > 0) {
+        // for (int i = 0; i < this.spawnerPosList.size(); i++) {
+        // nbt.putInt("SpawnerPosX" + i, this.spawnerPosList.get(i).getX());
+        // nbt.putInt("SpawnerPosY" + i, this.spawnerPosList.get(i).getY());
+        // nbt.putInt("SpawnerPosZ" + i, this.spawnerPosList.get(i).getZ());
+        // }
+        // }
+        nbt.putInt("SpawnerMapSize", this.spawnerPosEntityIdMap.size());
+        if (this.spawnerPosEntityIdMap.size() > 0) {
+            Iterator<Entry<BlockPos, Integer>> iterator = this.spawnerPosEntityIdMap.entrySet().iterator();
+            int count = 0;
+            while (iterator.hasNext()) {
+                Entry<BlockPos, Integer> entry = iterator.next();
+                nbt.putInt("SpawnerPosX" + count, entry.getKey().getX());
+                nbt.putInt("SpawnerPosY" + count, entry.getKey().getY());
+                nbt.putInt("SpawnerPosZ" + count, entry.getKey().getZ());
+                nbt.putInt("SpawnerEntityId" + count, entry.getValue());
+                count++;
             }
         }
     }
@@ -249,6 +285,22 @@ public class DungeonPortalEntity extends BlockEntity {
 
     public List<BlockPos> getExitPosList() {
         return this.exitPosList;
+    }
+
+    // public void setSpawnerPosList(List<BlockPos> spawnerPosList) {
+    // this.spawnerPosList = spawnerPosList;
+    // }
+
+    // public List<BlockPos> getSpawnerPosList() {
+    // return this.spawnerPosList;
+    // }
+
+    public void setSpawnerPosEntityIdMap(HashMap<BlockPos, Integer> spawnerPosEntityIdMap) {
+        this.spawnerPosEntityIdMap = spawnerPosEntityIdMap;
+    }
+
+    public HashMap<BlockPos, Integer> getSpawnerPosEntityIdMap() {
+        return this.spawnerPosEntityIdMap;
     }
 
 }
