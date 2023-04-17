@@ -36,6 +36,7 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                 String dungeonTypeId = data.get("dungeon_type").getAsString();
                 int maxGroupSize = data.get("max_group_size").getAsInt();
                 int cooldown = data.get("cooldown").getAsInt();
+                boolean allowElytra = data.has("elytra") ? data.get("elytra").getAsBoolean() : false;
                 Identifier dungeonStructurePoolId = new Identifier(data.get("dungeon_structure_pool_id").getAsString());
 
                 JsonObject difficultyObject = data.get("difficulty").getAsJsonObject();
@@ -114,6 +115,7 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                         Identifier blockIdentifier = new Identifier(specificBlockObject.get("replace").getAsString());
                         if (!blockIdentifier.toString().equals("minecraft:air") && Registry.BLOCK.get(blockIdentifier).toString().equals("Block{minecraft:air}")) {
                             DungeonzMain.LOGGER.warn("{} is not a valid block identifier", specificBlockObject.get("replace").getAsString());
+                            continue;
                         }
                         blockIdBlockReplacement.put(rawBlockId, Registry.BLOCK.getRawId(Registry.BLOCK.get(blockIdentifier)));
                     } else {
@@ -136,13 +138,37 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                     }
                     spawnerEntityIdCountMap.put(Registry.ENTITY_TYPE.getRawId(Registry.ENTITY_TYPE.get(entityIdentifier)), spawnerObject.get(entityString).getAsInt());
                 }
+                List<Integer> breakableBlockIds = new ArrayList<Integer>();
+                if (data.has("breakable")) {
+                    for (int i = 0; i < data.get("breakable").getAsJsonArray().size(); i++) {
+                        Identifier blockIdentifier = new Identifier(data.get("breakable").getAsJsonArray().get(i).getAsString());
+                        if (Registry.BLOCK.get(blockIdentifier).toString().equals("Block{minecraft:air}")) {
+                            DungeonzMain.LOGGER.warn("{} is not a valid block identifier", data.get("breakable").getAsJsonArray().get(i).getAsString());
+                            continue;
+                        }
+                        breakableBlockIds.add(Registry.BLOCK.getRawId(Registry.BLOCK.get(blockIdentifier)));
+                    }
+                }
+                List<Integer> placeableBlockIds = new ArrayList<Integer>();
+                if (data.has("placeable")) {
+                    for (int i = 0; i < data.get("placeable").getAsJsonArray().size(); i++) {
+                        Identifier blockIdentifier = new Identifier(data.get("placeable").getAsJsonArray().get(i).getAsString());
+                        if (Registry.BLOCK.get(blockIdentifier).toString().equals("Block{minecraft:air}")) {
+                            DungeonzMain.LOGGER.warn("{} is not a valid block identifier", data.get("placeable").getAsJsonArray().get(i).getAsString());
+                            continue;
+                        }
+                        placeableBlockIds.add(Registry.BLOCK.getRawId(Registry.BLOCK.get(blockIdentifier)));
+                    }
+                }
+
                 if (bossEntityType == null) {
                     DungeonzMain.LOGGER.warn("{} has no set boss", data);
                     return;
                 }
-                Dungeon.addDungeon(
-                        new Dungeon(dungeonTypeId, blockIdEntityMap, blockIdEntitySpawnChance, blockIdBlockReplacement, difficultyMobModificator, difficultyLootTableIds, difficultyBossModificator,
-                                difficultyBossLootTable, bossEntityType, bossBlockId, bossLootBlockId, exitBlockId, maxGroupSize, cooldown, dungeonStructurePoolId, spawnerEntityIdCountMap));
+
+                Dungeon.addDungeon(new Dungeon(dungeonTypeId, blockIdEntityMap, blockIdEntitySpawnChance, blockIdBlockReplacement, spawnerEntityIdCountMap, breakableBlockIds, placeableBlockIds,
+                        difficultyMobModificator, difficultyLootTableIds, difficultyBossModificator, difficultyBossLootTable, bossEntityType, bossBlockId, bossLootBlockId, exitBlockId, allowElytra,
+                        maxGroupSize, cooldown, dungeonStructurePoolId));
             } catch (Exception e) {
                 DungeonzMain.LOGGER.error("Error occurred while loading resource {}. {}", id.toString(), e.toString());
             }

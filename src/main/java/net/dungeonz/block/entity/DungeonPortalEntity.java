@@ -11,6 +11,7 @@ import net.dungeonz.dimension.DungeonPlacementHandler;
 import net.dungeonz.dungeon.Dungeon;
 import net.dungeonz.init.BlockInit;
 import net.dungeonz.init.CriteriaInit;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -21,6 +22,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.registry.Registry;
 
 public class DungeonPortalEntity extends BlockEntity {
 
@@ -35,8 +37,8 @@ public class DungeonPortalEntity extends BlockEntity {
     private List<BlockPos> exitPosList = new ArrayList<BlockPos>();
     private BlockPos bossBlockPos = new BlockPos(0, 0, 0);
     private BlockPos bossLootBlockPos = new BlockPos(0, 0, 0);
-    // private List<BlockPos> spawnerPosEntityMap= new ArrayList<BlockPos>();
     private HashMap<BlockPos, Integer> spawnerPosEntityIdMap = new HashMap<BlockPos, Integer>();
+    private HashMap<BlockPos, Integer> replacePosBlockIdMap = new HashMap<BlockPos, Integer>();
 
     public DungeonPortalEntity(BlockPos pos, BlockState state) {
         super(BlockInit.DUNGEON_PORTAL_ENTITY, pos, state);
@@ -49,6 +51,7 @@ public class DungeonPortalEntity extends BlockEntity {
         this.difficulty = nbt.getString("Difficulty");
         this.dungeonStructureGenerated = nbt.getBoolean("DungeonStructureGenerated");
         this.dungeonPlayerUUIDs.clear();
+
         for (int i = 0; i < nbt.getInt("DungeonPlayerCount"); i++) {
             this.dungeonPlayerUUIDs.add(nbt.getUuid("PlayerUUID" + i));
         }
@@ -68,29 +71,33 @@ public class DungeonPortalEntity extends BlockEntity {
         }
 
         this.bossBlockPos = new BlockPos(nbt.getInt("BossPosX"), nbt.getInt("BossPosY"), nbt.getInt("BossPosZ"));
+        this.bossLootBlockPos = new BlockPos(nbt.getInt("BossLootPosX"), nbt.getInt("BossLootPosY"), nbt.getInt("BossLootPosZ"));
+
         if (nbt.getInt("ChestListSize") > 0) {
             this.chestPosList.clear();
             for (int i = 0; i < nbt.getInt("ChestListSize"); i++) {
                 this.chestPosList.add(new BlockPos(nbt.getInt("ChestPosX" + i), nbt.getInt("ChestPosY" + i), nbt.getInt("ChestPosZ" + i)));
             }
         }
+
         if (nbt.getInt("ExitListSize") > 0) {
             this.exitPosList.clear();
             for (int i = 0; i < nbt.getInt("ExitListSize"); i++) {
                 this.exitPosList.add(new BlockPos(nbt.getInt("ExitPosX" + i), nbt.getInt("ExitPosY" + i), nbt.getInt("ExitPosZ" + i)));
             }
         }
-        // if (nbt.getInt("SpawnerListSize") > 0) {
-        // this.spawnerPosList.clear();
-        // for (int i = 0; i < nbt.getInt("SpawnerListSize"); i++) {
-        // this.spawnerPosList.add(new BlockPos(nbt.getInt("SpawnerPosX" + i), nbt.getInt("SpawnerPosY" + i), nbt.getInt("SpawnerPosZ" + i)));
-        // }
-        // }
 
         if (nbt.getInt("SpawnerMapSize") > 0) {
             this.spawnerPosEntityIdMap.clear();
             for (int i = 0; i < nbt.getInt("SpawnerListSize"); i++) {
                 this.spawnerPosEntityIdMap.put(new BlockPos(nbt.getInt("SpawnerPosX" + i), nbt.getInt("SpawnerPosY" + i), nbt.getInt("SpawnerPosZ" + i)), nbt.getInt("SpawnerEntityId" + i));
+            }
+        }
+
+        if (nbt.getInt("ReplacePosSize") > 0) {
+            this.replacePosBlockIdMap.clear();
+            for (int i = 0; i < nbt.getInt("ReplacePosSize"); i++) {
+                this.replacePosBlockIdMap.put(new BlockPos(nbt.getInt("ReplacePosX" + i), nbt.getInt("ReplacePosY" + i), nbt.getInt("ReplacePosZ" + i)), nbt.getInt("ReplaceBlockId" + i));
             }
         }
     }
@@ -129,6 +136,10 @@ public class DungeonPortalEntity extends BlockEntity {
         nbt.putInt("BossPosY", this.bossBlockPos.getY());
         nbt.putInt("BossPosZ", this.bossBlockPos.getZ());
 
+        nbt.putInt("BossLootPosX", this.bossLootBlockPos.getX());
+        nbt.putInt("BossLootPosY", this.bossLootBlockPos.getY());
+        nbt.putInt("BossLootPosZ", this.bossLootBlockPos.getZ());
+
         nbt.putInt("ChestListSize", this.chestPosList.size());
         if (this.chestPosList.size() > 0) {
             for (int i = 0; i < this.chestPosList.size(); i++) {
@@ -146,14 +157,7 @@ public class DungeonPortalEntity extends BlockEntity {
                 nbt.putInt("ExitPosZ" + i, this.exitPosList.get(i).getZ());
             }
         }
-        // nbt.putInt("SpawnerListSize", this.spawnerPosList.size());
-        // if (this.spawnerPosList.size() > 0) {
-        // for (int i = 0; i < this.spawnerPosList.size(); i++) {
-        // nbt.putInt("SpawnerPosX" + i, this.spawnerPosList.get(i).getX());
-        // nbt.putInt("SpawnerPosY" + i, this.spawnerPosList.get(i).getY());
-        // nbt.putInt("SpawnerPosZ" + i, this.spawnerPosList.get(i).getZ());
-        // }
-        // }
+
         nbt.putInt("SpawnerMapSize", this.spawnerPosEntityIdMap.size());
         if (this.spawnerPosEntityIdMap.size() > 0) {
             Iterator<Entry<BlockPos, Integer>> iterator = this.spawnerPosEntityIdMap.entrySet().iterator();
@@ -164,6 +168,20 @@ public class DungeonPortalEntity extends BlockEntity {
                 nbt.putInt("SpawnerPosY" + count, entry.getKey().getY());
                 nbt.putInt("SpawnerPosZ" + count, entry.getKey().getZ());
                 nbt.putInt("SpawnerEntityId" + count, entry.getValue());
+                count++;
+            }
+        }
+
+        nbt.putInt("ReplacePosSize", this.replacePosBlockIdMap.size());
+        if (this.replacePosBlockIdMap.size() > 0) {
+            Iterator<Entry<BlockPos, Integer>> iterator = this.replacePosBlockIdMap.entrySet().iterator();
+            int count = 0;
+            while (iterator.hasNext()) {
+                Entry<BlockPos, Integer> entry = iterator.next();
+                nbt.putInt("ReplacePosX" + count, entry.getKey().getX());
+                nbt.putInt("ReplacePosY" + count, entry.getKey().getY());
+                nbt.putInt("ReplacePosZ" + count, entry.getKey().getZ());
+                nbt.putInt("ReplaceBlockId" + count, entry.getValue());
                 count++;
             }
         }
@@ -184,6 +202,7 @@ public class DungeonPortalEntity extends BlockEntity {
         }
 
         // play dungeon sound
+        System.out.println("BOSS CHEST: " + this.getBossLootBlockPos());
         world.setBlockState(this.getBossLootBlockPos(), Blocks.CHEST.getDefaultState(), 3);
         DungeonPlacementHandler.fillChestWithLoot(world.getServer(), world, this.getBossLootBlockPos(), this.getDungeon().getDifficultyBossLootTableMap().get(this.getDifficulty()));
     }
@@ -287,20 +306,24 @@ public class DungeonPortalEntity extends BlockEntity {
         return this.exitPosList;
     }
 
-    // public void setSpawnerPosList(List<BlockPos> spawnerPosList) {
-    // this.spawnerPosList = spawnerPosList;
-    // }
-
-    // public List<BlockPos> getSpawnerPosList() {
-    // return this.spawnerPosList;
-    // }
-
     public void setSpawnerPosEntityIdMap(HashMap<BlockPos, Integer> spawnerPosEntityIdMap) {
         this.spawnerPosEntityIdMap = spawnerPosEntityIdMap;
     }
 
     public HashMap<BlockPos, Integer> getSpawnerPosEntityIdMap() {
         return this.spawnerPosEntityIdMap;
+    }
+
+    public void setReplaceBlockIdMap(HashMap<BlockPos, Integer> replacePosBlockIdMap) {
+        this.replacePosBlockIdMap = replacePosBlockIdMap;
+    }
+
+    public void addReplaceBlockId(BlockPos pos, Block block) {
+        this.replacePosBlockIdMap.put(pos, Registry.BLOCK.getRawId(block));
+    }
+
+    public HashMap<BlockPos, Integer> getReplaceBlockIdMap() {
+        return this.replacePosBlockIdMap;
     }
 
 }

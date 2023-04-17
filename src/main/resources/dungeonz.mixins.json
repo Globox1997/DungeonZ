@@ -8,11 +8,13 @@
     "PlayerManagerMixin",
     "PlayerEntityMixin",
     "MobEntityMixin",
-    "SpawnEggItemMixin"
+    "SpawnEggItemMixin",
+    "ServerPlayerInteractionManagerMixin"
   ],
   "client": [
     "client.MinecraftClientMixin",
-    "client.IntegratedServerLoaderMixin"
+    "client.IntegratedServerLoaderMixin",
+    "client.ClientPlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

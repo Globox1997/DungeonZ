@@ -12,6 +12,7 @@ import net.dungeonz.init.CriteriaInit;
 import net.dungeonz.init.DimensionInit;
 import net.dungeonz.init.JsonReaderInit;
 import net.dungeonz.init.WorldInit;
+import net.dungeonz.network.DungeonServerPacket;
 import net.fabricmc.api.ModInitializer;
 
 public class DungeonzMain implements ModInitializer {
@@ -24,6 +25,7 @@ public class DungeonzMain implements ModInitializer {
     public void onInitialize() {
         BlockInit.init();
         DimensionInit.init();
+        DungeonServerPacket.init();
         WorldInit.init();
         JsonReaderInit.init();
         CriteriaInit.init();

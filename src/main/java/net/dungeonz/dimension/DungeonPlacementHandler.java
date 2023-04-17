@@ -15,6 +15,7 @@ import net.dungeonz.block.entity.DungeonPortalEntity;
 import net.dungeonz.block.entity.DungeonSpawnerEntity;
 import net.dungeonz.dungeon.Dungeon;
 import net.dungeonz.init.BlockInit;
+import net.dungeonz.network.DungeonServerPacket;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.ChestBlockEntity;
@@ -65,11 +66,14 @@ public class DungeonPlacementHandler {
             portalEntity.setDungeonStructureGenerated();
             spawnDungeonStructure(dungeonWorld, newPos, portalEntity);
         }
+        Dungeon dungeon = portalEntity.getDungeon();
         if (portalEntity.getDungeonPlayerCount() == 0) {
             // set difficulty here
-            refreshDungeon(serverPlayerEntity.server, dungeonWorld, portalEntity, portalEntity.getDungeon(), "easy");
+            refreshDungeon(serverPlayerEntity.server, dungeonWorld, portalEntity, dungeon, "easy");
         }
         portalEntity.joinDungeon(serverPlayerEntity.getUuid());
+        // Sync breakable and other stuff to client
+        DungeonServerPacket.writeS2CDungeonInfoPacket(serverPlayerEntity, dungeon.getBreakableBlockIdList(), dungeon.getplaceableBlockIdList(), dungeon.isElytraAllowed());
 
         return new TeleportTarget(Vec3d.of(newPos).add(0.5, 0, 0.5), Vec3d.ZERO, 0, 0);
     }
@@ -219,13 +223,22 @@ public class DungeonPlacementHandler {
                         ? Registry.BLOCK.get(dungeon.getBlockIdBlockReplacementMap().get(dungeon.getBossLootBlockId())).getDefaultState()
                         : Registry.BLOCK.get(dungeon.getBossLootBlockId()).getDefaultState(),
                 3);
-        Iterator<Entry<BlockPos, Integer>> iterator = portalEntity.getSpawnerPosEntityIdMap().entrySet().iterator();
-        while (iterator.hasNext()) {
-            Entry<BlockPos, Integer> entry = iterator.next();
+
+        Iterator<Entry<BlockPos, Integer>> spawnerPosIterator = portalEntity.getSpawnerPosEntityIdMap().entrySet().iterator();
+        while (spawnerPosIterator.hasNext()) {
+            Entry<BlockPos, Integer> entry = spawnerPosIterator.next();
             world.setBlockState(entry.getKey(), BlockInit.DUNGEON_SPAWNER.getDefaultState(), 3);
             ((DungeonSpawnerEntity) world.getBlockEntity(entry.getKey())).getLogic().setDungeonInfo(dungeon, difficulty,
                     dungeon.getSpawnerEntityIdMap().containsKey(entry.getValue()) ? dungeon.getSpawnerEntityIdMap().get(entry.getValue()) : 0, Registry.ENTITY_TYPE.get(entry.getValue()));
         }
+
+        Iterator<Entry<BlockPos, Integer>> replaceBlockIterator = portalEntity.getReplaceBlockIdMap().entrySet().iterator();
+        while (replaceBlockIterator.hasNext()) {
+            Entry<BlockPos, Integer> entry = replaceBlockIterator.next();
+            world.setBlockState(entry.getKey(), Registry.BLOCK.get(entry.getValue()).getDefaultState(), 3);
+        }
+
+        // Todo: Weather in dungeon has to set to always non rain
     }
 
     public static void fillChestWithLoot(MinecraftServer server, ServerWorld world, BlockPos pos, String lootTableString) {

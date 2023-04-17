@@ -58,11 +58,16 @@
     },
     "spawner": {
         "minecraft:zombie": 10,
-        "minecraft:skeleton": 5,
-        "test": 1
+        "minecraft:skeleton": 5
     },
+    "breakable": [
+        "minecraft:stone"
+    ],
+    "placeable": [
+        "minecraft:stone"
+    ],
+    "elytra": false,
     "max_group_size": 5,
     "cooldown": 10000,
-    "dungeon_structure_pool_id": "dungeonz:ruin_dungeon_start",
-    "elytra": false
+    "dungeon_structure_pool_id": "dungeonz:ruin_dungeon_start"
 }
