@@ -6,7 +6,6 @@ import net.dungeonz.block.screen.DungeonPortalScreenHandler;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
-import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
@@ -26,7 +25,6 @@ public class BlockInit {
     public static BlockEntityType<DungeonPortalEntity> DUNGEON_PORTAL_ENTITY;
     public static BlockEntityType<DungeonSpawnerEntity> DUNGEON_SPAWNER_ENTITY;
 
-    // public static ScreenHandlerType<?> PORTAL;// = new ScreenHandlerType<>(DungeonPortalScreenHandler::new);
     public static final ScreenHandlerType<DungeonPortalScreenHandler> PORTAL = new ExtendedScreenHandlerType<>(DungeonPortalScreenHandler::new);
 
     public static void init() {
@@ -41,10 +39,5 @@ public class BlockInit {
                 FabricBlockEntityTypeBuilder.create(DungeonSpawnerEntity::new, DUNGEON_SPAWNER).build(null));
 
         Registry.register(Registry.SCREEN_HANDLER, "dungeonz:portal", PORTAL);
-        // PORTAL= Registry.register(Registry.SCREEN_HANDLER, "dungeonz:portal", new ScreenHandlerType<>((syncId, inventory) -> new DungeonPortalScreenHandler(syncId, inventory, buf)));
-
-        // REFORGE_SCREEN_HANDLER_TYPE = Registry.register(Registry.SCREEN_HANDLER, "tiered",
-        // new ScreenHandlerType<>((syncId, inventory) -> new ReforgeScreenHandler(syncId, inventory, ScreenHandlerContext.EMPTY)));
-        // PORTAL = ScreenHandlerRegistry.registerSimple(BOX, BoxScreenHandler::new);
     }
 }

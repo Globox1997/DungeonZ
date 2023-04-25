@@ -2,11 +2,9 @@ package net.dungeonz.block.screen;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.Map.Entry;
 
 import net.dungeonz.block.entity.DungeonPortalEntity;
 import net.dungeonz.init.BlockInit;
@@ -15,11 +13,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.screen.AnvilScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public class DungeonPortalScreenHandler extends ScreenHandler {
@@ -29,12 +25,9 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
     private final DungeonPortalEntity dungeonPortalEntity;
     private BlockPos pos;
 
-    // private List<UUID> dungeonPlayerUUIDs = new ArrayList<UUID>();
     private List<String> difficulties = new ArrayList<String>();
     private Map<String, List<ItemStack>> possibleLootDifficultyItemStackMap = new HashMap<String, List<ItemStack>>();
     private List<ItemStack> requiredItemStacks = new ArrayList<ItemStack>();
-    // private int maxPlayerCount = 0;
-    // private int cooldown = 0;
 
     public DungeonPortalScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
         this(syncId, playerInventory, new DungeonPortalEntity(buf.readBlockPos(), playerInventory.player.world.getBlockState(buf.readBlockPos())), ScreenHandlerContext.EMPTY);
@@ -83,8 +76,6 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         this.setMaxPlayerCount(maxGroupSize);
         this.setCooldown(cooldown);
         this.setDifficulty(difficulty);
-
-        // System.out.println("SET ON CLIENT? " + difficulty + " : " + difficulties);
     }
 
     public DungeonPortalScreenHandler(int syncId, PlayerInventory playerInventory, DungeonPortalEntity dungeonPortalEntity, ScreenHandlerContext context) {
@@ -93,22 +84,12 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         this.world = playerInventory.player.world;
         this.dungeonPortalEntity = dungeonPortalEntity;
         this.pos = dungeonPortalEntity.getPos();
-        // System.out.println(this.dungeonPortalEntity);
 
-        // setDungeonPlayerUUIDs(this.dungeonPortalEntity.getDungeonPlayerUUIDs());
         if (!this.world.isClient) {
             setDifficulties(this.dungeonPortalEntity.getDungeon().getDifficultyList());
             setRequiredItemStacks(DungeonHelper.getRequiredItemStackList(this.dungeonPortalEntity.getDungeon()));
-            // System.out.println(this.world);
-            // System.out.println(this.world.getServer());
-            // System.out.println(playerInventory.player.getServer());
-            // System.out.println(dungeonPortalEntity.getWorld().getServer());
             setPossibleLootItemStacks(DungeonHelper.getPossibleLootItemStackMap(this.dungeonPortalEntity.getDungeon(), this.world.getServer()));
         }
-        // setRequiredItemStacks(requiredItemStacks);
-        // setMaxPlayerCount(this.dungeonPortalEntity.getMaxGroupSize());
-        // setCooldown(this.dungeonPortalEntity.getCooldown());
-
     }
 
     @Override
@@ -132,54 +113,6 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         }, true);
     }
 
-    // public List<UUID> getDungeonPlayerUUIDs() {
-    // return this.dungeonPlayerUUIDs;
-    // }
-
-    // public void setDungeonPlayerUUIDs(List<UUID> dungeonPlayerUUIDs) {
-    // this.dungeonPlayerUUIDs = dungeonPlayerUUIDs;
-    // }
-
-    // public List<String> getDifficulties() {
-    // return this.difficulties;
-    // }
-
-    // public void setDifficulties(List<String> difficulties) {
-    // this.difficulties = difficulties;
-    // }
-
-    // public Map<String, ItemStack> getPossibleLootDifficultyItemStackMap() {
-    // return this.possibleLootDifficultyItemStackMap;
-    // }
-
-    // public void setPossibleLootItemStacks(Map<String, ItemStack> possibleLootDifficultyItemStackMap) {
-    // this.possibleLootDifficultyItemStackMap = possibleLootDifficultyItemStackMap;
-    // }
-
-    // public List<ItemStack> getRequiredItemStacks() {
-    // return this.requiredItemStacks;
-    // }
-
-    // public void setRequiredItemStacks(List<ItemStack> requiredItemStacks) {
-    // this.requiredItemStacks = requiredItemStacks;
-    // }
-
-    // public int getMaxPlayerCount() {
-    // return this.maxPlayerCount;
-    // }
-
-    // public void setMaxPlayerCount(int maxPlayerCount) {
-    // this.maxPlayerCount = maxPlayerCount;
-    // }
-
-    // public int getCooldown() {
-    // return this.cooldown;
-    // }
-
-    // public void setCooldown(int cooldown) {
-    // this.cooldown = cooldown;
-    // }
-
     public List<UUID> getDungeonPlayerUUIDs() {
         return this.dungeonPortalEntity.getDungeonPlayerUUIDs();
     }
@@ -190,7 +123,6 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
 
     public List<String> getDifficulties() {
         return this.difficulties;
-        // return this.dungeonPortalEntity.getDungeon().getDifficultyList();
     }
 
     public void setDifficulties(List<String> difficulties) {
