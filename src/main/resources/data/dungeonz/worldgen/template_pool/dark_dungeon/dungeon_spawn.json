@@ -1,0 +1,15 @@
+{
+    "name": "dungeonz:dungeon_spawn",
+    "fallback": "minecraft:empty",
+    "elements": [
+        {
+            "weight": 1,
+            "element": {
+                "location": "dungeonz:dungeon_spawn",
+                "processors": "minecraft:empty",
+                "projection": "rigid",
+                "element_type": "minecraft:single_pool_element"
+            }
+        }
+    ]
+}

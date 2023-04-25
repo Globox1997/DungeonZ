@@ -1,4 +1,4 @@
-package net.dungeonz.mixin;
+package net.dungeonz.mixin.item;
 
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;

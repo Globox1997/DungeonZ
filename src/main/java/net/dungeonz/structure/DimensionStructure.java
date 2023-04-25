@@ -137,7 +137,9 @@ public class DimensionStructure extends Structure {
 
         if (!list.isEmpty()) {
             System.out.println(list.size() + " PORTAL POS AT: " + list.get(0) + " In OVERWORLD " + world.getBlockState(list.get(0)));
-            ((DungeonPortalEntity) world.getBlockEntity(list.get(0))).setDungeonType(dungeonType);
+            DungeonPortalEntity dungeonPortalEntity = (DungeonPortalEntity) world.getBlockEntity(list.get(0));
+            dungeonPortalEntity.setDungeonType(dungeonType);
+            dungeonPortalEntity.setDifficulty(dungeonPortalEntity.getDungeon().getDifficultyList().get(0));
 
             // DungeonPortalEntity dungeonPortalEntity = (DungeonPortalEntity) world.getBlockEntity(list.get(0));
             // dungeonPortalEntity.s

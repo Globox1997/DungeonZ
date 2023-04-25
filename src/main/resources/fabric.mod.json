@@ -22,6 +22,9 @@
     ],
     "client": [
       "net.dungeonz.DungeonzClient"
+    ],
+    "modmenu": [
+      "net.dungeonz.config.ModMenuIntegration"
     ]
   },
   "mixins": [

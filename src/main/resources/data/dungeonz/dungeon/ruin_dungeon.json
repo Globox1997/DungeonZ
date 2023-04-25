@@ -66,8 +66,11 @@
     "placeable": [
         "minecraft:stone"
     ],
+    "required": {
+        "minecraft:stick": 3
+    },
     "elytra": false,
     "max_group_size": 5,
     "cooldown": 10000,
-    "dungeon_structure_pool_id": "dungeonz:ruin_dungeon_start"
+    "dungeon_structure_pool_id": "dungeonz:dark_dungeon/dungeon_spawn"
 }

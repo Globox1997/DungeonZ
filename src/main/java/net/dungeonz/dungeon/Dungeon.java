@@ -20,6 +20,8 @@ public class Dungeon {
 
     private final HashMap<Integer, Integer> spawnerEntityIdCountMap;
 
+    private final HashMap<Integer, Integer> requiredItemCountMap;
+
     private final List<Integer> breakableBlockIds;
     private final List<Integer> placeableBlockIds;
 
@@ -42,14 +44,16 @@ public class Dungeon {
     private final Identifier dungeonStructurePoolId;
 
     public Dungeon(String dungeonTypeId, HashMap<Integer, List<EntityType<?>>> blockIdEntityMap, HashMap<Integer, Float> blockIdEntitySpawnChance, HashMap<Integer, Integer> blockIdBlockReplacement,
-            HashMap<Integer, Integer> spawnerEntityIdCountMap, List<Integer> breakableBlockIds, List<Integer> placeableBlockIds, HashMap<String, Float> difficultyMobModificator,
-            HashMap<String, List<String>> difficultyLootTableIds, HashMap<String, Float> difficultyBossModificator, HashMap<String, String> difficultyBossLootTable, EntityType<?> bossEntityType,
-            int bossBlockId, int bossLootBlockId, int exitBlockId, boolean allowElytra, int maxGroupSize, int cooldown, Identifier dungeonStructurePoolId) {
+            HashMap<Integer, Integer> spawnerEntityIdCountMap, HashMap<Integer, Integer> requiredItemCountMap, List<Integer> breakableBlockIds, List<Integer> placeableBlockIds,
+            HashMap<String, Float> difficultyMobModificator, HashMap<String, List<String>> difficultyLootTableIds, HashMap<String, Float> difficultyBossModificator,
+            HashMap<String, String> difficultyBossLootTable, EntityType<?> bossEntityType, int bossBlockId, int bossLootBlockId, int exitBlockId, boolean allowElytra, int maxGroupSize, int cooldown,
+            Identifier dungeonStructurePoolId) {
         this.dungeonTypeId = dungeonTypeId;
         this.blockIdEntityMap = blockIdEntityMap;
         this.blockIdEntitySpawnChance = blockIdEntitySpawnChance;
         this.blockIdBlockReplacement = blockIdBlockReplacement;
         this.spawnerEntityIdCountMap = spawnerEntityIdCountMap;
+        this.requiredItemCountMap = requiredItemCountMap;
         this.breakableBlockIds = breakableBlockIds;
         this.placeableBlockIds = placeableBlockIds;
         this.difficultyMobModificator = difficultyMobModificator;
@@ -108,6 +112,10 @@ public class Dungeon {
 
     public HashMap<Integer, Integer> getSpawnerEntityIdMap() {
         return this.spawnerEntityIdCountMap;
+    }
+
+    public HashMap<Integer, Integer> getRequiredItemCountMap() {
+        return this.requiredItemCountMap;
     }
 
     public List<Integer> getBreakableBlockIdList() {

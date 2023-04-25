@@ -10,5 +10,5 @@
     },
     "project_start_to_heightmap": "WORLD_SURFACE_WG",
     "spawn_overrides": {},
-    "dungeon_type": "ruin_dungeon"
+    "dungeon_type": "dark_dungeon"
 }

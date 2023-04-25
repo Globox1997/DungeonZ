@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import net.dungeonz.dungeon.Dungeon;
 import net.dungeonz.init.BlockInit;
+import net.dungeonz.init.ConfigInit;
 import net.dungeonz.init.CriteriaInit;
 import net.dungeonz.init.DimensionInit;
 import net.dungeonz.init.JsonReaderInit;
@@ -29,6 +30,7 @@ public class DungeonzMain implements ModInitializer {
         WorldInit.init();
         JsonReaderInit.init();
         CriteriaInit.init();
+        ConfigInit.init();
     }
 
 }

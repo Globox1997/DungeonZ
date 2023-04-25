@@ -4,12 +4,24 @@
   "package": "net.dungeonz.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "MinecraftServerMixin",
     "ServerPlayerEntityMixin",
     "PlayerManagerMixin",
     "PlayerEntityMixin",
     "MobEntityMixin",
-    "SpawnEggItemMixin",
-    "ServerPlayerInteractionManagerMixin"
+    "ServerPlayerInteractionManagerMixin",
+    "ExplosionMixin",
+    "block.VineBlockMixin",
+    "block.SaplingBlockMixin",
+    "block.AbstractPlantStemBlockMixin",
+    "block.SugarCaneBlockMixin",
+    "block.CropBlockMixin",
+    "block.BambooBlockMixin",
+    "block.StemBlockMixin",
+    "block.SpreadableBlockMixin",
+    "block.FireBlockMixin",
+    "item.SpawnEggItemMixin",
+    "item.BoneMealItemMixin"
   ],
   "client": [
     "client.MinecraftClientMixin",

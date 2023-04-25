@@ -1,0 +1,15 @@
+{
+    "name": "dungeonz:dungeon_left_connectorroom_parkour",
+    "fallback": "minecraft:empty",
+    "elements": [
+        {
+            "weight": 1,
+            "element": {
+                "location": "dungeonz:dungeon_left_connectorroom_parkour",
+                "processors": "minecraft:empty",
+                "projection": "rigid",
+                "element_type": "minecraft:single_pool_element"
+            }
+        }
+    ]
+}

@@ -5,5 +5,20 @@
     "dungeonz.difficulty": "Difficulty",
     "dungeonz.difficulty.easy": "Easy",
     "dungeonz.difficulty.normal": "Normal",
-    "dungeonz.difficulty.hard": "Hard"
+    "dungeonz.difficulty.hard": "Hard",
+    "dungeonz.difficulty.extreme": "Extreme",
+
+    "container.dungeon_portal": "Dungeon Portal",
+    "dungeon.task.join": "Join",
+    "dungeon.task.leave": "Leave",
+    "dungeon.ruin_dungeon": "Ruin Dungeon",
+    "dungeon.dark_dungeon": "Dark Dungeon",
+
+    "text.dungeonz.empty_name": "-",
+    "text.dungeonz.player_list": "Players (%d/%d)",
+    "text.dungeonz.dungeon_full": "Dungeon is full",
+    "text.dungeonz.dungeon_portal_missing": "No dungeon found",
+
+    "text.autoconfig.dungeonz.title": "DungeonZ Config",
+    "text.autoconfig.dungeonz.option.devMode": "Dev Mode"
 }

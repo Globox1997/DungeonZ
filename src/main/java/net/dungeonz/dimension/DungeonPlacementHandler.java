@@ -54,10 +54,11 @@ import net.minecraft.world.gen.structure.Structure;
 
 public class DungeonPlacementHandler {
 
-    public static TeleportTarget enter(ServerPlayerEntity serverPlayerEntity, ServerWorld dungeonWorld, ServerWorld oldWorld, DungeonPortalEntity portalEntity, BlockPos portalPos) {
+    public static TeleportTarget enter(ServerPlayerEntity serverPlayerEntity, ServerWorld dungeonWorld, ServerWorld oldWorld, DungeonPortalEntity portalEntity, BlockPos portalPos,
+            String difficulty) {
         ((ServerPlayerAccess) serverPlayerEntity).setDungeonInfo(oldWorld, portalPos, serverPlayerEntity.getBlockPos());
 
-        BlockPos newPos = new BlockPos(0, 0, 0).add(portalPos.getX() * 4, 100, portalPos.getZ());
+        BlockPos newPos = new BlockPos(0, 0, 0).add(portalPos.getX() * 16, 100, portalPos.getZ() * 16);
 
         // System.out.println("ENTER: " + portalPos.getX() + " : " + portalPos.getZ());
         // System.out.println("NEW POS " + newPos);
@@ -69,7 +70,7 @@ public class DungeonPlacementHandler {
         Dungeon dungeon = portalEntity.getDungeon();
         if (portalEntity.getDungeonPlayerCount() == 0) {
             // set difficulty here
-            refreshDungeon(serverPlayerEntity.server, dungeonWorld, portalEntity, dungeon, "easy");
+            refreshDungeon(serverPlayerEntity.server, dungeonWorld, portalEntity, dungeon, difficulty);
         }
         portalEntity.joinDungeon(serverPlayerEntity.getUuid());
         // Sync breakable and other stuff to client
@@ -96,7 +97,7 @@ public class DungeonPlacementHandler {
         // has to be the template_pool name
         RegistryEntry<StructurePool> registryEntry = registry.entryOf(RegistryKey.of(Registry.STRUCTURE_POOL_KEY, portalEntity.getDungeon().getStructurePoolId()));
         // has to be the first jigsaw block to generate of
-        generate((ServerWorld) world, portalEntity, portalEntity.getDungeon(), registryEntry, new Identifier("dungeonz:spawn"), 16, pos, false);
+        generate((ServerWorld) world, portalEntity, portalEntity.getDungeon(), registryEntry, new Identifier("dungeonz:spawn"), 64, pos, false);
     }
 
     private static boolean generate(ServerWorld world, DungeonPortalEntity portalEntity, Dungeon dungeon, RegistryEntry<StructurePool> structurePool, Identifier id, int size, BlockPos pos,
@@ -107,7 +108,7 @@ public class DungeonPlacementHandler {
         Random random = world.getRandom();
         Structure.Context context = new Structure.Context(world.getRegistryManager(), chunkGenerator, chunkGenerator.getBiomeSource(), world.getChunkManager().getNoiseConfig(),
                 structureTemplateManager, world.getSeed(), new ChunkPos(pos), world, registryEntry -> true);
-        Optional<Structure.StructurePosition> optional = StructurePoolBasedGenerator.generate(context, structurePool, Optional.of(id), size, pos, false, Optional.empty(), 128);
+        Optional<Structure.StructurePosition> optional = StructurePoolBasedGenerator.generate(context, structurePool, Optional.of(id), size, pos, false, Optional.empty(), 512);
         if (optional.isPresent()) {
             HashMap<Integer, ArrayList<BlockPos>> blockIdPosMap = new HashMap<Integer, ArrayList<BlockPos>>();
             ArrayList<BlockPos> chestPosList = new ArrayList<BlockPos>();
@@ -119,10 +120,13 @@ public class DungeonPlacementHandler {
             StructurePiecesCollector structurePiecesCollector = optional.get().generate();
             for (StructurePiece structurePiece : structurePiecesCollector.toList().pieces()) {
                 if (!(structurePiece instanceof PoolStructurePiece)) {
+                    // System.out.println("???? " + structurePiece.getType());
                     continue;
                 }
                 PoolStructurePiece poolStructurePiece = (PoolStructurePiece) structurePiece;
                 poolStructurePiece.generate((StructureWorldAccess) world, structureAccessor, chunkGenerator, random, BlockBox.infinite(), pos, keepJigsaws);
+
+                // System.out.println(structurePiece.getType() + " : " + structurePiece.getChainLength());
 
                 for (int i = poolStructurePiece.getBoundingBox().getMinX(); i <= poolStructurePiece.getBoundingBox().getMaxX(); i++) {
                     for (int u = poolStructurePiece.getBoundingBox().getMinY(); u <= poolStructurePiece.getBoundingBox().getMaxY(); u++) {
@@ -238,7 +242,7 @@ public class DungeonPlacementHandler {
             world.setBlockState(entry.getKey(), Registry.BLOCK.get(entry.getValue()).getDefaultState(), 3);
         }
 
-        // Todo: Weather in dungeon has to set to always non rain
+        // Todo: Remove all item entities laying around here
     }
 
     public static void fillChestWithLoot(MinecraftServer server, ServerWorld world, BlockPos pos, String lootTableString) {

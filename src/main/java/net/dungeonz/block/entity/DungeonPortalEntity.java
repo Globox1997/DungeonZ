@@ -7,25 +7,36 @@ import java.util.List;
 import java.util.UUID;
 import java.util.Map.Entry;
 
+import org.jetbrains.annotations.Nullable;
+
+import net.dungeonz.block.screen.DungeonPortalScreenHandler;
 import net.dungeonz.dimension.DungeonPlacementHandler;
 import net.dungeonz.dungeon.Dungeon;
 import net.dungeonz.init.BlockInit;
 import net.dungeonz.init.CriteriaInit;
+import net.dungeonz.network.DungeonServerPacket;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.registry.Registry;
 
-public class DungeonPortalEntity extends BlockEntity {
+public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
 
+    private Text title = Text.translatable("container.dungeon_portal");
     private String dungeonType = "";
     private String difficulty = "";
     private boolean dungeonStructureGenerated = false;
@@ -187,6 +198,60 @@ public class DungeonPortalEntity extends BlockEntity {
         }
     }
 
+    @Override
+    public Text getDisplayName() {
+        if (this.getDungeon() != null) {
+            return Text.translatable("dungeon." + this.getDungeonType());
+        }
+        return title;
+    }
+
+    @Override
+    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+        return new DungeonPortalScreenHandler(syncId, playerInventory, this, ScreenHandlerContext.create(world, pos));
+    }
+
+    @Override
+    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+        buf.writeBlockPos(this.pos);
+        buf.writeBlockPos(this.pos);
+        buf.writeBlockPos(this.pos);
+
+        buf.writeInt(this.getDungeonPlayerCount());
+        for (int i = 0; i < this.getDungeonPlayerCount(); i++) {
+            buf.writeUuid(this.getDungeonPlayerUUIDs().get(i));
+        }
+        System.out.println("HAS DUNGEON? " + this.getDungeon());
+
+        if (this.getDungeon() != null) {
+            // Difficulty
+            buf.writeInt(this.getDungeon().getDifficultyList().size());
+            for (int i = 0; i < this.getDungeon().getDifficultyList().size(); i++) {
+                buf.writeString(this.getDungeon().getDifficultyList().get(i));
+            }
+            // Possible Loot Items
+            buf.writeInt(this.getDungeon().getDifficultyBossLootTableMap().size());
+            // Map<String,I
+            // buf.writeMap(dungeonPortalEntity.getDungeon().getDifficultyBossLootTableMap(), PacketByteBuf::writeString, PacketByteBuf::writeItemStack);
+            // Required Items
+            buf.writeInt(this.getDungeon().getRequiredItemCountMap().size());
+            // Iterator<Entry<Integer, Integer>> requiredItemIterator = dungeonPortalEntity.getDungeon().getRequiredItemCountMap().entrySet().iterator();
+            // while (requiredItemIterator.hasNext()) {
+            // Entry<Integer, Integer> entry = requiredItemIterator.next();
+            // buf.writeItemStack(new ItemStack(Registry.ITEM.get(entry.getKey()), entry.getValue()));
+            // }
+        } else {
+            buf.writeInt(0);
+            buf.writeInt(0);
+            buf.writeInt(0);
+        }
+
+        buf.writeInt(this.getMaxGroupSize());
+        buf.writeInt(this.getCooldown());
+        buf.writeString(this.getDifficulty());
+        // DungeonServerPacket.writeS2CDungeonScreenPacket(player, (DungeonPortalEntity) world.getBlockEntity(pos));
+    }
+
     public void finishDungeon(ServerWorld world, BlockPos pos) {
         List<PlayerEntity> players = world.getPlayers(TargetPredicate.createAttackable().setBaseMaxDistance(64.0), null, new Box(pos).expand(64.0, 64.0, 64.0));
         for (int i = 0; i < players.size(); i++) {
@@ -202,13 +267,17 @@ public class DungeonPortalEntity extends BlockEntity {
         }
 
         // play dungeon sound
-        System.out.println("BOSS CHEST: " + this.getBossLootBlockPos());
+        // System.out.println("BOSS CHEST: " + this.getBossLootBlockPos());
         world.setBlockState(this.getBossLootBlockPos(), Blocks.CHEST.getDefaultState(), 3);
         DungeonPlacementHandler.fillChestWithLoot(world.getServer(), world, this.getBossLootBlockPos(), this.getDungeon().getDifficultyBossLootTableMap().get(this.getDifficulty()));
+
+        this.setCooldown(this.getDungeon().getCooldown());
     }
 
+    @Nullable
     public Dungeon getDungeon() {
-        return Dungeon.getDungeon(this.dungeonType);
+        return Dungeon.getDungeon("dark_dungeon");
+        // return Dungeon.getDungeon(this.dungeonType);
     }
 
     public void setDungeonType(String dungeonType) {
@@ -216,7 +285,8 @@ public class DungeonPortalEntity extends BlockEntity {
     }
 
     public String getDungeonType() {
-        return this.dungeonType;
+        return "dark_dungeon";
+        // return this.dungeonType;
     }
 
     public void setDifficulty(String difficulty) {
@@ -247,6 +317,14 @@ public class DungeonPortalEntity extends BlockEntity {
 
     public int getDungeonPlayerCount() {
         return this.dungeonPlayerUUIDs.size();
+    }
+
+    public void setDungeonPlayerUUIDs(List<UUID> dungeonPlayerUUIDs) {
+        this.dungeonPlayerUUIDs = dungeonPlayerUUIDs;
+    }
+
+    public List<UUID> getDungeonPlayerUUIDs() {
+        return this.dungeonPlayerUUIDs;
     }
 
     // Might lead to issues if using "="
