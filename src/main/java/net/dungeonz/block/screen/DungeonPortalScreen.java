@@ -8,10 +8,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.dungeonz.init.ConfigInit;
 import net.dungeonz.init.DimensionInit;
 import net.dungeonz.network.DungeonClientPacket;
+import net.dungeonz.util.InventoryHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ingame.EnchantmentScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
@@ -89,7 +91,8 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
             } else {
                 this.difficultyButton.setDisabled(false);
             }
-            if (this.handler.getDungeonPlayerUUIDs().size() < this.handler.getMaxPlayerCount()) {
+            if (this.handler.getDungeonPlayerUUIDs().size() < this.handler.getMaxPlayerCount()
+                    && InventoryHelper.hasRequiredItemStacks(this.playerEntity.getInventory(), this.handler.getRequiredItemStacks())) {
                 this.dungeonButton.setDisabled(false);
             } else {
                 this.dungeonButton.setDisabled(true);
@@ -143,19 +146,50 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
 
         // Dungeon player list
         int k = this.y + ConfigInit.CONFIG.test1;
-        this.textRenderer.draw(matrices, Text.translatable("text.dungeonz.player_list", this.handler.getDungeonPlayerUUIDs().size(), this.handler.getMaxPlayerCount()), this.x + 5, this.y + 15,
+        this.textRenderer.draw(matrices, Text.translatable("text.dungeonz.player_list", this.handler.getDungeonPlayerUUIDs().size(), this.handler.getMaxPlayerCount()), this.x + 8, this.y + 15,
                 0x3F3F3F);
         for (int i = 0; i < this.handler.getDungeonPlayerUUIDs().size() && i < 10; i++) {
             String playerName = getPlayerName(this.handler.getDungeonPlayerUUIDs().get(i), 60, 10).getString();
             if (i == 9) {
                 playerName = "...";
             }
-            this.textRenderer.draw(matrices, playerName, this.x + 10, k, 0xFFFFFF);
+            this.textRenderer.draw(matrices, playerName, this.x + 12, k, 0xFFFFFF);
             k += 13;
         }
-        // Difficulty
-        // this.textRenderer.draw(matrices, Text.translatable("dungeonz.difficulty"), this.x + ConfigInit.CONFIG.test2, this.y + 15, 0x3F3F3F);
+        // Required items
+        this.textRenderer.draw(matrices, Text.translatable("text.dungeonz.required"), this.x + ConfigInit.CONFIG.test6, this.y + ConfigInit.CONFIG.test7, 0x3F3F3F);
+        RenderSystem.setShaderTexture(0, TEXTURE);
+        this.drawTexture(matrices, this.x + ConfigInit.CONFIG.test6 + 2 + this.textRenderer.getWidth(Text.translatable("text.dungeonz.required")), this.y - 3 + ConfigInit.CONFIG.test7,
+                228 + (InventoryHelper.hasRequiredItemStacks(this.playerEntity.getInventory(), this.handler.getRequiredItemStacks()) ? 0 : 14), 0, 14, 14);
 
+        if (this.handler.getRequiredItemStacks().size() > 0) {
+            int l = 0;
+            for (int i = 0; i < this.handler.getRequiredItemStacks().size(); i++) {
+                this.itemRenderer.renderInGuiWithOverrides(this.handler.getRequiredItemStacks().get(i), this.x + ConfigInit.CONFIG.test8 + l, this.y + ConfigInit.CONFIG.test9);
+                this.itemRenderer.renderGuiItemOverlay(this.textRenderer, this.handler.getRequiredItemStacks().get(i), this.x + ConfigInit.CONFIG.test8 + l, this.y + ConfigInit.CONFIG.test9);
+                l += 18;
+            }
+        } else {
+            this.textRenderer.draw(matrices, Text.translatable("text.dungeonz.nothing_required"), this.x + ConfigInit.CONFIG.test8, this.y + ConfigInit.CONFIG.test9, 0x3F3F3F);
+        }
+        // Possible loot
+        this.textRenderer.draw(matrices, Text.translatable("text.dungeonz.possible"), this.x + ConfigInit.CONFIG.test10, this.y + ConfigInit.CONFIG.test11, 0x3F3F3F);
+        if (this.handler.getPossibleLootDifficultyItemStackMap().size() > 0 && this.handler.getPossibleLootDifficultyItemStackMap().containsKey(this.handler.getDifficulty())
+                && this.handler.getPossibleLootDifficultyItemStackMap().get(this.handler.getDifficulty()).size() > 0) {
+            int l = 0;
+            int o = 0;
+            for (int i = 0; i < this.handler.getPossibleLootDifficultyItemStackMap().get(this.handler.getDifficulty()).size() && i < 8; i++) {
+                this.itemRenderer.renderInGuiWithOverrides(this.handler.getPossibleLootDifficultyItemStackMap().get(this.handler.getDifficulty()).get(i), this.x + ConfigInit.CONFIG.test12 + l,
+                        this.y + o + ConfigInit.CONFIG.test13);
+                this.itemRenderer.renderGuiItemOverlay(this.textRenderer, this.handler.getPossibleLootDifficultyItemStackMap().get(this.handler.getDifficulty()).get(i),
+                        this.x + ConfigInit.CONFIG.test12 + l, this.y + o + ConfigInit.CONFIG.test13);
+                l += 18;
+                if (i == 3) {
+                    l = 0;
+                    o = 18;
+                }
+            }
+        }
         this.drawMouseoverTooltip(matrices, mouseX, mouseY);
     }
 
@@ -197,7 +231,6 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
 
         public DungeonButton(int x, int y, Text text, ButtonWidget.PressAction onPress) {
             super(x, y, 52, 20, text, onPress);
-            this.disabled = true;
         }
 
         @Override

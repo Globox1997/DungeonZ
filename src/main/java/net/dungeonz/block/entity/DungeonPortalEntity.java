@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.Map.Entry;
 
@@ -15,6 +16,7 @@ import net.dungeonz.dungeon.Dungeon;
 import net.dungeonz.init.BlockInit;
 import net.dungeonz.init.CriteriaInit;
 import net.dungeonz.network.DungeonServerPacket;
+import net.dungeonz.util.DungeonHelper;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -23,6 +25,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
@@ -221,7 +224,6 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         for (int i = 0; i < this.getDungeonPlayerCount(); i++) {
             buf.writeUuid(this.getDungeonPlayerUUIDs().get(i));
         }
-        System.out.println("HAS DUNGEON? " + this.getDungeon());
 
         if (this.getDungeon() != null) {
             // Difficulty
@@ -230,16 +232,22 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
                 buf.writeString(this.getDungeon().getDifficultyList().get(i));
             }
             // Possible Loot Items
-            buf.writeInt(this.getDungeon().getDifficultyBossLootTableMap().size());
-            // Map<String,I
-            // buf.writeMap(dungeonPortalEntity.getDungeon().getDifficultyBossLootTableMap(), PacketByteBuf::writeString, PacketByteBuf::writeItemStack);
+            Map<String, List<ItemStack>> possibleLoot = DungeonHelper.getPossibleLootItemStackMap(this.getDungeon(), player.getServer());
+            buf.writeInt(possibleLoot.size());
+            Iterator<Entry<String, List<ItemStack>>> possibleLootIterator = possibleLoot.entrySet().iterator();
+            while (possibleLootIterator.hasNext()) {
+                Entry<String, List<ItemStack>> entry = possibleLootIterator.next();
+                buf.writeString(entry.getKey());
+                buf.writeInt(entry.getValue().size());
+                for (int i = 0; i < entry.getValue().size(); i++) {
+                    buf.writeItemStack(entry.getValue().get(i));
+                }
+            }
             // Required Items
-            buf.writeInt(this.getDungeon().getRequiredItemCountMap().size());
-            // Iterator<Entry<Integer, Integer>> requiredItemIterator = dungeonPortalEntity.getDungeon().getRequiredItemCountMap().entrySet().iterator();
-            // while (requiredItemIterator.hasNext()) {
-            // Entry<Integer, Integer> entry = requiredItemIterator.next();
-            // buf.writeItemStack(new ItemStack(Registry.ITEM.get(entry.getKey()), entry.getValue()));
-            // }
+            buf.writeInt(DungeonHelper.getRequiredItemStackList(this.getDungeon()).size());
+            for (int i = 0; i < DungeonHelper.getRequiredItemStackList(this.getDungeon()).size(); i++) {
+                buf.writeItemStack(DungeonHelper.getRequiredItemStackList(this.getDungeon()).get(i));
+            }
         } else {
             buf.writeInt(0);
             buf.writeInt(0);
@@ -249,7 +257,6 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         buf.writeInt(this.getMaxGroupSize());
         buf.writeInt(this.getCooldown());
         buf.writeString(this.getDifficulty());
-        // DungeonServerPacket.writeS2CDungeonScreenPacket(player, (DungeonPortalEntity) world.getBlockEntity(pos));
     }
 
     public void finishDungeon(ServerWorld world, BlockPos pos) {

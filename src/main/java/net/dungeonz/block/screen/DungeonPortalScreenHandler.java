@@ -2,12 +2,15 @@ package net.dungeonz.block.screen;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Map.Entry;
 
 import net.dungeonz.block.entity.DungeonPortalEntity;
 import net.dungeonz.init.BlockInit;
+import net.dungeonz.util.DungeonHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -16,6 +19,7 @@ import net.minecraft.screen.AnvilScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public class DungeonPortalScreenHandler extends ScreenHandler {
@@ -50,13 +54,23 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         int possibleLootCount = buf.readInt();
         Map<String, List<ItemStack>> possibleLootDifficultyItemStackMap = new HashMap<String, List<ItemStack>>();
         if (possibleLootCount != 0) {
-            // possibleLootDifficultyItemStackMap = buf.readMap(PacketByteBuf::readString, PacketByteBuf::readItemStack);
+            for (int i = 0; i < possibleLootCount; i++) {
+                List<ItemStack> itemStacks = new ArrayList<ItemStack>();
+                String difficulty = buf.readString();
+                int lootCount = buf.readInt();
+                for (int u = 0; u < lootCount; u++) {
+                    itemStacks.add(buf.readItemStack());
+                }
+                possibleLootDifficultyItemStackMap.put(difficulty, itemStacks);
+            }
         }
         final Map<String, List<ItemStack>> possibleLootDifficultyItemStacks = possibleLootDifficultyItemStackMap;
         int requiredItemCount = buf.readInt();
         List<ItemStack> requiredItemStacks = new ArrayList<ItemStack>();
         if (requiredItemCount != 0) {
-            // requiredItemStacks.add(buf.readItemStack());
+            for (int i = 0; i < requiredItemCount; i++) {
+                requiredItemStacks.add(buf.readItemStack());
+            }
         }
         int maxGroupSize = buf.readInt();
         int cooldown = buf.readInt();
@@ -82,8 +96,15 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         // System.out.println(this.dungeonPortalEntity);
 
         // setDungeonPlayerUUIDs(this.dungeonPortalEntity.getDungeonPlayerUUIDs());
-        setDifficulties(this.dungeonPortalEntity.getDungeon().getDifficultyList());
-        // setPossibleLootItemStacks(possibleLootDifficultyItemStackMap);
+        if (!this.world.isClient) {
+            setDifficulties(this.dungeonPortalEntity.getDungeon().getDifficultyList());
+            setRequiredItemStacks(DungeonHelper.getRequiredItemStackList(this.dungeonPortalEntity.getDungeon()));
+            // System.out.println(this.world);
+            // System.out.println(this.world.getServer());
+            // System.out.println(playerInventory.player.getServer());
+            // System.out.println(dungeonPortalEntity.getWorld().getServer());
+            setPossibleLootItemStacks(DungeonHelper.getPossibleLootItemStackMap(this.dungeonPortalEntity.getDungeon(), this.world.getServer()));
+        }
         // setRequiredItemStacks(requiredItemStacks);
         // setMaxPlayerCount(this.dungeonPortalEntity.getMaxGroupSize());
         // setCooldown(this.dungeonPortalEntity.getCooldown());

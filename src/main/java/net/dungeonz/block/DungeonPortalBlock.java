@@ -1,30 +1,18 @@
 package net.dungeonz.block;
 
-import org.jetbrains.annotations.Nullable;
-
 import net.dungeonz.access.ServerPlayerAccess;
 import net.dungeonz.block.entity.DungeonPortalEntity;
-import net.dungeonz.block.screen.DungeonPortalScreenHandler;
 import net.dungeonz.dimension.DungeonPlacementHandler;
 import net.dungeonz.init.DimensionInit;
-import net.dungeonz.network.DungeonServerPacket;
+import net.dungeonz.util.DungeonHelper;
+import net.dungeonz.util.InventoryHelper;
 import net.fabricmc.fabric.api.dimension.v1.FabricDimensions;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.gui.screen.ingame.MerchantScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.MerchantScreenHandler;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.screen.ScreenHandlerFactory;
-import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -56,10 +44,6 @@ public class DungeonPortalBlock extends BlockWithEntity {
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (world.getBlockEntity(pos) != null) {
             if (!world.isClient) {
-                // if (((DungeonPortalEntity) world.getBlockEntity(pos)).getDungeon() != null) {
-                // SCREEN_TITLE = Text.translatable("dungeon." + ((DungeonPortalEntity) world.getBlockEntity(pos)).getDungeon().getDungeonTypeId());
-                // }
-                // openHandledScreen((ServerPlayerEntity) player, state, world, pos, SCREEN_TITLE);
                 player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
             } else {
                 return ActionResult.success(world.isClient);
@@ -68,29 +52,6 @@ public class DungeonPortalBlock extends BlockWithEntity {
 
         return super.onUse(state, world, pos, player, hand, hit);
     }
-
-    // private void openHandledScreen(ServerPlayerEntity player, BlockState state, World world, BlockPos pos, Text title) {
-    // if (world.getBlockEntity(pos) != null && world.getBlockEntity(pos) instanceof DungeonPortalEntity) {
-    // player.openHandledScreen(new SimpleNamedScreenHandlerFactory(
-    // (syncId, inventory, playerX) -> new DungeonPortalScreenHandler(syncId, inventory, (DungeonPortalEntity) world.getBlockEntity(pos), ScreenHandlerContext.create(world, pos)),
-    // title));
-    // DungeonServerPacket.writeS2CDungeonScreenPacket(player, (DungeonPortalEntity) world.getBlockEntity(pos));
-    // }
-    // }
-
-    // @Nullable
-    // @Override
-    // public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
-    // if (world.getBlockEntity(pos) != null && world.getBlockEntity(pos) instanceof DungeonPortalEntity) {
-    // DungeonPortalEntity dungeonPortalEntity = (DungeonPortalEntity) world.getBlockEntity(pos);
-    // OptionalInt optionalInt = player2.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, playerInventory, player) -> new MerchantScreenHandler(syncId, playerInventory, this), test));
-    // if (optionalInt.isPresent() && !(tradeOfferList = this.getOffers()).isEmpty()) {
-    // player2.sendTradeOffers(optionalInt.getAsInt(), tradeOfferList, levelProgress, this.getExperience(), this.isLeveledMerchant(), this.canRefreshTrades());
-    // }
-    // return new SimpleNamedScreenHandlerFactory((syncId, inventory, player) -> new DungeonPortalScreenHandler(syncId, inventory, ScreenHandlerContext.create(world, pos)), SCREEN_TITLE);
-    // }
-    // return null;
-    // }
 
     @Override
     public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
@@ -146,6 +107,12 @@ public class DungeonPortalBlock extends BlockWithEntity {
                 }
                 if (dungeonPortalEntity.getDungeonPlayerCount() < dungeonPortalEntity.getMaxGroupSize()) {
                     if (dungeonPortalEntity.getDungeon() != null) {
+                        if (InventoryHelper.hasRequiredItemStacks(player.getInventory(), DungeonHelper.getRequiredItemStackList(dungeonPortalEntity.getDungeon()))) {
+                            InventoryHelper.decrementRequiredItemStacks(player.getInventory(), DungeonHelper.getRequiredItemStackList(dungeonPortalEntity.getDungeon()));
+                        } else {
+                            player.sendMessage(Text.translatable("text.dungeonz.missing"), false);
+                            return;
+                        }
                         FabricDimensions.teleport(player, dungeonWorld,
                                 DungeonPlacementHandler.enter(player, dungeonWorld, (ServerWorld) player.world, dungeonPortalEntity, dungeonPortalPos, dungeonPortalEntity.getDifficulty()));
                     } else {
@@ -157,11 +124,5 @@ public class DungeonPortalBlock extends BlockWithEntity {
             }
         }
     }
-
-    // @Override
-    // public ScreenHandler createMenu(int var1, PlayerInventory var2, PlayerEntity var3) {
-    // // TODO Auto-generated method stub
-    // return null;
-    // }
 
 }

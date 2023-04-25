@@ -13,6 +13,14 @@ public class DungeonzConfig implements ConfigData {
     public int test3 = 30;
     public int test4 = 30;
     public int test5 = 82;
+    public int test6 = 82;
+    public int test7 = 82;
+    public int test8 = 82;
+    public int test9 = 82;
+    public int test10 = 82;
+    public int test11 = 82;
+    public int test12 = 82;
+    public int test13 = 82;
     @Comment("Crops won't grow")
     public boolean devMode = false;
 

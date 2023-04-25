@@ -158,7 +158,6 @@ public class DungeonPlacementHandler {
                     }
                 }
             }
-            portalEntity.setMaxGroupSize(dungeon.getMaxGroupSize());
             portalEntity.setChestPosList(chestPosList);
             portalEntity.setExitPosList(exitPosList);
             portalEntity.setBlockMap(blockIdPosMap);
