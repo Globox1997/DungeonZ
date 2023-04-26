@@ -56,7 +56,11 @@ public class DungeonPortalBlock extends BlockWithEntity {
     @Override
     public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
         if (!world.isClient && !entity.hasVehicle() && !entity.hasPassengers() && entity.canUsePortals() && entity instanceof ServerPlayerEntity) {
-            teleportDungeon((ServerPlayerEntity) entity, pos);
+            if (!entity.hasPortalCooldown()) {
+                teleportDungeon((ServerPlayerEntity) entity, pos);
+            } else {
+                entity.resetPortalCooldown();
+            }
         }
     }
 
@@ -107,6 +111,10 @@ public class DungeonPortalBlock extends BlockWithEntity {
                 }
                 if (dungeonPortalEntity.getDungeonPlayerCount() < dungeonPortalEntity.getMaxGroupSize()) {
                     if (dungeonPortalEntity.getDungeon() != null) {
+                        if (dungeonPortalEntity.getCooldown() > 0) {
+                            player.sendMessage(Text.translatable("text.dungeonz.dungeon_cooldown"), false);
+                            return;
+                        }
                         if (InventoryHelper.hasRequiredItemStacks(player.getInventory(), DungeonHelper.getRequiredItemStackList(dungeonPortalEntity.getDungeon()))) {
                             InventoryHelper.decrementRequiredItemStacks(player.getInventory(), DungeonHelper.getRequiredItemStackList(dungeonPortalEntity.getDungeon()));
                         } else {

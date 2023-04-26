@@ -15,7 +15,6 @@ import net.dungeonz.dimension.DungeonPlacementHandler;
 import net.dungeonz.dungeon.Dungeon;
 import net.dungeonz.init.BlockInit;
 import net.dungeonz.init.CriteriaInit;
-import net.dungeonz.network.DungeonServerPacket;
 import net.dungeonz.util.DungeonHelper;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
