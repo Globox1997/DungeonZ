@@ -27,50 +27,75 @@
         }
     },
     "blocks": {
-        "minecraft:grass_block": {
+        "minecraft:diamond_block": {
             "spawns": [
-                "minecraft:zombie",
+                "minecraft:wither_skeleton"
+            ],
+            "chance": 0.6,
+            "replace": "minecraft:air"
+        },
+        "minecraft:gold_block": {
+            "spawns": [
                 "minecraft:skeleton"
             ],
             "chance": 0.6,
             "replace": "minecraft:air"
         },
-        "acacia_leaves": {
+        "minecraft:iron_block": {
             "spawns": [
-                "minecraft:zombie",
-                "minecraft:skeleton"
+                "minecraft:zombie"
             ],
             "chance": 0.6,
-            "replace": "minecraft:stone"
-        },
-        "minecraft:iron_ore": {
-            "boss_entity": "minecraft:sheep",
             "replace": "minecraft:air"
         },
-        "minecraft:emerald_ore": {
+        "minecraft:raw_gold_block": {
+            "spawns": [
+                "minecraft:spider"
+            ],
+            "chance": 0.6,
+            "replace": "minecraft:air"
+        },
+        "minecraft:raw_copper_block": {
+            "spawns": [
+                "minecraft:creeper"
+            ],
+            "chance": 0.6,
+            "replace": "minecraft:air"
+        },
+        "minecraft:raw_iron_block": {
+            "spawns": [
+                "minecraft:witch"
+            ],
+            "chance": 0.6,
+            "replace": "minecraft:air"
+        },
+        "minecraft:netherite_block": {
+            "boss_entity": "minecraft:warden",
+            "replace": "minecraft:air"
+        },
+        "minecraft:emerald_block": {
+            "boss_loot_block": true,
+            "replace": "minecraft:air"
+        },
+        "minecraft:quartz_block": {
             "exit_block": true,
             "replace": "minecraft:stone_bricks"
-        },
-        "minecraft:diamond_ore": {
-            "boss_loot_block": true,
-            "replace": null
         }
     },
     "spawner": {
         "minecraft:zombie": 10,
         "minecraft:skeleton": 5
     },
-    "breakable": [
-        "minecraft:stone"
-    ],
+    "breakable": [],
     "placeable": [
-        "minecraft:stone"
+        "minecraft:torch"
     ],
     "required": {
         "minecraft:stick": 3
     },
     "elytra": false,
     "max_group_size": 5,
-    "cooldown": 10000,
+    "cooldown": 108000,
+    "background_texture": "",
     "dungeon_structure_pool_id": "dungeonz:dungeon_spawn"
 }

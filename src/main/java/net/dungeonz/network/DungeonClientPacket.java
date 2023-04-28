@@ -31,6 +31,7 @@ public class DungeonClientPacket {
         ClientPlayNetworking.registerGlobalReceiver(DungeonServerPacket.SYNC_SCREEN_PACKET, (client, handler, buf, sender) -> {
             BlockPos dungeonPortalPos = buf.readBlockPos();
             String difficulty = buf.readString();
+
             client.execute(() -> {
                 if (client.world.getBlockEntity(dungeonPortalPos) != null && client.world.getBlockEntity(dungeonPortalPos) instanceof DungeonPortalEntity) {
                     DungeonPortalEntity dungeonPortalEntity = (DungeonPortalEntity) client.world.getBlockEntity(dungeonPortalPos);
@@ -47,10 +48,18 @@ public class DungeonClientPacket {
         });
     }
 
-    public static void writeC2SChanceDifficultyPacket(MinecraftClient client, BlockPos portalBlockPos) {
+    public static void writeC2SChangeDifficultyPacket(MinecraftClient client, BlockPos portalBlockPos) {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         buf.writeBlockPos(portalBlockPos);
         CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(DungeonServerPacket.CHANGE_DUNGEON_DIFFICULTY_PACKET, buf);
+        client.getNetworkHandler().sendPacket(packet);
+    }
+
+    public static void writeC2SChangeEffectsPacket(MinecraftClient client, BlockPos portalBlockPos, boolean disableEffects) {
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+        buf.writeBlockPos(portalBlockPos);
+        buf.writeBoolean(disableEffects);
+        CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(DungeonServerPacket.CHANGE_DUNGEON_EFFECTS_PACKET, buf);
         client.getNetworkHandler().sendPacket(packet);
     }
 
@@ -61,4 +70,12 @@ public class DungeonClientPacket {
         client.getNetworkHandler().sendPacket(packet);
     }
 
+    public static void writeC2SSetDungeonTypePacket(MinecraftClient client, String dungeonType, String defaultDifficulty, BlockPos portalBlockPos) {
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+        buf.writeBlockPos(portalBlockPos);
+        buf.writeString(dungeonType);
+        buf.writeString(defaultDifficulty);
+        CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(DungeonServerPacket.SET_DUNGEON_TYPE_PACKET, buf);
+        client.getNetworkHandler().sendPacket(packet);
+    }
 }

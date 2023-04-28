@@ -8,34 +8,37 @@ import org.spongepowered.asm.mixin.injection.At;
 import net.dungeonz.access.ClientPlayerAccess;
 import net.dungeonz.init.DimensionInit;
 import net.dungeonz.util.DungeonHelper;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 
 @Mixin(PlayerEntity.class)
-public class PlayerEntityMixin {
+public abstract class PlayerEntityMixin extends LivingEntity {
+
+    public PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
+        super(entityType, world);
+    }
 
     @Inject(method = "canPlaceOn", at = @At(value = "HEAD"), cancellable = true)
     public void canPlaceOnMixin(BlockPos pos, Direction facing, ItemStack stack, CallbackInfoReturnable<Boolean> info) {
         PlayerEntity playerEntity = (PlayerEntity) (Object) this;
-        if (playerEntity != null && !playerEntity.isCreative() && playerEntity.world.getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
+        if (playerEntity != null && !playerEntity.isCreative() && world.getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
             info.setReturnValue(false);
         }
     }
 
-    // used on client and server
-    // currently only handled on server
     @Inject(method = "checkFallFlying", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getEquippedStack(Lnet/minecraft/entity/EquipmentSlot;)Lnet/minecraft/item/ItemStack;"), cancellable = true)
     public void checkFallFlyingMixin(CallbackInfoReturnable<Boolean> info) {
         PlayerEntity playerEntity = (PlayerEntity) (Object) this;
-        // if (playerEntity != null && !playerEntity.world.isClient && !playerEntity.isCreative() && playerEntity.world.getRegistryKey() == DimensionInit.DUNGEON_WORLD
-        // && DungeonHelper.getCurrentDungeon((ServerPlayerEntity) playerEntity) != null && !DungeonHelper.getCurrentDungeon((ServerPlayerEntity) playerEntity).isElytraAllowed()) {
-        // info.setReturnValue(false);
-        // }
-        if (playerEntity != null && !playerEntity.isCreative() && playerEntity.world.getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
-            if (!playerEntity.world.isClient) {
+        if (playerEntity != null && !playerEntity.isCreative() && world.getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
+            if (!world.isClient) {
                 if (DungeonHelper.getCurrentDungeon((ServerPlayerEntity) playerEntity) != null && !DungeonHelper.getCurrentDungeon((ServerPlayerEntity) playerEntity).isElytraAllowed()) {
                     info.setReturnValue(false);
                 }
@@ -47,23 +50,14 @@ public class PlayerEntityMixin {
         }
     }
 
-    // used on client and server
-    // currently only handled on server -> leads to Mismatch in destroy block error message
-    // @Inject(method = "isBlockBreakingRestricted", at = @At("HEAD"), cancellable = true)
-    // private void isBlockBreakingRestrictedMixin(World world, BlockPos pos, GameMode gameMode, CallbackInfoReturnable<Boolean> info) {
-    // if (!world.isClient && world.getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
-    // PlayerEntity playerEntity = (PlayerEntity) (Object) this;
-    // if (!playerEntity.isCreative() && DungeonHelper.getCurrentDungeon((ServerPlayerEntity) playerEntity) != null
-    // && !DungeonHelper.getCurrentDungeon((ServerPlayerEntity) playerEntity).getDestroyableBlockIdList().contains(Registry.BLOCK.getRawId(world.getBlockState(pos).getBlock()))) {
-    // info.setReturnValue(true);
-    // } else {
-    // System.out.println("RESTRICTED " + pos);
-    // // if (DungeonHelper.getDungeonPortalEntity((ServerPlayerEntity) playerEntity) != null
-    // // && !DungeonHelper.getDungeonPortalEntity((ServerPlayerEntity) playerEntity).getReplaceBlockIdMap().containsKey(pos)) {
-    // // DungeonHelper.getDungeonPortalEntity((ServerPlayerEntity) playerEntity).addReplaceBlockId(pos, world.getBlockState(pos).getBlock());
-    // // }
-    // }
-    // }
-    // }
+    @Override
+    public boolean addStatusEffect(StatusEffectInstance effect, Entity source) {
+        if (!world.isClient && effect.getEffectType().isBeneficial() && world.getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
+            if (DungeonHelper.getDungeonPortalEntity((ServerPlayerEntity) (Object) this).getDisableEffects()) {
+                return false;
+            }
+        }
+        return super.addStatusEffect(effect, source);
+    }
 
 }

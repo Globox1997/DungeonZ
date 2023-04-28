@@ -18,12 +18,18 @@
     "text.dungeonz.possible": "Possible Loot",
     "text.dungeonz.required": "Required",
     "text.dungeonz.missing": "Missing items",
+    "text.dungeonz.effects": "Effects",
     "text.dungeonz.nothing_required": "-",
     "text.dungeonz.empty_name": "-",
     "text.dungeonz.player_list": "Players (%d/%d)",
     "text.dungeonz.dungeon_full": "Dungeon is full",
     "text.dungeonz.dungeon_cooldown": "Dungeon is on cooldown",
-    "text.dungeonz.dungeon_portal_missing": "No dungeon found",
+    "text.dungeonz.dungeon_cooldown_time": "Dungeon is on cooldown for %dh %dm %ds",
+    "text.dungeonz.dungeon_missing": "No dungeon found",
+
+    "dungeon.op_screen.dungeon_type": "Dungeon Type",
+    "dungeon.op_screen.default_difficulty": "Default Difficulty",
+
     "text.autoconfig.dungeonz.title": "DungeonZ Config",
     "text.autoconfig.dungeonz.option.devMode": "Dev Mode"
 }

@@ -11,11 +11,11 @@ import java.util.Map.Entry;
 import org.jetbrains.annotations.Nullable;
 
 import net.dungeonz.block.screen.DungeonPortalScreenHandler;
-import net.dungeonz.dimension.DungeonPlacementHandler;
 import net.dungeonz.dungeon.Dungeon;
 import net.dungeonz.init.BlockInit;
 import net.dungeonz.init.CriteriaInit;
 import net.dungeonz.util.DungeonHelper;
+import net.dungeonz.util.InventoryHelper;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -45,6 +45,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
     private List<UUID> dungeonPlayerUUIDs = new ArrayList<UUID>();
     private int maxGroupSize = 0;
     private int cooldown = 0;
+    private boolean disableEffects = false;
     private HashMap<Integer, ArrayList<BlockPos>> blockBlockPosMap = new HashMap<Integer, ArrayList<BlockPos>>();
     private List<BlockPos> chestPosList = new ArrayList<BlockPos>();
     private List<BlockPos> exitPosList = new ArrayList<BlockPos>();
@@ -52,6 +53,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
     private BlockPos bossLootBlockPos = new BlockPos(0, 0, 0);
     private HashMap<BlockPos, Integer> spawnerPosEntityIdMap = new HashMap<BlockPos, Integer>();
     private HashMap<BlockPos, Integer> replacePosBlockIdMap = new HashMap<BlockPos, Integer>();
+    private List<Integer> dungeonEdgeList = new ArrayList<Integer>();
 
     public DungeonPortalEntity(BlockPos pos, BlockState state) {
         super(BlockInit.DUNGEON_PORTAL_ENTITY, pos, state);
@@ -70,9 +72,8 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         }
         this.maxGroupSize = nbt.getInt("MaxGroupSize");
         this.cooldown = nbt.getInt("Cooldown");
-
+        this.disableEffects = nbt.getBoolean("DisableEffects");
         this.blockBlockPosMap.clear();
-
         if (nbt.getInt("BlockMapSize") > 0) {
             for (int i = 0; i < nbt.getInt("BlockMapSize"); i++) {
                 ArrayList<BlockPos> posList = new ArrayList<>();
@@ -113,6 +114,15 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
                 this.replacePosBlockIdMap.put(new BlockPos(nbt.getInt("ReplacePosX" + i), nbt.getInt("ReplacePosY" + i), nbt.getInt("ReplacePosZ" + i)), nbt.getInt("ReplaceBlockId" + i));
             }
         }
+
+        if (nbt.getInt("DungeonEdgeSize") > 0) {
+            this.dungeonEdgeList.clear();
+            for (int i = 0; i < nbt.getInt("DungeonEdgeSize") / 3; i++) {
+                this.dungeonEdgeList.add(nbt.getInt("DungeonEdgeX" + i));
+                this.dungeonEdgeList.add(nbt.getInt("DungeonEdgeY" + i));
+                this.dungeonEdgeList.add(nbt.getInt("DungeonEdgeZ" + i));
+            }
+        }
     }
 
     @Override
@@ -127,6 +137,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         }
         nbt.putInt("MaxGroupSize", this.maxGroupSize);
         nbt.putInt("Cooldown", this.cooldown);
+        nbt.putBoolean("DisableEffects", this.disableEffects);
 
         nbt.putInt("BlockMapSize", this.blockBlockPosMap.size());
         if (this.blockBlockPosMap.size() > 0) {
@@ -198,6 +209,15 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
                 count++;
             }
         }
+
+        nbt.putInt("DungeonEdgeSize", this.dungeonEdgeList.size());
+        if (this.dungeonEdgeList.size() > 0) {
+            for (int i = 0; i < this.dungeonEdgeList.size() / 3; i++) {
+                nbt.putInt("DungeonEdgeX" + i, this.dungeonEdgeList.get(i + 3 * i));
+                nbt.putInt("DungeonEdgeY" + i, this.dungeonEdgeList.get(i + 1 + 3 * i));
+                nbt.putInt("DungeonEdgeZ" + i, this.dungeonEdgeList.get(i + 2 + 3 * i));
+            }
+        }
     }
 
     @Override
@@ -256,6 +276,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         buf.writeInt(this.getMaxGroupSize());
         buf.writeInt(this.getCooldown());
         buf.writeString(this.getDifficulty());
+        buf.writeBoolean(this.getDisableEffects());
     }
 
     public void finishDungeon(ServerWorld world, BlockPos pos) {
@@ -267,23 +288,21 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         }
 
         for (int i = 0; i < this.getExitPosList().size(); i++) {
-            // System.out.println(this.getExitPosList().get(i));
-
             world.setBlockState(this.getExitPosList().get(i), BlockInit.DUNGEON_PORTAL.getDefaultState(), 3);
         }
 
         // play dungeon sound
         // System.out.println("BOSS CHEST: " + this.getBossLootBlockPos());
         world.setBlockState(this.getBossLootBlockPos(), Blocks.CHEST.getDefaultState(), 3);
-        DungeonPlacementHandler.fillChestWithLoot(world.getServer(), world, this.getBossLootBlockPos(), this.getDungeon().getDifficultyBossLootTableMap().get(this.getDifficulty()));
+        InventoryHelper.fillChestWithLoot(world.getServer(), world, this.getBossLootBlockPos(), this.getDungeon().getDifficultyBossLootTableMap().get(this.getDifficulty()), this.getDisableEffects());
 
         this.setCooldown(this.getDungeon().getCooldown());
     }
 
     @Nullable
     public Dungeon getDungeon() {
-        return Dungeon.getDungeon("dark_dungeon");
-        // return Dungeon.getDungeon(this.dungeonType);
+        // return Dungeon.getDungeon("dark_dungeon");
+        return Dungeon.getDungeon(this.dungeonType);
     }
 
     public void setDungeonType(String dungeonType) {
@@ -291,8 +310,8 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
     }
 
     public String getDungeonType() {
-        return "dark_dungeon";
-        // return this.dungeonType;
+        // return "dark_dungeon";
+        return this.dungeonType;
     }
 
     public void setDifficulty(String difficulty) {
@@ -358,6 +377,14 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         return this.maxGroupSize;
     }
 
+    public void setDisableEffects(boolean disableEffects) {
+        this.disableEffects = disableEffects;
+    }
+
+    public boolean getDisableEffects() {
+        return this.disableEffects;
+    }
+
     public void setBossBlockPos(BlockPos pos) {
         this.bossBlockPos = pos;
     }
@@ -388,6 +415,16 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
 
     public List<BlockPos> getExitPosList() {
         return this.exitPosList;
+    }
+
+    public void addDungeonEdge(int edgeX, int edgeY, int edgeZ) {
+        this.dungeonEdgeList.add(edgeX);
+        this.dungeonEdgeList.add(edgeY);
+        this.dungeonEdgeList.add(edgeZ);
+    }
+
+    public List<Integer> getDungeonEdgeList() {
+        return this.dungeonEdgeList;
     }
 
     public void setSpawnerPosEntityIdMap(HashMap<BlockPos, Integer> spawnerPosEntityIdMap) {

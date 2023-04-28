@@ -16,6 +16,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ingame.EnchantmentScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.option.VideoOptionsScreen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -40,14 +41,13 @@ import net.minecraft.util.math.MathHelper;
 @Environment(EnvType.CLIENT)
 public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandler> implements ScreenHandlerListener {
 
-    private static final Identifier TEXTURE = new Identifier("dungeonz:textures/gui/dungeon_portal.png");
+    private static Identifier TEXTURE = new Identifier("dungeonz:textures/gui/dungeon_portal.png");
     private static final Text JOIN = Text.translatable("dungeon.task.join");
     private static final Text LEAVE = Text.translatable("dungeon.task.leave");
 
-    // private CyclingButtonWidget<String> difficultySwitchButton;
-
-    public DungeonPortalScreen.DungeonButton dungeonButton;
     public DungeonPortalScreen.DungeonDifficultyButton difficultyButton;
+    private DungeonPortalScreen.DungeonButton dungeonButton;
+    private CyclingButtonWidget<Boolean> effectButton;
     private final PlayerEntity playerEntity;
 
     int backgroundHeight = 203;
@@ -78,18 +78,29 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
         this.difficultyButton = (DungeonPortalScreen.DungeonDifficultyButton) this
                 .addDrawableChild(new DungeonPortalScreen.DungeonDifficultyButton(i + ConfigInit.CONFIG.test3, j + ConfigInit.CONFIG.test4, buttonText, (button) -> {
                     if (button instanceof DungeonPortalScreen.DungeonDifficultyButton && !((DungeonPortalScreen.DungeonDifficultyButton) button).disabled) {
-                        DungeonClientPacket.writeC2SChanceDifficultyPacket(this.client, this.handler.getPos());
+                        DungeonClientPacket.writeC2SChangeDifficultyPacket(this.client, this.handler.getPos());
                     }
                 }));
+        this.effectButton = this.addDrawableChild(CyclingButtonWidget.onOffBuilder(this.handler.getDisableEffects()).omitKeyText().build(i + ConfigInit.CONFIG.test14, j + ConfigInit.CONFIG.test15,
+                26, 20, Text.of(""), (button, statusEffects) -> {
+                    if (button.active) {
+                        this.handler.setDisableEffects(statusEffects);
+                        DungeonClientPacket.writeC2SChangeEffectsPacket(client, this.handler.getPos(), statusEffects);
+                    }
+                }));
+        this.effectButton.setValue(this.handler.getDisableEffects());
 
         if (playerIsInDungeonWorld) {
             this.dungeonButton.setDisabled(false);
             this.difficultyButton.setDisabled(true);
+            this.effectButton.active = false;
         } else {
             if (this.handler.getDungeonPlayerUUIDs().size() > 0) {
+                this.effectButton.active = false;
                 this.difficultyButton.setDisabled(true);
             } else {
                 this.difficultyButton.setDisabled(false);
+                this.effectButton.active = true;
             }
             if (this.handler.getDungeonPlayerUUIDs().size() < this.handler.getMaxPlayerCount()
                     && InventoryHelper.hasRequiredItemStacks(this.playerEntity.getInventory(), this.handler.getRequiredItemStacks())) {
@@ -98,29 +109,15 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
                 this.dungeonButton.setDisabled(true);
             }
         }
-        // System.out.println(this.handler.getDifficulty() + " : " + this.handler.getDifficulties() + " : " + (this.handler.getDifficulties().contains(this.handler.getDifficulty())));
         if (this.handler.getDifficulties().contains(this.handler.getDifficulty())) {
             this.difficultyButton.setText(Text.translatable("dungeonz.difficulty." + this.handler.getDifficulty()));
         } else {
             this.difficultyButton.setText(Text.translatable("dungeonz.difficulty." + this.handler.getDifficulties().get(0)));
         }
-        // this.handler.getd
-        // this.difficultyButton.setText(text);
 
-        // System.out.println(this.handler.getDifficulties());
-
-        // this.difficultySwitchButton = this.addDrawableChild(CyclingButtonWidget.builder(Difficulty::getTranslatableName).values((Difficulty[]) Difficulty.values()).initially(this.getDifficulty())
-        // .build(j, 100, 150, 20, Text.translatable("options.difficulty"), (button, difficulty) -> {
-        // this.currentDifficulty = difficulty;
-        // }));
-
-        // this.difficultySwitchButton =
-        // this.addDrawableChild(CyclingButtonWidget.builder(Difficulty::getTranslatableName).values((Difficulty[])Difficulty.values()).initially(this.getDifficulty()).build(j, 100, 150, 20,
-        // Text.translatable("options.difficulty"), (button, difficulty) -> {
-        // this.currentDifficulty = difficulty;
-        // }));
-        this.handler.setDungeonPlayerUUIDs(List.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(),
-                UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID()));
+        // remove this
+        // this.handler.setDungeonPlayerUUIDs(List.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(),
+        // UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID()));
     }
 
     private Text getPlayerName(UUID playerId, int length, int substringLength) {
@@ -167,6 +164,9 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
             for (int i = 0; i < this.handler.getRequiredItemStacks().size(); i++) {
                 this.itemRenderer.renderInGuiWithOverrides(this.handler.getRequiredItemStacks().get(i), this.x + ConfigInit.CONFIG.test8 + l, this.y + ConfigInit.CONFIG.test9);
                 this.itemRenderer.renderGuiItemOverlay(this.textRenderer, this.handler.getRequiredItemStacks().get(i), this.x + ConfigInit.CONFIG.test8 + l, this.y + ConfigInit.CONFIG.test9);
+                if (this.isPointWithinBounds(ConfigInit.CONFIG.test8 + l, ConfigInit.CONFIG.test9, 16, 16, mouseX, mouseY)) {
+                    this.renderTooltip(matrices, this.handler.getRequiredItemStacks().get(i).getName(), mouseX, mouseY);
+                }
                 l += 18;
             }
         } else {
@@ -183,6 +183,10 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
                         this.y + o + ConfigInit.CONFIG.test13);
                 this.itemRenderer.renderGuiItemOverlay(this.textRenderer, this.handler.getPossibleLootDifficultyItemStackMap().get(this.handler.getDifficulty()).get(i),
                         this.x + ConfigInit.CONFIG.test12 + l, this.y + o + ConfigInit.CONFIG.test13);
+
+                if (this.isPointWithinBounds(ConfigInit.CONFIG.test12 + l, o + ConfigInit.CONFIG.test13, 16, 16, mouseX, mouseY)) {
+                    this.renderTooltip(matrices, this.handler.getPossibleLootDifficultyItemStackMap().get(this.handler.getDifficulty()).get(i).getName(), mouseX, mouseY);
+                }
                 l += 18;
                 if (i == 3) {
                     l = 0;
@@ -190,6 +194,9 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
                 }
             }
         }
+        this.textRenderer.draw(matrices, Text.translatable("dungeonz.difficulty"), this.x + ConfigInit.CONFIG.test16, this.y + ConfigInit.CONFIG.test17, 0x3F3F3F);
+        this.textRenderer.draw(matrices, Text.translatable("text.dungeonz.effects"), this.x + ConfigInit.CONFIG.test18, this.y + ConfigInit.CONFIG.test19, 0x3F3F3F);
+
         this.drawMouseoverTooltip(matrices, mouseX, mouseY);
     }
 
@@ -212,11 +219,6 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         return super.mouseClicked(mouseX, mouseY, button);
     }
-
-    // @Override
-    // protected void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType) {
-    // super.onMouseClick(slot, slotId, button, actionType);
-    // }
 
     @Override
     public void onSlotUpdate(ScreenHandler var1, int var2, ItemStack var3) {
@@ -251,6 +253,20 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
 
             int o = this.active ? 0xFFFFFF : 0xA0A0A0;
             ClickableWidget.drawCenteredText(matrices, textRenderer, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, o | MathHelper.ceil(this.alpha * 255.0f) << 24);
+
+            if (this.disabled && this.isHovered()) {
+                Text text;
+                if (DungeonPortalScreen.this.handler.getCooldown() > 0) {
+                    int cooldown = DungeonPortalScreen.this.handler.getCooldown();
+                    int seconds = cooldown % 60;
+                    int minutes = cooldown / 60 % 60;
+                    int hours = cooldown / 60 / 60;
+                    text = Text.translatable("text.dungeonz.dungeon_cooldown_time", hours, minutes, seconds);
+                } else {
+                    text = Text.translatable("text.dungeonz.dungeon_full");
+                }
+                DungeonPortalScreen.this.renderTooltip(matrices, text, mouseX, mouseY);
+            }
         }
 
         public void setDisabled(boolean disable) {
@@ -292,27 +308,6 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
             this.renderBackground(matrices, minecraftClient, mouseX, mouseY);
             int j = this.active ? 0xFFFFFF : 0xA0A0A0;
             ClickableWidget.drawCenteredText(matrices, textRenderer, this.text, this.x + this.width / 2, this.y + (this.height - 8) / 2, j | MathHelper.ceil(this.alpha * 255.0f) << 24);
-
-            // RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            // RenderSystem.setShaderTexture(0, TEXTURE);
-            // RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-            // RenderSystem.enableBlend();
-            // RenderSystem.defaultBlendFunc();
-            // RenderSystem.enableDepthTest();
-            // int j = 20;
-            // if (this.disabled) {
-            // j = 0;
-            // } else if (this.isHovered()) {
-            // j += 20;
-            // }
-            // this.drawTexture(matrices, this.x, this.y, 176, j, this.width, this.height);
-
-            // int o = this.active ? 0xFFFFFF : 0xA0A0A0;
-            // ClickableWidget.drawCenteredText(matrices, textRenderer, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, o | MathHelper.ceil(this.alpha * 255.0f) << 24);
-            // }
-
-            // public void setDisabled(boolean disable) {
-            // this.disabled = disable;
         }
 
     }

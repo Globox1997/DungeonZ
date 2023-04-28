@@ -68,6 +68,7 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         int maxGroupSize = buf.readInt();
         int cooldown = buf.readInt();
         String difficulty = buf.readString();
+        boolean disableEffects = buf.readBoolean();
 
         this.setDungeonPlayerUUIDs(dungeonPlayerUUIDs);
         this.setDifficulties(difficulties);
@@ -76,6 +77,7 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         this.setMaxPlayerCount(maxGroupSize);
         this.setCooldown(cooldown);
         this.setDifficulty(difficulty);
+        this.setDisableEffects(disableEffects);
     }
 
     public DungeonPortalScreenHandler(int syncId, PlayerInventory playerInventory, DungeonPortalEntity dungeonPortalEntity, ScreenHandlerContext context) {
@@ -167,6 +169,14 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
 
     public void setDifficulty(String difficulty) {
         this.dungeonPortalEntity.setDifficulty(difficulty);
+    }
+
+    public boolean getDisableEffects() {
+        return this.dungeonPortalEntity.getDisableEffects();
+    }
+
+    public void setDisableEffects(boolean disableEffects) {
+        this.dungeonPortalEntity.setDisableEffects(disableEffects);
     }
 
     public BlockPos getPos() {
