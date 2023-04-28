@@ -4,26 +4,31 @@
         "easy": {
             "mob_modificator": 1.0,
             "loot_table_ids": [
-                "dungeonz:chests/test_chest_loot"
+                "dungeonz:chests/dark_dungeon_low_tier_chest_loot",
+                "dungeonz:chests/dark_dungeon_mid_tier_chest_loot"
             ],
-            "boss_modificator": 3.0,
-            "boss_loot_table_id": "dungeonz:chests/test_chest_loot"
+            "boss_modificator": 1.0,
+            "boss_loot_table_id": "dungeonz:chests/dark_dungeon_easy_boss_loot"
         },
         "normal": {
             "mob_modificator": 1.5,
             "loot_table_ids": [
-                "dungeonz:chests/test_chest_loot"
+                "dungeonz:chests/dark_dungeon_low_tier_chest_loot",
+                "dungeonz:chests/dark_dungeon_mid_tier_chest_loot",
+                "dungeonz:chests/dark_dungeon_high_tier_chest_loot"
             ],
-            "boss_modificator": 5.0,
-            "boss_loot_table_id": "dungeonz:chests/test_chest_loot"
+            "boss_modificator": 2.0,
+            "boss_loot_table_id": "dungeonz:chests/dark_dungeon_normal_boss_loot"
         },
         "hard": {
-            "mob_modificator": 2.0,
+            "mob_modificator": 3.0,
             "loot_table_ids": [
-                "dungeonz:chests/test_chest_loot"
+                "dungeonz:chests/dark_dungeon_mid_tier_chest_loot",
+                "dungeonz:chests/dark_dungeon_high_tier_chest_loot",
+                "dungeonz:chests/dark_dungeon_end_tier_chest_loot"
             ],
-            "boss_modificator": 7.0,
-            "boss_loot_table_id": "dungeonz:chests/test_chest_loot"
+            "boss_modificator": 4.0,
+            "boss_loot_table_id": "dungeonz:chests/dark_dungeon_hard_boss_loot"
         }
     },
     "blocks": {
@@ -31,42 +36,66 @@
             "spawns": [
                 "minecraft:wither_skeleton"
             ],
-            "chance": 0.6,
+            "chance": {
+                "easy": 0.4,
+                "normal": 0.7,
+                "hard": 1.0
+            },
             "replace": "minecraft:air"
         },
         "minecraft:gold_block": {
             "spawns": [
                 "minecraft:skeleton"
             ],
-            "chance": 0.6,
+            "chance": {
+                "easy": 0.4,
+                "normal": 0.7,
+                "hard": 1.0
+            },
             "replace": "minecraft:air"
         },
         "minecraft:iron_block": {
             "spawns": [
                 "minecraft:zombie"
             ],
-            "chance": 0.6,
+            "chance": {
+                "easy": 0.4,
+                "normal": 0.7,
+                "hard": 1.0
+            },
             "replace": "minecraft:air"
         },
         "minecraft:raw_gold_block": {
             "spawns": [
                 "minecraft:spider"
             ],
-            "chance": 0.6,
+            "chance": {
+                "easy": 0.4,
+                "normal": 0.7,
+                "hard": 1.0
+            },
             "replace": "minecraft:air"
         },
         "minecraft:raw_copper_block": {
             "spawns": [
                 "minecraft:creeper"
             ],
-            "chance": 0.6,
+            "chance": {
+                "easy": 0.4,
+                "normal": 0.7,
+                "hard": 1.0
+            },
             "replace": "minecraft:air"
         },
         "minecraft:raw_iron_block": {
             "spawns": [
                 "minecraft:witch"
             ],
-            "chance": 0.6,
+            "chance": {
+                "easy": 0.4,
+                "normal": 0.7,
+                "hard": 1.0
+            },
             "replace": "minecraft:air"
         },
         "minecraft:netherite_block": {

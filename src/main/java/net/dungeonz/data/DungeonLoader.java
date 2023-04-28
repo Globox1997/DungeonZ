@@ -27,7 +27,6 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
 
     @Override
     public void reload(ResourceManager manager) {
-        // restricted
         manager.findResources("dungeon", id -> id.getPath().endsWith(".json")).forEach((id, resourceRef) -> {
             try {
                 InputStream stream = resourceRef.getInputStream();
@@ -37,8 +36,10 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                 int maxGroupSize = data.get("max_group_size").getAsInt();
                 int cooldown = data.get("cooldown").getAsInt();
                 boolean allowElytra = data.has("elytra") ? data.get("elytra").getAsBoolean() : false;
+                Identifier dungeonBackgroundId = new Identifier(data.has("background_texture") ? data.get("background_texture").getAsString() : "");
                 Identifier dungeonStructurePoolId = new Identifier(data.get("dungeon_structure_pool_id").getAsString());
 
+                List<String> difficulties = new ArrayList<String>();
                 JsonObject difficultyObject = data.get("difficulty").getAsJsonObject();
                 Iterator<String> difficultyIterator = difficultyObject.keySet().iterator();
 
@@ -49,6 +50,7 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
 
                 while (difficultyIterator.hasNext()) {
                     String difficulty = difficultyIterator.next();
+                    difficulties.add(difficulty);
                     JsonObject specificDifficultyObject = difficultyObject.get(difficulty).getAsJsonObject();
 
                     difficultyMobModificator.put(difficulty, specificDifficultyObject.get("mob_modificator").getAsFloat());
@@ -65,7 +67,7 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                 Iterator<String> blockIterator = blockObject.keySet().iterator();
 
                 HashMap<Integer, List<EntityType<?>>> blockIdEntityMap = new HashMap<Integer, List<EntityType<?>>>();
-                HashMap<Integer, Float> blockIdEntitySpawnChance = new HashMap<Integer, Float>();
+                HashMap<Integer, HashMap<String, Float>> blockIdEntitySpawnChance = new HashMap<Integer, HashMap<String, Float>>();
                 HashMap<Integer, Integer> blockIdBlockReplacement = new HashMap<Integer, Integer>();
                 int bossBlockId = -1;
                 int bossLootBlockId = -1;
@@ -92,7 +94,13 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                             entityTypes.add(Registry.ENTITY_TYPE.get(new Identifier(specificBlockObject.get("spawns").getAsJsonArray().get(i).getAsString())));
                         }
                         blockIdEntityMap.put(rawBlockId, entityTypes);
-                        blockIdEntitySpawnChance.put(rawBlockId, specificBlockObject.get("chance").getAsFloat());
+
+                        HashMap<String, Float> difficultyChance = new HashMap<String, Float>();
+                        for (int i = 0; i < difficulties.size(); i++) {
+                            difficultyChance.put(difficulties.get(i), specificBlockObject.get("chance").getAsJsonObject().get(difficulties.get(i)).getAsFloat());
+                        }
+                        blockIdEntitySpawnChance.put(rawBlockId, difficultyChance);
+
                     } else if (specificBlockObject.has("boss_entity")) {
                         if (!Registry.ENTITY_TYPE.containsId(new Identifier(specificBlockObject.get("boss_entity").getAsString()))) {
                             DungeonzMain.LOGGER.warn("{} is not a valid entity identifier", specificBlockObject.get("boss_entity").getAsString());
@@ -184,7 +192,7 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
 
                 Dungeon.addDungeon(new Dungeon(dungeonTypeId, blockIdEntityMap, blockIdEntitySpawnChance, blockIdBlockReplacement, spawnerEntityIdCountMap, requiredItemCountMap, breakableBlockIds,
                         placeableBlockIds, difficultyMobModificator, difficultyLootTableIds, difficultyBossModificator, difficultyBossLootTable, bossEntityType, bossBlockId, bossLootBlockId,
-                        exitBlockId, allowElytra, maxGroupSize, cooldown, dungeonStructurePoolId));
+                        exitBlockId, allowElytra, maxGroupSize, cooldown, dungeonBackgroundId, dungeonStructurePoolId));
             } catch (Exception e) {
                 DungeonzMain.LOGGER.error("Error occurred while loading resource {}. {}", id.toString(), e.toString());
             }

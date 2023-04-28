@@ -15,7 +15,7 @@ public class Dungeon {
     private final String dungeonTypeId;
 
     private final HashMap<Integer, List<EntityType<?>>> blockIdEntityMap;
-    private final HashMap<Integer, Float> blockIdEntitySpawnChance;
+    private final HashMap<Integer, HashMap<String, Float>> blockIdEntitySpawnChance;
     private final HashMap<Integer, Integer> blockIdBlockReplacement;
 
     private final HashMap<Integer, Integer> spawnerEntityIdCountMap;
@@ -41,13 +41,14 @@ public class Dungeon {
     private final int maxGroupSize;
     private final int cooldown;
 
+    private final Identifier dungeonBackgroundId;
     private final Identifier dungeonStructurePoolId;
 
-    public Dungeon(String dungeonTypeId, HashMap<Integer, List<EntityType<?>>> blockIdEntityMap, HashMap<Integer, Float> blockIdEntitySpawnChance, HashMap<Integer, Integer> blockIdBlockReplacement,
-            HashMap<Integer, Integer> spawnerEntityIdCountMap, HashMap<Integer, Integer> requiredItemCountMap, List<Integer> breakableBlockIds, List<Integer> placeableBlockIds,
-            HashMap<String, Float> difficultyMobModificator, HashMap<String, List<String>> difficultyLootTableIds, HashMap<String, Float> difficultyBossModificator,
+    public Dungeon(String dungeonTypeId, HashMap<Integer, List<EntityType<?>>> blockIdEntityMap, HashMap<Integer, HashMap<String, Float>> blockIdEntitySpawnChance,
+            HashMap<Integer, Integer> blockIdBlockReplacement, HashMap<Integer, Integer> spawnerEntityIdCountMap, HashMap<Integer, Integer> requiredItemCountMap, List<Integer> breakableBlockIds,
+            List<Integer> placeableBlockIds, HashMap<String, Float> difficultyMobModificator, HashMap<String, List<String>> difficultyLootTableIds, HashMap<String, Float> difficultyBossModificator,
             HashMap<String, String> difficultyBossLootTable, EntityType<?> bossEntityType, int bossBlockId, int bossLootBlockId, int exitBlockId, boolean allowElytra, int maxGroupSize, int cooldown,
-            Identifier dungeonStructurePoolId) {
+            Identifier dungeonBackgroundId, Identifier dungeonStructurePoolId) {
         this.dungeonTypeId = dungeonTypeId;
         this.blockIdEntityMap = blockIdEntityMap;
         this.blockIdEntitySpawnChance = blockIdEntitySpawnChance;
@@ -67,6 +68,7 @@ public class Dungeon {
         this.allowElytra = allowElytra;
         this.maxGroupSize = maxGroupSize;
         this.cooldown = cooldown;
+        this.dungeonBackgroundId = dungeonBackgroundId;
         this.dungeonStructurePoolId = dungeonStructurePoolId;
     }
 
@@ -78,6 +80,10 @@ public class Dungeon {
         return this.dungeonStructurePoolId;
     }
 
+    public Identifier getBackgroundId() {
+        return this.dungeonBackgroundId;
+    }
+
     public List<String> getDifficultyList() {
         return new ArrayList<>(this.difficultyMobModificator.keySet());
     }
@@ -86,7 +92,7 @@ public class Dungeon {
         return this.blockIdEntityMap;
     }
 
-    public HashMap<Integer, Float> getBlockIdEntitySpawnChanceMap() {
+    public HashMap<Integer, HashMap<String, Float>> getBlockIdEntitySpawnChanceMap() {
         return this.blockIdEntitySpawnChance;
     }
 

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.dungeonz.block.entity.DungeonPortalEntity;
 import net.dungeonz.init.BlockInit;
 import net.dungeonz.util.DungeonHelper;
@@ -15,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -113,6 +116,14 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
             }
             return player.squaredDistanceTo((double) pos.getX() + 0.5, (double) pos.getY() + 0.5, (double) pos.getZ() + 0.5) <= 64.0;
         }, true);
+    }
+
+    @Nullable
+    public Identifier getBackgroundId() {
+        if (this.dungeonPortalEntity.getDungeon() == null) {
+            return null;
+        }
+        return this.dungeonPortalEntity.getDungeon().getBackgroundId();
     }
 
     public List<UUID> getDungeonPlayerUUIDs() {

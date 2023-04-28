@@ -55,11 +55,13 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
     public DungeonPortalScreen(DungeonPortalScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
         this.playerEntity = inventory.player;
+        TEXTURE = handler.getBackgroundId() != null ? handler.getBackgroundId() : TEXTURE;
     }
 
     @Override
     protected void init() {
         super.init();
+
         this.titleX = (this.backgroundWidth - this.textRenderer.getWidth(this.title)) / 2;
         this.titleY = -10;
         ((DungeonPortalScreenHandler) this.handler).addListener(this);
