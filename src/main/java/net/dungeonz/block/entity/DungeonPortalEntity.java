@@ -49,6 +49,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
     private HashMap<Integer, ArrayList<BlockPos>> blockBlockPosMap = new HashMap<Integer, ArrayList<BlockPos>>();
     private List<BlockPos> chestPosList = new ArrayList<BlockPos>();
     private List<BlockPos> exitPosList = new ArrayList<BlockPos>();
+    private List<BlockPos> gatePosList = new ArrayList<BlockPos>();
     private BlockPos bossBlockPos = new BlockPos(0, 0, 0);
     private BlockPos bossLootBlockPos = new BlockPos(0, 0, 0);
     private HashMap<BlockPos, Integer> spawnerPosEntityIdMap = new HashMap<BlockPos, Integer>();
@@ -121,6 +122,13 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
                 this.dungeonEdgeList.add(nbt.getInt("DungeonEdgeX" + i));
                 this.dungeonEdgeList.add(nbt.getInt("DungeonEdgeY" + i));
                 this.dungeonEdgeList.add(nbt.getInt("DungeonEdgeZ" + i));
+            }
+        }
+
+        if (nbt.getInt("GateListSize") > 0) {
+            this.gatePosList.clear();
+            for (int i = 0; i < nbt.getInt("GateListSize"); i++) {
+                this.gatePosList.add(new BlockPos(nbt.getInt("GatePosX" + i), nbt.getInt("GatePosY" + i), nbt.getInt("GatePosZ" + i)));
             }
         }
     }
@@ -216,6 +224,15 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
                 nbt.putInt("DungeonEdgeX" + i, this.dungeonEdgeList.get(i + 3 * i));
                 nbt.putInt("DungeonEdgeY" + i, this.dungeonEdgeList.get(i + 1 + 3 * i));
                 nbt.putInt("DungeonEdgeZ" + i, this.dungeonEdgeList.get(i + 2 + 3 * i));
+            }
+        }
+
+        nbt.putInt("GateListSize", this.gatePosList.size());
+        if (this.gatePosList.size() > 0) {
+            for (int i = 0; i < this.gatePosList.size(); i++) {
+                nbt.putInt("GatePosX" + i, this.gatePosList.get(i).getX());
+                nbt.putInt("GatePosY" + i, this.gatePosList.get(i).getY());
+                nbt.putInt("GatePosZ" + i, this.gatePosList.get(i).getZ());
             }
         }
     }
@@ -410,6 +427,14 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
 
     public List<BlockPos> getChestPosList() {
         return this.chestPosList;
+    }
+
+    public void setGatePosList(List<BlockPos> gatePosList) {
+        this.gatePosList = gatePosList;
+    }
+
+    public List<BlockPos> getGatePosList() {
+        return this.gatePosList;
     }
 
     public void setExitPosList(List<BlockPos> exitPosList) {

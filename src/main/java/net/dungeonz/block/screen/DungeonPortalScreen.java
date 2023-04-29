@@ -78,7 +78,7 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
             }
         }));
         this.difficultyButton = (DungeonPortalScreen.DungeonDifficultyButton) this
-                .addDrawableChild(new DungeonPortalScreen.DungeonDifficultyButton(i + ConfigInit.CONFIG.test3, j + ConfigInit.CONFIG.test4, buttonText, (button) -> {
+                .addDrawableChild(new DungeonPortalScreen.DungeonDifficultyButton(i + ConfigInit.CONFIG.test3, j + ConfigInit.CONFIG.test4, Text.of(""), (button) -> {
                     if (button instanceof DungeonPortalScreen.DungeonDifficultyButton && !((DungeonPortalScreen.DungeonDifficultyButton) button).disabled) {
                         DungeonClientPacket.writeC2SChangeDifficultyPacket(this.client, this.handler.getPos());
                     }
@@ -264,8 +264,10 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
                     int minutes = cooldown / 60 % 60;
                     int hours = cooldown / 60 / 60;
                     text = Text.translatable("text.dungeonz.dungeon_cooldown_time", hours, minutes, seconds);
-                } else {
+                } else if (DungeonPortalScreen.this.handler.getDungeonPlayerUUIDs().size() < DungeonPortalScreen.this.handler.getMaxPlayerCount()) {
                     text = Text.translatable("text.dungeonz.dungeon_full");
+                } else {
+                    text = Text.translatable("text.dungeonz.missing");
                 }
                 DungeonPortalScreen.this.renderTooltip(matrices, text, mouseX, mouseY);
             }

@@ -12,6 +12,8 @@ import org.jetbrains.annotations.Nullable;
 import net.dungeonz.DungeonzMain;
 import net.dungeonz.access.BossEntityAccess;
 import net.dungeonz.access.ServerPlayerAccess;
+import net.dungeonz.block.DungeonGateBlock;
+import net.dungeonz.block.entity.DungeonGateEntity;
 import net.dungeonz.block.entity.DungeonPortalEntity;
 import net.dungeonz.block.entity.DungeonSpawnerEntity;
 import net.dungeonz.dungeon.Dungeon;
@@ -112,6 +114,7 @@ public class DungeonPlacementHandler {
             HashMap<Integer, ArrayList<BlockPos>> blockIdPosMap = new HashMap<Integer, ArrayList<BlockPos>>();
             ArrayList<BlockPos> chestPosList = new ArrayList<BlockPos>();
             ArrayList<BlockPos> exitPosList = new ArrayList<BlockPos>();
+            ArrayList<BlockPos> gatePosList = new ArrayList<BlockPos>();
             HashMap<BlockPos, Integer> spawnerPosEntityIdMap = new HashMap<BlockPos, Integer>();
             Block exitBlock = Registry.BLOCK.get(dungeon.getExitBlockId());
             Block bossLootBlock = Registry.BLOCK.get(dungeon.getBossLootBlockId());
@@ -119,13 +122,11 @@ public class DungeonPlacementHandler {
             StructurePiecesCollector structurePiecesCollector = optional.get().generate();
             for (StructurePiece structurePiece : structurePiecesCollector.toList().pieces()) {
                 if (!(structurePiece instanceof PoolStructurePiece)) {
-                    // System.out.println("???? " + structurePiece.getType());
                     continue;
                 }
                 PoolStructurePiece poolStructurePiece = (PoolStructurePiece) structurePiece;
                 poolStructurePiece.generate((StructureWorldAccess) world, structureAccessor, chunkGenerator, random, BlockBox.infinite(), pos, keepJigsaws);
 
-                // System.out.println(structurePiece.getType() + " : " + structurePiece.getChainLength());
                 portalEntity.addDungeonEdge(poolStructurePiece.getBoundingBox().getMinX(), poolStructurePiece.getBoundingBox().getMinY(), poolStructurePiece.getBoundingBox().getMinZ());
                 portalEntity.addDungeonEdge(poolStructurePiece.getBoundingBox().getMaxX(), poolStructurePiece.getBoundingBox().getMaxY(), poolStructurePiece.getBoundingBox().getMaxZ());
                 for (int i = poolStructurePiece.getBoundingBox().getMinX(); i <= poolStructurePiece.getBoundingBox().getMaxX(); i++) {
@@ -152,6 +153,16 @@ public class DungeonPlacementHandler {
                                     portalEntity.setBossLootBlockPos(checkPos);
                                 } else if (world.getBlockState(checkPos).isOf(BlockInit.DUNGEON_SPAWNER)) {
                                     spawnerPosEntityIdMap.put(checkPos, ((DungeonSpawnerEntity) world.getBlockEntity(checkPos)).getLogic().getEntityId());
+                                } else if (world.getBlockState(checkPos).isOf(BlockInit.DUNGEON_GATE)) {
+                                    gatePosList.add(checkPos);
+                                    if (world.getBlockEntity(checkPos) != null && ((DungeonGateEntity) world.getBlockEntity(checkPos)).getUnlockItem() == null) {
+                                        DungeonGateEntity dungeonGateEntity = (DungeonGateEntity) world.getBlockEntity(checkPos);
+                                        dungeonGateEntity.addDungeonEdge(poolStructurePiece.getBoundingBox().getMinX(), poolStructurePiece.getBoundingBox().getMinY(),
+                                                poolStructurePiece.getBoundingBox().getMinZ());
+                                        dungeonGateEntity.addDungeonEdge(poolStructurePiece.getBoundingBox().getMaxX(), poolStructurePiece.getBoundingBox().getMaxY(),
+                                                poolStructurePiece.getBoundingBox().getMaxZ());
+                                        dungeonGateEntity.markDirty();
+                                    }
                                 }
                             }
                         }
@@ -162,6 +173,8 @@ public class DungeonPlacementHandler {
             portalEntity.setExitPosList(exitPosList);
             portalEntity.setBlockMap(blockIdPosMap);
             portalEntity.setSpawnerPosEntityIdMap(spawnerPosEntityIdMap);
+            portalEntity.setGatePosList(gatePosList);
+            portalEntity.markDirty();
             return true;
         }
         return false;
@@ -231,6 +244,9 @@ public class DungeonPlacementHandler {
                             ? Registry.BLOCK.get(dungeon.getBlockIdBlockReplacementMap().get(dungeon.getExitBlockId())).getDefaultState()
                             : Registry.BLOCK.get(dungeon.getExitBlockId()).getDefaultState(),
                     3);
+        } // Refresh gates
+        for (int i = 0; i < portalEntity.getGatePosList().size(); i++) {
+            world.setBlockState(portalEntity.getGatePosList().get(i), world.getBlockState(portalEntity.getGatePosList().get(i)).cycle(DungeonGateBlock.ENABLED));
         }
         // Refresh boss loot
         world.setBlockState(portalEntity.getBossLootBlockPos(),
@@ -252,6 +268,7 @@ public class DungeonPlacementHandler {
             Entry<BlockPos, Integer> entry = replaceBlockIterator.next();
             world.setBlockState(entry.getKey(), Registry.BLOCK.get(entry.getValue()).getDefaultState(), 3);
         }
+        portalEntity.markDirty();
     }
 
     @Nullable

@@ -2,6 +2,7 @@ package net.dungeonz.block.screen;
 
 import org.apache.commons.lang3.StringUtils;
 
+import net.dungeonz.block.entity.DungeonPortalEntity;
 import net.dungeonz.network.DungeonClientPacket;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -37,6 +38,15 @@ public class DungeonPortalOpScreen extends Screen {
 
     @Override
     protected void init() {
+        if (client.world != null && client.world.getBlockEntity(this.dungeonPortalPos) != null && client.world.getBlockEntity(this.dungeonPortalPos) instanceof DungeonPortalEntity) {
+            DungeonPortalEntity dungeonPortalEntity = (DungeonPortalEntity) client.world.getBlockEntity(this.dungeonPortalPos);
+            if (!dungeonPortalEntity.getDungeonType().equals("")) {
+                defaultDungeonType = dungeonPortalEntity.getDungeonType();
+            }
+            if (!dungeonPortalEntity.getDifficulty().equals("")) {
+                defaultDungeonDifficulty = dungeonPortalEntity.getDifficulty();
+            }
+        }
 
         this.dungeonTypeTextFieldWidget = new TextFieldWidget(this.textRenderer, this.width / 2 - 152, 50, 300, 20, DUNGEON_TYPE_TEXT);
         this.dungeonTypeTextFieldWidget.setMaxLength(128);

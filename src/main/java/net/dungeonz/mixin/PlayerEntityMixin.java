@@ -51,6 +51,14 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     @Override
+    public boolean teleport(double x, double y, double z, boolean particleEffects) {
+        if (world.getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
+            return false;
+        }
+        return super.teleport(x, y, z, particleEffects);
+    }
+
+    @Override
     public boolean addStatusEffect(StatusEffectInstance effect, Entity source) {
         if (!world.isClient && effect.getEffectType().isBeneficial() && world.getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
             if (DungeonHelper.getDungeonPortalEntity((ServerPlayerEntity) (Object) this).getDisableEffects()) {

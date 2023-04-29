@@ -141,7 +141,7 @@ public class DimensionStructure extends Structure {
             dungeonPortalEntity.setDungeonType(dungeonType);
             dungeonPortalEntity.setDifficulty(dungeonPortalEntity.getDungeon().getDifficultyList().get(0));
             dungeonPortalEntity.setMaxGroupSize(dungeonPortalEntity.getDungeon().getMaxGroupSize());
-
+            dungeonPortalEntity.markDirty();
             // DungeonPortalEntity dungeonPortalEntity = (DungeonPortalEntity) world.getBlockEntity(list.get(0));
             // dungeonPortalEntity.s
             // System.out.println(box.getCenter() + " : " + count + " : " + iCount + " : " + uCount + " : " + oCount + " : " + pieces.getBoundingBox());

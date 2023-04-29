@@ -2,9 +2,9 @@ package net.dungeonz.block;
 
 import net.dungeonz.access.ServerPlayerAccess;
 import net.dungeonz.block.entity.DungeonPortalEntity;
-import net.dungeonz.block.screen.DungeonPortalOpScreen;
 import net.dungeonz.dimension.DungeonPlacementHandler;
 import net.dungeonz.init.DimensionInit;
+import net.dungeonz.network.DungeonServerPacket;
 import net.dungeonz.util.DungeonHelper;
 import net.dungeonz.util.InventoryHelper;
 import net.fabricmc.fabric.api.dimension.v1.FabricDimensions;
@@ -12,7 +12,6 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -47,8 +46,8 @@ public class DungeonPortalBlock extends BlockWithEntity {
             DungeonPortalEntity dungeonPortalEntity = (DungeonPortalEntity) player.world.getBlockEntity(pos);
 
             if (player.isCreativeLevelTwoOp() && (dungeonPortalEntity.getDungeon() == null || player.isSneaking())) {
-                if (world.isClient) {
-                    MinecraftClient.getInstance().setScreen(new DungeonPortalOpScreen(pos));
+                if (!world.isClient) {
+                    DungeonServerPacket.writeS2COpenOpScreenPacket((ServerPlayerEntity) player, dungeonPortalEntity, null);
                 }
                 return ActionResult.success(world.isClient);
             } else if (dungeonPortalEntity.getDungeon() != null) {

@@ -4,7 +4,10 @@ import java.util.List;
 
 import io.netty.buffer.Unpooled;
 import net.dungeonz.access.ClientPlayerAccess;
+import net.dungeonz.block.entity.DungeonGateEntity;
 import net.dungeonz.block.entity.DungeonPortalEntity;
+import net.dungeonz.block.screen.DungeonGateOpScreen;
+import net.dungeonz.block.screen.DungeonPortalOpScreen;
 import net.dungeonz.block.screen.DungeonPortalScreen;
 import net.dungeonz.block.screen.DungeonPortalScreenHandler;
 import net.fabricmc.api.EnvType;
@@ -14,6 +17,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
 @Environment(EnvType.CLIENT)
@@ -42,6 +46,30 @@ public class DungeonClientPacket {
                     }
                     if (client.player.currentScreenHandler instanceof DungeonPortalScreenHandler) {
                         ((DungeonPortalScreenHandler) client.player.currentScreenHandler).setDifficulty(difficulty);
+                    }
+                }
+            });
+        });
+        ClientPlayNetworking.registerGlobalReceiver(DungeonServerPacket.OP_SCREEN_PACKET, (client, handler, buf, sender) -> {
+            String portalOrGate = buf.readString();
+            BlockPos portalOrGatePos = buf.readBlockPos();
+            String dungeonTypeOrBlockId = buf.readString();
+            String difficultyOrParticleId = buf.readString();
+            String unlockItemId = portalOrGate.equals("gate") ? buf.readString() : "";
+
+            client.execute(() -> {
+                if (client.world.getBlockEntity(portalOrGatePos) != null) {
+                    if (client.world.getBlockEntity(portalOrGatePos) instanceof DungeonPortalEntity) {
+                        DungeonPortalEntity dungeonPortalEntity = (DungeonPortalEntity) client.world.getBlockEntity(portalOrGatePos);
+                        dungeonPortalEntity.setDungeonType(dungeonTypeOrBlockId);
+                        dungeonPortalEntity.setDifficulty(difficultyOrParticleId);
+                        client.setScreen(new DungeonPortalOpScreen(portalOrGatePos));
+                    } else if (client.world.getBlockEntity(portalOrGatePos) instanceof DungeonGateEntity) {
+                        DungeonGateEntity dungeonGateEntity = (DungeonGateEntity) client.world.getBlockEntity(portalOrGatePos);
+                        dungeonGateEntity.setBlockId(new Identifier(dungeonTypeOrBlockId));
+                        dungeonGateEntity.setParticleEffectId(difficultyOrParticleId);
+                        dungeonGateEntity.setUnlockItemId(unlockItemId);
+                        client.setScreen(new DungeonGateOpScreen(portalOrGatePos));
                     }
                 }
             });
@@ -76,6 +104,16 @@ public class DungeonClientPacket {
         buf.writeString(dungeonType);
         buf.writeString(defaultDifficulty);
         CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(DungeonServerPacket.SET_DUNGEON_TYPE_PACKET, buf);
+        client.getNetworkHandler().sendPacket(packet);
+    }
+
+    public static void writeC2SSetGateBlockPacket(MinecraftClient client, String blockId, String particleId, String unlockItemId, BlockPos portalBlockPos) {
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+        buf.writeBlockPos(portalBlockPos);
+        buf.writeString(blockId);
+        buf.writeString(particleId);
+        buf.writeString(unlockItemId);
+        CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(DungeonServerPacket.SET_GATE_BLOCK_PACKET, buf);
         client.getNetworkHandler().sendPacket(packet);
     }
 }

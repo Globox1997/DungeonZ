@@ -1,5 +1,6 @@
 package net.dungeonz.init;
 
+import net.dungeonz.block.render.DungeonGateRenderer;
 import net.dungeonz.block.render.DungeonPortalRenderer;
 import net.dungeonz.block.render.DungeonSpawnerRenderer;
 import net.dungeonz.block.screen.DungeonPortalScreen;
@@ -15,9 +16,11 @@ public class RenderInit {
 
     public static void init() {
         BlockRenderLayerMap.INSTANCE.putBlock(BlockInit.DUNGEON_SPAWNER, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(BlockInit.DUNGEON_GATE, RenderLayer.getCutout());
 
         BlockEntityRendererFactories.register(BlockInit.DUNGEON_PORTAL_ENTITY, DungeonPortalRenderer::new);
         BlockEntityRendererFactories.register(BlockInit.DUNGEON_SPAWNER_ENTITY, DungeonSpawnerRenderer::new);
+        BlockEntityRendererFactories.register(BlockInit.DUNGEON_GATE_ENTITY, DungeonGateRenderer::new);
 
         HandledScreens.register(BlockInit.PORTAL, DungeonPortalScreen::new);
     }

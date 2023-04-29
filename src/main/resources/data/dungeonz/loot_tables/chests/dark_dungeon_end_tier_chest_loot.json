@@ -2,11 +2,11 @@
     "type": "minecraft:chest",
     "pools": [
         {
-            "rolls": 10,
+            "rolls": 1,
             "entries": [
                 {
                     "type": "minecraft:item",
-                    "name": "minecraft:stone"
+                    "name": "minecraft:gold_block"
                 }
             ]
         }
