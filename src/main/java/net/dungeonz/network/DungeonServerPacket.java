@@ -30,6 +30,7 @@ public class DungeonServerPacket {
 
     public static final Identifier SET_DUNGEON_TYPE_PACKET = new Identifier("dungeonz", "set_dungeon_type");
     public static final Identifier SET_GATE_BLOCK_PACKET = new Identifier("dungeonz", "set_gate_block");
+    public static final Identifier SYNC_GATE_BLOCK_PACKET = new Identifier("dungeonz", "sync_gate_block");
 
     public static final Identifier SYNC_SCREEN_PACKET = new Identifier("dungeonz", "sync_screen");
     public static final Identifier OP_SCREEN_PACKET = new Identifier("dungeonz", "op_screen");
@@ -114,12 +115,6 @@ public class DungeonServerPacket {
             server.execute(() -> {
                 if (player.isCreativeLevelTwoOp()) {
                     if (player.world.getBlockEntity(gatePos) != null && player.world.getBlockEntity(gatePos) instanceof DungeonGateEntity) {
-                        DungeonGateEntity dungeonGateEntity = (DungeonGateEntity) player.world.getBlockEntity(gatePos);
-                        dungeonGateEntity.setBlockId(new Identifier(blockId));
-                        dungeonGateEntity.setParticleEffectId(particleId);
-                        dungeonGateEntity.setUnlockItemId(unlockItemId);
-                        dungeonGateEntity.markDirty();
-
                         List<BlockPos> otherDungeonGatesPosList = DungeonGateEntity.getConnectedDungeonGatePosList(player.world, gatePos);
                         for (int i = 0; i < otherDungeonGatesPosList.size(); i++) {
                             if (player.world.getBlockEntity(otherDungeonGatesPosList.get(i)) != null && player.world.getBlockEntity(otherDungeonGatesPosList.get(i)) instanceof DungeonGateEntity) {
@@ -130,6 +125,7 @@ public class DungeonServerPacket {
                                 otherDungeonGateEntity.markDirty();
                             }
                         }
+                        writeS2CSyncGatePacket(player, (DungeonGateEntity) player.world.getBlockEntity(gatePos), otherDungeonGatesPosList);
                     }
                 }
             });
@@ -170,6 +166,20 @@ public class DungeonServerPacket {
             buf.writeString(dungeonGateEntity.getUnlockItem() != null ? Registry.ITEM.getId(dungeonGateEntity.getUnlockItem()).toString() : "");
         }
         CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(OP_SCREEN_PACKET, buf);
+        serverPlayerEntity.networkHandler.sendPacket(packet);
+    }
+
+    public static void writeS2CSyncGatePacket(ServerPlayerEntity serverPlayerEntity, DungeonGateEntity dungeonGateEntity, List<BlockPos> dungeonGatesPosList) {
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+        buf.writeInt(dungeonGatesPosList.size());
+        for (int i = 0; i < dungeonGatesPosList.size(); i++) {
+            buf.writeBlockPos(dungeonGatesPosList.get(i));
+        }
+        buf.writeString(Registry.BLOCK.getId(dungeonGateEntity.getBlockState().getBlock()).toString());
+        buf.writeString(dungeonGateEntity.getParticleEffect() != null ? dungeonGateEntity.getParticleEffect().asString() : "");
+        buf.writeString(dungeonGateEntity.getUnlockItem() != null ? Registry.ITEM.getId(dungeonGateEntity.getUnlockItem()).toString() : "");
+
+        CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(SYNC_GATE_BLOCK_PACKET, buf);
         serverPlayerEntity.networkHandler.sendPacket(packet);
     }
 

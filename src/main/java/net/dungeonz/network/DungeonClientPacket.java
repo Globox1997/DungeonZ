@@ -1,5 +1,6 @@
 package net.dungeonz.network;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.netty.buffer.Unpooled;
@@ -74,6 +75,28 @@ public class DungeonClientPacket {
                 }
             });
         });
+        ClientPlayNetworking.registerGlobalReceiver(DungeonServerPacket.SYNC_GATE_BLOCK_PACKET, (client, handler, buf, sender) -> {
+            int posListSize = buf.readInt();
+            List<BlockPos> dungeonGatesPosList = new ArrayList<BlockPos>();
+            for (int i = 0; i < posListSize; i++) {
+                dungeonGatesPosList.add(buf.readBlockPos());
+            }
+            String blockId = buf.readString();
+            String particleId = buf.readString();
+            String unlockItemId = buf.readString();
+
+            client.execute(() -> {
+                for (int i = 0; i < dungeonGatesPosList.size(); i++) {
+                    if (client.world.getBlockEntity(dungeonGatesPosList.get(i)) != null && client.world.getBlockEntity(dungeonGatesPosList.get(i)) instanceof DungeonGateEntity) {
+                        DungeonGateEntity dungeonGateEntity = (DungeonGateEntity) client.world.getBlockEntity(dungeonGatesPosList.get(i));
+                        dungeonGateEntity.setBlockId(new Identifier(blockId));
+                        dungeonGateEntity.setParticleEffectId(particleId);
+                        dungeonGateEntity.setUnlockItemId(unlockItemId);
+                    }
+                }
+            });
+        });
+
     }
 
     public static void writeC2SChangeDifficultyPacket(MinecraftClient client, BlockPos portalBlockPos) {
