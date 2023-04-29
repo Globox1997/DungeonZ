@@ -2,8 +2,8 @@ package net.dungeonz.util;
 
 import java.util.List;
 
-import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.context.LootContext;
@@ -17,16 +17,16 @@ import net.minecraft.util.math.Vec3d;
 
 public class InventoryHelper {
 
-    public static void fillChestWithLoot(MinecraftServer server, ServerWorld world, BlockPos pos, String lootTableString, boolean luck) {
-        // Clear chest
-        ((ChestBlockEntity) world.getBlockEntity(pos)).clear();
+    public static void fillInventoryWithLoot(MinecraftServer server, ServerWorld world, BlockPos pos, String lootTableString, boolean luck) {
+        // Clear inventory
+        ((Inventory) world.getBlockEntity(pos)).clear();
         // Generate loot
         LootTable lootTable = server.getLootManager().getTable(new Identifier(lootTableString));
         LootContext.Builder builder = new LootContext.Builder(world).parameter(LootContextParameters.ORIGIN, new Vec3d(pos.getX(), pos.getY(), pos.getZ())).random(world.getRandom().nextLong());
         if (luck) {
             builder.luck(1.1f);
         }
-        lootTable.supplyInventory((ChestBlockEntity) world.getBlockEntity(pos), builder.build(LootContextTypes.CHEST));
+        lootTable.supplyInventory((Inventory) world.getBlockEntity(pos), builder.build(LootContextTypes.CHEST));
     }
 
     public static boolean hasRequiredItemStacks(PlayerInventory playerInventory, List<ItemStack> requiredItemStacks) {

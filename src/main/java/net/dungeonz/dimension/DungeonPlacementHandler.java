@@ -235,7 +235,7 @@ public class DungeonPlacementHandler {
         // Refresh chests
         for (int i = 0; i < portalEntity.getChestPosList().size(); i++) {
             String lootTableString = dungeon.getDifficultyLootTableIdMap().get(difficulty).get(world.getRandom().nextInt(dungeon.getDifficultyLootTableIdMap().get(difficulty).size()));
-            InventoryHelper.fillChestWithLoot(server, world, portalEntity.getChestPosList().get(i), lootTableString, luck);
+            InventoryHelper.fillInventoryWithLoot(server, world, portalEntity.getChestPosList().get(i), lootTableString, luck);
         }
         // Refresh exit
         for (int i = 0; i < portalEntity.getExitPosList().size(); i++) {

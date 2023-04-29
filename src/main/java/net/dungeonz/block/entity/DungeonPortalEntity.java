@@ -316,7 +316,8 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         // play dungeon sound
         // System.out.println("BOSS CHEST: " + this.getBossLootBlockPos());
         world.setBlockState(this.getBossLootBlockPos(), Blocks.CHEST.getDefaultState(), 3);
-        InventoryHelper.fillChestWithLoot(world.getServer(), world, this.getBossLootBlockPos(), this.getDungeon().getDifficultyBossLootTableMap().get(this.getDifficulty()), this.getDisableEffects());
+        InventoryHelper.fillInventoryWithLoot(world.getServer(), world, this.getBossLootBlockPos(), this.getDungeon().getDifficultyBossLootTableMap().get(this.getDifficulty()),
+                this.getDisableEffects());
 
         this.setCooldown(this.getDungeon().getCooldown());
     }
