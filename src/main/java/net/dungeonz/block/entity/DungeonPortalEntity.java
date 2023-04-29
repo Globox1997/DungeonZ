@@ -229,6 +229,11 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
     }
 
     @Override
+    public NbtCompound toInitialChunkDataNbt() {
+        return this.createNbt();
+    }
+
+    @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
         return new DungeonPortalScreenHandler(syncId, playerInventory, this, ScreenHandlerContext.create(world, pos));
     }
@@ -301,7 +306,6 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
 
     @Nullable
     public Dungeon getDungeon() {
-        // return Dungeon.getDungeon("dark_dungeon");
         return Dungeon.getDungeon(this.dungeonType);
     }
 
@@ -310,7 +314,6 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
     }
 
     public String getDungeonType() {
-        // return "dark_dungeon";
         return this.dungeonType;
     }
 
