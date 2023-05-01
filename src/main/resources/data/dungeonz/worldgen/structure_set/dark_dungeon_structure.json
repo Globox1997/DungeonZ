@@ -8,11 +8,11 @@
     "placement": {
         "type": "minecraft:random_spread",
         "salt": 1224466880,
-        "spacing": 2,
-        "separation": 1,
+        "spacing": 1024,
+        "separation": 512,
         "exclusion_zone": {
             "chunk_count": 10,
-            "other_set": "minecraft:ocean_monuments"
+            "other_set": "minecraft:villages"
         }
     }
 }
