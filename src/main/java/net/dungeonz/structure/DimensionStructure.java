@@ -110,16 +110,11 @@ public class DimensionStructure extends Structure {
         return structurePiecesGenerator;
     }
 
-    // Make random mobs not spawnable in this dimension
-
     @Override
     public void postPlace(StructureWorldAccess world, StructureAccessor structureAccessor, ChunkGenerator chunkGenerator, Random random, BlockBox box, ChunkPos chunkPos, StructurePiecesList pieces) {
         List<BlockPos> list = new ArrayList<BlockPos>();
 
         pieces.pieces().forEach((piece) -> {
-            // System.out.println("Type: " + piece.getType());
-
-            // piece.getType();
             for (int i = piece.getBoundingBox().getMinX(); i <= piece.getBoundingBox().getMaxX(); i++) {
                 for (int u = piece.getBoundingBox().getMinY(); u <= piece.getBoundingBox().getMaxY(); u++) {
                     for (int o = piece.getBoundingBox().getMinZ(); o <= piece.getBoundingBox().getMaxZ(); o++) {
@@ -131,20 +126,13 @@ public class DimensionStructure extends Structure {
                 }
             }
         });
-        // System.out.println("POST " + list.size());
-
-        // System.out.println("BÜDSBPIDS " + this.dimensionzType);
 
         if (!list.isEmpty()) {
-            System.out.println(list.size() + " PORTAL POS AT: " + list.get(0) + " In OVERWORLD " + world.getBlockState(list.get(0)));
             DungeonPortalEntity dungeonPortalEntity = (DungeonPortalEntity) world.getBlockEntity(list.get(0));
             dungeonPortalEntity.setDungeonType(dungeonType);
             dungeonPortalEntity.setDifficulty(dungeonPortalEntity.getDungeon().getDifficultyList().get(0));
             dungeonPortalEntity.setMaxGroupSize(dungeonPortalEntity.getDungeon().getMaxGroupSize());
             dungeonPortalEntity.markDirty();
-            // DungeonPortalEntity dungeonPortalEntity = (DungeonPortalEntity) world.getBlockEntity(list.get(0));
-            // dungeonPortalEntity.s
-            // System.out.println(box.getCenter() + " : " + count + " : " + iCount + " : " + uCount + " : " + oCount + " : " + pieces.getBoundingBox());
         }
     }
 

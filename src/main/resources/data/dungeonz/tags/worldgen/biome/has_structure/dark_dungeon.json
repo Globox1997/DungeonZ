@@ -1,0 +1,14 @@
+{
+    "replace": false,
+    "values": [
+        "minecraft:plains",
+        "minecraft:forest",
+        "minecraft:sparse_jungle",
+        "minecraft:dark_forest",
+        "minecraft:taiga",
+        {
+            "id": "minecraft:birch_forest",
+            "required": false
+        }
+    ]
+}
