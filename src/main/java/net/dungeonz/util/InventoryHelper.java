@@ -48,13 +48,18 @@ public class InventoryHelper {
     }
 
     public static void decrementRequiredItemStacks(PlayerInventory playerInventory, List<ItemStack> requiredItemStacks) {
-        if (!requiredItemStacks.isEmpty()) {
+        if (!requiredItemStacks.isEmpty() && !playerInventory.player.isCreative()) {
             for (int i = 0; i < requiredItemStacks.size(); i++) {
                 int requiredCount = requiredItemStacks.get(i).getCount();
                 for (int u = 0; u < playerInventory.main.size(); u++) {
                     if (ItemStack.areItemsEqual(playerInventory.main.get(u), requiredItemStacks.get(i))) {
+                        if (playerInventory.main.get(u).getCount() >= requiredCount) {
+                            playerInventory.main.get(u).decrement(requiredCount);
+                            break;
+                        }
                         requiredCount -= playerInventory.main.get(u).getCount();
-                        playerInventory.main.get(u).decrement(requiredCount);
+                        playerInventory.main.get(u).setCount(0);
+
                         if (requiredCount <= 0) {
                             break;
                         }

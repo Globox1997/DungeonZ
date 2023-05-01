@@ -184,8 +184,8 @@ public class DungeonPlacementHandler {
         // Remove mobs and items
         for (int i = 0; i < portalEntity.getDungeonEdgeList().size() / 6; i++) {
             List<Entity> entities = world.getOtherEntities(null,
-                    new Box(portalEntity.getDungeonEdgeList().get(i + 6 * i), portalEntity.getDungeonEdgeList().get(i + 1 + 6 * i), portalEntity.getDungeonEdgeList().get(i + 2 + 6 * i),
-                            portalEntity.getDungeonEdgeList().get(i + 3 + 6 * i), portalEntity.getDungeonEdgeList().get(i + 4 + 6 * i), portalEntity.getDungeonEdgeList().get(i + 5 + 6 * i)));
+                    new Box(portalEntity.getDungeonEdgeList().get(6 * i), portalEntity.getDungeonEdgeList().get(1 + 6 * i), portalEntity.getDungeonEdgeList().get(2 + 6 * i),
+                            portalEntity.getDungeonEdgeList().get(3 + 6 * i), portalEntity.getDungeonEdgeList().get(4 + 6 * i), portalEntity.getDungeonEdgeList().get(5 + 6 * i)));
             for (int u = 0; u < entities.size(); u++) {
                 // if (entities.get(u) instanceof LivingEntity || entities.get(u) instanceof ItemEntity || entities.get(u) instanceof ProjectileEntity) {
                 entities.get(u).remove(RemovalReason.DISCARDED);
@@ -268,6 +268,7 @@ public class DungeonPlacementHandler {
             Entry<BlockPos, Integer> entry = replaceBlockIterator.next();
             world.setBlockState(entry.getKey(), Registry.BLOCK.get(entry.getValue()).getDefaultState(), 3);
         }
+        portalEntity.getDeadDungeonPlayerUUIDs().clear();
         portalEntity.markDirty();
     }
 

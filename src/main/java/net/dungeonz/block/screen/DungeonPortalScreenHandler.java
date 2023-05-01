@@ -40,6 +40,11 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         for (int i = 0; i < dungeonPlayerCount; i++) {
             dungeonPlayerUUIDs.add(buf.readUuid());
         }
+        int deadDungeonPlayerCount = buf.readInt();
+        List<UUID> deadDungeonPlayerUUIDs = new ArrayList<UUID>();
+        for (int i = 0; i < deadDungeonPlayerCount; i++) {
+            deadDungeonPlayerUUIDs.add(buf.readUuid());
+        }
         int difficultyCount = buf.readInt();
         List<String> difficulties = new ArrayList<String>();
         if (difficultyCount != 0) {
@@ -74,6 +79,7 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         boolean disableEffects = buf.readBoolean();
 
         this.setDungeonPlayerUUIDs(dungeonPlayerUUIDs);
+        this.setDeadDungeonPlayerUUIDs(deadDungeonPlayerUUIDs);
         this.setDifficulties(difficulties);
         this.setPossibleLootItemStacks(possibleLootDifficultyItemStacks);
         this.setRequiredItemStacks(requiredItemStacks);
@@ -95,12 +101,6 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
             setRequiredItemStacks(DungeonHelper.getRequiredItemStackList(this.dungeonPortalEntity.getDungeon()));
             setPossibleLootItemStacks(DungeonHelper.getPossibleLootItemStackMap(this.dungeonPortalEntity.getDungeon(), this.world.getServer()));
         }
-    }
-
-    @Override
-    public boolean onButtonClick(PlayerEntity player, int id) {
-        System.out.println(player + " : " + id);
-        return true;
     }
 
     @Override
@@ -132,6 +132,14 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
 
     public void setDungeonPlayerUUIDs(List<UUID> dungeonPlayerUUIDs) {
         this.dungeonPortalEntity.setDungeonPlayerUUIDs(dungeonPlayerUUIDs);
+    }
+
+    public List<UUID> getDeadDungeonPlayerUUIDs() {
+        return this.dungeonPortalEntity.getDeadDungeonPlayerUUIDs();
+    }
+
+    public void setDeadDungeonPlayerUUIDs(List<UUID> deadDungeonPlayerUUIDs) {
+        this.dungeonPortalEntity.setDeadDungeonPlayerUUIDs(deadDungeonPlayerUUIDs);
     }
 
     public List<String> getDifficulties() {

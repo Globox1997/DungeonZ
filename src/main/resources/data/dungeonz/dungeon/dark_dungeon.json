@@ -126,5 +126,5 @@
     "max_group_size": 5,
     "cooldown": 108000,
     "background_texture": "",
-    "dungeon_structure_pool_id": "dungeonz:dungeon_spawn"
+    "dungeon_structure_pool_id": "dungeonz:dark_dungeon/dungeon_spawn"
 }

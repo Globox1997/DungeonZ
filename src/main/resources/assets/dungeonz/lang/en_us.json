@@ -21,6 +21,7 @@
     "text.dungeonz.missing": "Missing items",
     "text.dungeonz.effects": "Effects",
     "text.dungeonz.nothing_required": "-",
+    "text.dungeonz.dead_player": "Rejoin not allowed",
     "text.dungeonz.empty_name": "-",
     "text.dungeonz.player_list": "Players (%d/%d)",
     "text.dungeonz.dungeon_full": "Dungeon is full",

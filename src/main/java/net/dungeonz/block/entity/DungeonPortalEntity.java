@@ -46,6 +46,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
     private String difficulty = "";
     private boolean dungeonStructureGenerated = false;
     private List<UUID> dungeonPlayerUUIDs = new ArrayList<UUID>();
+    private List<UUID> deadDungeonPlayerUUIDs = new ArrayList<UUID>();
     private int maxGroupSize = 0;
     private int cooldown = 0;
     private boolean disableEffects = false;
@@ -70,9 +71,12 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         this.difficulty = nbt.getString("Difficulty");
         this.dungeonStructureGenerated = nbt.getBoolean("DungeonStructureGenerated");
         this.dungeonPlayerUUIDs.clear();
-
         for (int i = 0; i < nbt.getInt("DungeonPlayerCount"); i++) {
             this.dungeonPlayerUUIDs.add(nbt.getUuid("PlayerUUID" + i));
+        }
+        this.deadDungeonPlayerUUIDs.clear();
+        for (int i = 0; i < nbt.getInt("DeadDungeonPlayerCount"); i++) {
+            this.deadDungeonPlayerUUIDs.add(nbt.getUuid("DeadPlayerUUID" + i));
         }
         this.maxGroupSize = nbt.getInt("MaxGroupSize");
         this.cooldown = nbt.getInt("Cooldown");
@@ -145,6 +149,10 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         nbt.putInt("DungeonPlayerCount", this.dungeonPlayerUUIDs.size());
         for (int i = 0; i < this.dungeonPlayerUUIDs.size(); i++) {
             nbt.putUuid("PlayerUUID" + i, this.dungeonPlayerUUIDs.get(i));
+        }
+        nbt.putInt("DeadDungeonPlayerCount", this.deadDungeonPlayerUUIDs.size());
+        for (int i = 0; i < this.deadDungeonPlayerUUIDs.size(); i++) {
+            nbt.putUuid("DeadPlayerUUID" + i, this.deadDungeonPlayerUUIDs.get(i));
         }
         nbt.putInt("MaxGroupSize", this.maxGroupSize);
         nbt.putInt("Cooldown", this.cooldown);
@@ -224,9 +232,9 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         nbt.putInt("DungeonEdgeSize", this.dungeonEdgeList.size());
         if (this.dungeonEdgeList.size() > 0) {
             for (int i = 0; i < this.dungeonEdgeList.size() / 3; i++) {
-                nbt.putInt("DungeonEdgeX" + i, this.dungeonEdgeList.get(i + 3 * i));
-                nbt.putInt("DungeonEdgeY" + i, this.dungeonEdgeList.get(i + 1 + 3 * i));
-                nbt.putInt("DungeonEdgeZ" + i, this.dungeonEdgeList.get(i + 2 + 3 * i));
+                nbt.putInt("DungeonEdgeX" + i, this.dungeonEdgeList.get(3 * i));
+                nbt.putInt("DungeonEdgeY" + i, this.dungeonEdgeList.get(1 + 3 * i));
+                nbt.putInt("DungeonEdgeZ" + i, this.dungeonEdgeList.get(2 + 3 * i));
             }
         }
 
@@ -279,6 +287,10 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         buf.writeInt(this.getDungeonPlayerCount());
         for (int i = 0; i < this.getDungeonPlayerCount(); i++) {
             buf.writeUuid(this.getDungeonPlayerUUIDs().get(i));
+        }
+        buf.writeInt(this.getDeadDungeonPlayerUUIDs().size());
+        for (int i = 0; i < this.getDeadDungeonPlayerUUIDs().size(); i++) {
+            buf.writeUuid(this.getDeadDungeonPlayerUUIDs().get(i));
         }
 
         if (this.getDungeon() != null) {
@@ -385,6 +397,18 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
 
     public List<UUID> getDungeonPlayerUUIDs() {
         return this.dungeonPlayerUUIDs;
+    }
+
+    public void addDeadDungeonPlayerUUIDs(UUID deadDungeonPlayerUUID) {
+        this.deadDungeonPlayerUUIDs.add(deadDungeonPlayerUUID);
+    }
+
+    public void setDeadDungeonPlayerUUIDs(List<UUID> deadDungeonPlayerUUIDs) {
+        this.deadDungeonPlayerUUIDs = deadDungeonPlayerUUIDs;
+    }
+
+    public List<UUID> getDeadDungeonPlayerUUIDs() {
+        return this.deadDungeonPlayerUUIDs;
     }
 
     // Might lead to issues if using "="

@@ -105,7 +105,9 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
                 this.effectButton.active = true;
             }
             if (this.handler.getDungeonPlayerUUIDs().size() < this.handler.getMaxPlayerCount()
-                    && InventoryHelper.hasRequiredItemStacks(this.playerEntity.getInventory(), this.handler.getRequiredItemStacks())) {
+                    && InventoryHelper.hasRequiredItemStacks(this.playerEntity.getInventory(), this.handler.getRequiredItemStacks())
+                    && !this.handler.getDeadDungeonPlayerUUIDs().contains(this.playerEntity.getUuid())) {
+
                 this.dungeonButton.setDisabled(false);
             } else {
                 this.dungeonButton.setDisabled(true);
@@ -264,8 +266,11 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
                     int minutes = cooldown / 60 % 60;
                     int hours = cooldown / 60 / 60;
                     text = Text.translatable("text.dungeonz.dungeon_cooldown_time", hours, minutes, seconds);
-                } else if (DungeonPortalScreen.this.handler.getDungeonPlayerUUIDs().size() < DungeonPortalScreen.this.handler.getMaxPlayerCount()) {
+                } else if (DungeonPortalScreen.this.handler.getDungeonPlayerUUIDs().size() >= DungeonPortalScreen.this.handler.getMaxPlayerCount()) {
                     text = Text.translatable("text.dungeonz.dungeon_full");
+                } else if (client.player != null && !DungeonPortalScreen.this.handler.getDeadDungeonPlayerUUIDs().isEmpty()
+                        && DungeonPortalScreen.this.handler.getDeadDungeonPlayerUUIDs().contains(client.player.getUuid())) {
+                    text = Text.translatable("text.dungeonz.dead_player");
                 } else {
                     text = Text.translatable("text.dungeonz.missing");
                 }
