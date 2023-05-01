@@ -50,6 +50,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
     private int maxGroupSize = 0;
     private int cooldown = 0;
     private boolean disableEffects = false;
+    private boolean privateGroup = false;
     private HashMap<Integer, ArrayList<BlockPos>> blockBlockPosMap = new HashMap<Integer, ArrayList<BlockPos>>();
     private List<BlockPos> chestPosList = new ArrayList<BlockPos>();
     private List<BlockPos> exitPosList = new ArrayList<BlockPos>();
@@ -81,6 +82,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         this.maxGroupSize = nbt.getInt("MaxGroupSize");
         this.cooldown = nbt.getInt("Cooldown");
         this.disableEffects = nbt.getBoolean("DisableEffects");
+        this.privateGroup = nbt.getBoolean("PrivateGroup");
         this.blockBlockPosMap.clear();
         if (nbt.getInt("BlockMapSize") > 0) {
             for (int i = 0; i < nbt.getInt("BlockMapSize"); i++) {
@@ -157,6 +159,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         nbt.putInt("MaxGroupSize", this.maxGroupSize);
         nbt.putInt("Cooldown", this.cooldown);
         nbt.putBoolean("DisableEffects", this.disableEffects);
+        nbt.putBoolean("PrivateGroup", this.privateGroup);
 
         nbt.putInt("BlockMapSize", this.blockBlockPosMap.size());
         if (this.blockBlockPosMap.size() > 0) {
@@ -326,6 +329,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         buf.writeInt(this.getCooldown());
         buf.writeString(this.getDifficulty());
         buf.writeBoolean(this.getDisableEffects());
+        buf.writeBoolean(this.getPrivateGroup());
     }
 
     public void finishDungeon(ServerWorld world, BlockPos pos) {
@@ -441,6 +445,14 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
 
     public boolean getDisableEffects() {
         return this.disableEffects;
+    }
+
+    public void setPrivateGroup(boolean privateGroup) {
+        this.privateGroup = privateGroup;
+    }
+
+    public boolean getPrivateGroup() {
+        return this.privateGroup;
     }
 
     public void setBossBlockPos(BlockPos pos) {

@@ -17,9 +17,10 @@
     "dungeon.dark_dungeon": "Dark Dungeon",
 
     "text.dungeonz.possible": "Possible Loot",
-    "text.dungeonz.required": "Required",
+    "text.dungeonz.required": "Required Items",
     "text.dungeonz.missing": "Missing items",
-    "text.dungeonz.effects": "Effects",
+    "text.dungeonz.effects": "Positive Effects",
+    "text.dungeonz.private": "Private Group",
     "text.dungeonz.nothing_required": "-",
     "text.dungeonz.dead_player": "Rejoin not allowed",
     "text.dungeonz.empty_name": "-",

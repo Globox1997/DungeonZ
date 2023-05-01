@@ -114,6 +114,14 @@ public class DungeonClientPacket {
         client.getNetworkHandler().sendPacket(packet);
     }
 
+    public static void writeC2SChangePrivateGroupPacket(MinecraftClient client, BlockPos portalBlockPos, boolean privateGroup) {
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+        buf.writeBlockPos(portalBlockPos);
+        buf.writeBoolean(privateGroup);
+        CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(DungeonServerPacket.CHANGE_DUNGEON_PRIVATE_GROUP_PACKET, buf);
+        client.getNetworkHandler().sendPacket(packet);
+    }
+
     public static void writeC2SDungeonTeleportPacket(MinecraftClient client, BlockPos portalBlockPos) {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         buf.writeBlockPos(portalBlockPos);

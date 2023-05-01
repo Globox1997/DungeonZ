@@ -27,6 +27,7 @@ public class DungeonServerPacket {
 
     public static final Identifier CHANGE_DUNGEON_DIFFICULTY_PACKET = new Identifier("dungeonz", "change_dungeon_difficulty");
     public static final Identifier CHANGE_DUNGEON_EFFECTS_PACKET = new Identifier("dungeonz", "change_dungeon_effects");
+    public static final Identifier CHANGE_DUNGEON_PRIVATE_GROUP_PACKET = new Identifier("dungeonz", "change_dungeon_private_group");
 
     public static final Identifier SET_DUNGEON_TYPE_PACKET = new Identifier("dungeonz", "set_dungeon_type");
     public static final Identifier SET_GATE_BLOCK_PACKET = new Identifier("dungeonz", "set_gate_block");
@@ -74,6 +75,20 @@ public class DungeonServerPacket {
 
                     if (dungeonPortalEntity.getDungeonPlayerCount() == 0) {
                         dungeonPortalEntity.setDisableEffects(disableEffects);
+                        dungeonPortalEntity.markDirty();
+                    }
+                }
+            });
+        });
+        ServerPlayNetworking.registerGlobalReceiver(CHANGE_DUNGEON_PRIVATE_GROUP_PACKET, (server, player, handler, buffer, sender) -> {
+            BlockPos dungeonPortalPos = buffer.readBlockPos();
+            boolean privateGroup = buffer.readBoolean();
+            server.execute(() -> {
+                if (player.world.getBlockEntity(dungeonPortalPos) != null && player.world.getBlockEntity(dungeonPortalPos) instanceof DungeonPortalEntity) {
+                    DungeonPortalEntity dungeonPortalEntity = (DungeonPortalEntity) player.world.getBlockEntity(dungeonPortalPos);
+
+                    if (dungeonPortalEntity.getDungeonPlayerCount() == 0) {
+                        dungeonPortalEntity.setPrivateGroup(privateGroup);
                         dungeonPortalEntity.markDirty();
                     }
                 }

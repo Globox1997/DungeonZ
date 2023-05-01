@@ -99,7 +99,7 @@ public class DungeonPortalBlock extends BlockWithEntity {
                     return;
                 }
                 if (dungeonPortalEntity.getDungeon() != null) {
-                    if (dungeonPortalEntity.getDungeonPlayerCount() < dungeonPortalEntity.getMaxGroupSize()) {
+                    if ((dungeonPortalEntity.getDungeonPlayerCount() + dungeonPortalEntity.getDeadDungeonPlayerUUIDs().size()) < dungeonPortalEntity.getMaxGroupSize()) {
 
                         if (dungeonPortalEntity.getCooldown() > 0) {
                             player.sendMessage(Text.translatable("text.dungeonz.dungeon_cooldown"), false);

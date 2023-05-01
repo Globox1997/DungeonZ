@@ -77,6 +77,7 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         int cooldown = buf.readInt();
         String difficulty = buf.readString();
         boolean disableEffects = buf.readBoolean();
+        boolean privateGroup = buf.readBoolean();
 
         this.setDungeonPlayerUUIDs(dungeonPlayerUUIDs);
         this.setDeadDungeonPlayerUUIDs(deadDungeonPlayerUUIDs);
@@ -87,6 +88,7 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         this.setCooldown(cooldown);
         this.setDifficulty(difficulty);
         this.setDisableEffects(disableEffects);
+        this.setPrivateGroup(privateGroup);
     }
 
     public DungeonPortalScreenHandler(int syncId, PlayerInventory playerInventory, DungeonPortalEntity dungeonPortalEntity, ScreenHandlerContext context) {
@@ -196,6 +198,14 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
 
     public void setDisableEffects(boolean disableEffects) {
         this.dungeonPortalEntity.setDisableEffects(disableEffects);
+    }
+
+    public boolean getPrivateGroup() {
+        return this.dungeonPortalEntity.getPrivateGroup();
+    }
+
+    public void setPrivateGroup(boolean privateGroup) {
+        this.dungeonPortalEntity.setPrivateGroup(privateGroup);
     }
 
     public BlockPos getPos() {
