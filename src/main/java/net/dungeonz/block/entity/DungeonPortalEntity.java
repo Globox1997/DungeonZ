@@ -14,6 +14,7 @@ import net.dungeonz.block.screen.DungeonPortalScreenHandler;
 import net.dungeonz.dungeon.Dungeon;
 import net.dungeonz.init.BlockInit;
 import net.dungeonz.init.CriteriaInit;
+import net.dungeonz.init.SoundInit;
 import net.dungeonz.util.DungeonHelper;
 import net.dungeonz.util.InventoryHelper;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
@@ -31,10 +32,12 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 
 public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
 
@@ -237,6 +240,18 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         }
     }
 
+    public static void clientTick(World world, BlockPos pos, BlockState state, DungeonPortalEntity blockEntity) {
+        if (blockEntity.getCooldown() > 0) {
+            blockEntity.setCooldown(blockEntity.getCooldown() - 1);
+        }
+    }
+
+    public static void serverTick(World world, BlockPos pos, BlockState state, DungeonPortalEntity blockEntity) {
+        if (blockEntity.getCooldown() > 0) {
+            blockEntity.setCooldown(blockEntity.getCooldown() - 1);
+        }
+    }
+
     @Override
     public Text getDisplayName() {
         if (this.getDungeon() != null) {
@@ -305,21 +320,20 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         List<PlayerEntity> players = world.getPlayers(TargetPredicate.createAttackable().setBaseMaxDistance(64.0), null, new Box(pos).expand(64.0, 64.0, 64.0));
         for (int i = 0; i < players.size(); i++) {
             CriteriaInit.DUNGEON_COMPLETION.trigger((ServerPlayerEntity) players.get(i), this.getDungeonType(), this.getDifficulty());
-            // play success sound here
-
+            world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundInit.DUNGEON_COMPLETION_EVENT, SoundCategory.BLOCKS, 1.0f, 0.9f + world.getRandom().nextFloat() * 0.2f,
+                    world.getRandom().nextLong());
         }
 
         for (int i = 0; i < this.getExitPosList().size(); i++) {
             world.setBlockState(this.getExitPosList().get(i), BlockInit.DUNGEON_PORTAL.getDefaultState(), 3);
         }
 
-        // play dungeon sound
-        // System.out.println("BOSS CHEST: " + this.getBossLootBlockPos());
         world.setBlockState(this.getBossLootBlockPos(), Blocks.CHEST.getDefaultState(), 3);
         InventoryHelper.fillInventoryWithLoot(world.getServer(), world, this.getBossLootBlockPos(), this.getDungeon().getDifficultyBossLootTableMap().get(this.getDifficulty()),
                 this.getDisableEffects());
 
         this.setCooldown(this.getDungeon().getCooldown());
+        markDirty();
     }
 
     @Nullable

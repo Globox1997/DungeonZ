@@ -12,15 +12,19 @@ import net.dungeonz.block.DungeonGateBlock;
 import net.dungeonz.init.BlockInit;
 import net.dungeonz.init.ConfigInit;
 import net.dungeonz.init.DimensionInit;
+import net.dungeonz.init.SoundInit;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.command.argument.ParticleEffectArgumentType;
+import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -104,7 +108,11 @@ public class DungeonGateEntity extends BlockEntity {
     }
 
     public void unlockGate(BlockPos pos) {
-        // Play sound here
+        List<PlayerEntity> players = world.getPlayers(TargetPredicate.createAttackable().setBaseMaxDistance(32.0), null, new Box(pos).expand(32.0, 32.0, 32.0));
+        for (int i = 0; i < players.size(); i++) {
+            world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundInit.DUNGEON_GATE_UNLOCK_EVENT, SoundCategory.BLOCKS, 1.0f, 0.9f + world.getRandom().nextFloat() * 0.2f,
+                    world.getRandom().nextLong());
+        }
         List<BlockPos> dungeonGatesPosList = DungeonGateEntity.getConnectedDungeonGatePosList(world, pos);
         for (int i = 0; i < dungeonGatesPosList.size(); i++) {
             if (world.getBlockEntity(dungeonGatesPosList.get(i)) != null && world.getBlockEntity(dungeonGatesPosList.get(i)) instanceof DungeonGateEntity) {

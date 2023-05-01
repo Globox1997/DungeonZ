@@ -1,0 +1,12 @@
+{
+  "dungeon_completion": {
+    "sounds": [
+      "dungeonz:dungeon_completion"
+    ]
+  },
+  "dungeon_gate_unlock": {
+    "sounds": [
+      "dungeonz:dungeon_gate_unlock"
+    ]
+  }
+}

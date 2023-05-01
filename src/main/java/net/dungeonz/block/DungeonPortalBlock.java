@@ -1,8 +1,11 @@
 package net.dungeonz.block;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.dungeonz.access.ServerPlayerAccess;
 import net.dungeonz.block.entity.DungeonPortalEntity;
 import net.dungeonz.dimension.DungeonPlacementHandler;
+import net.dungeonz.init.BlockInit;
 import net.dungeonz.init.DimensionInit;
 import net.dungeonz.network.DungeonServerPacket;
 import net.dungeonz.util.DungeonHelper;
@@ -12,6 +15,8 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -69,6 +74,12 @@ public class DungeonPortalBlock extends BlockWithEntity {
                 entity.resetPortalCooldown();
             }
         }
+    }
+
+    @Override
+    @Nullable
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return DungeonGateBlock.checkType(type, BlockInit.DUNGEON_PORTAL_ENTITY, world.isClient ? DungeonPortalEntity::clientTick : DungeonPortalEntity::serverTick);
     }
 
     public static void teleportDungeon(ServerPlayerEntity player, BlockPos dungeonPortalPos) {
