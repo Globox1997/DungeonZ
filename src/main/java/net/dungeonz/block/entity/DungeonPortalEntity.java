@@ -332,9 +332,8 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         List<PlayerEntity> players = world.getPlayers(TargetPredicate.createAttackable().setBaseMaxDistance(64.0), null, new Box(pos).expand(64.0, 64.0, 64.0));
         for (int i = 0; i < players.size(); i++) {
             CriteriaInit.DUNGEON_COMPLETION.trigger((ServerPlayerEntity) players.get(i), this.getDungeonType(), this.getDifficulty());
-            world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundInit.DUNGEON_COMPLETION_EVENT, SoundCategory.BLOCKS, 1.0f, 0.9f + world.getRandom().nextFloat() * 0.2f,
-                    world.getRandom().nextLong());
         }
+        world.playSound(null, pos, SoundInit.DUNGEON_COMPLETION_EVENT, SoundCategory.BLOCKS, 1.0f, 0.9f + world.getRandom().nextFloat() * 0.2f);
 
         for (int i = 0; i < this.getExitPosList().size(); i++) {
             world.setBlockState(this.getExitPosList().get(i), BlockInit.DUNGEON_PORTAL.getDefaultState(), 3);

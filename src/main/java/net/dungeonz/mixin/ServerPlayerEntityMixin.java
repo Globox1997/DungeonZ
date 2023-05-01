@@ -12,9 +12,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.dungeonz.access.ServerPlayerAccess;
-import net.dungeonz.dimension.DungeonPlacementHandler;
-import net.dungeonz.init.DimensionInit;
-import net.fabricmc.fabric.api.dimension.v1.FabricDimensions;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.encryption.PlayerPublicKey;
@@ -64,16 +61,6 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
 
         if (this.oldWorld != null) {
             nbt.putString("DungeonRegistryKey", this.oldWorld.getRegistryKey().getValue().toString());
-        }
-    }
-
-    @Inject(method = "onDisconnect", at = @At("TAIL"))
-    private void onDisconnectMixin(CallbackInfo info) {
-        if (this.world.getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
-            ServerWorld oldWorld = this.getOldServerWorld();
-            if (oldWorld != null) {
-                FabricDimensions.teleport(this, oldWorld, DungeonPlacementHandler.leave((ServerPlayerEntity) (Object) this, oldWorld));
-            }
         }
     }
 

@@ -73,13 +73,14 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
         Text buttonText = playerIsInDungeonWorld ? LEAVE : JOIN;
 
         this.dungeonButton = (DungeonPortalScreen.DungeonButton) this.addDrawableChild(new DungeonPortalScreen.DungeonButton(i + 88 - 26, j + 170, buttonText, (button) -> {
-            if (button instanceof DungeonPortalScreen.DungeonButton && !((DungeonPortalScreen.DungeonButton) button).disabled) {
+            if (button.active) {
                 DungeonClientPacket.writeC2SDungeonTeleportPacket(this.client, this.handler.getPos());
+                ((DungeonPortalScreen.DungeonButton) button).active = false;
             }
         }));
         this.difficultyButton = (DungeonPortalScreen.DungeonDifficultyButton) this
                 .addDrawableChild(new DungeonPortalScreen.DungeonDifficultyButton(i + ConfigInit.CONFIG.test3, j + ConfigInit.CONFIG.test4, Text.of(""), (button) -> {
-                    if (button instanceof DungeonPortalScreen.DungeonDifficultyButton && !((DungeonPortalScreen.DungeonDifficultyButton) button).disabled) {
+                    if (button.active) {
                         DungeonClientPacket.writeC2SChangeDifficultyPacket(this.client, this.handler.getPos());
                     }
                 }));
@@ -93,24 +94,24 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
         this.effectButton.setValue(this.handler.getDisableEffects());
 
         if (playerIsInDungeonWorld) {
-            this.dungeonButton.setDisabled(false);
-            this.difficultyButton.setDisabled(true);
+            this.dungeonButton.active = true;
+            this.difficultyButton.active = false;
             this.effectButton.active = false;
         } else {
             if (this.handler.getDungeonPlayerUUIDs().size() > 0) {
                 this.effectButton.active = false;
-                this.difficultyButton.setDisabled(true);
+                this.difficultyButton.active = false;
             } else {
-                this.difficultyButton.setDisabled(false);
+                this.difficultyButton.active = true;
                 this.effectButton.active = true;
             }
             if (this.handler.getDungeonPlayerUUIDs().size() < this.handler.getMaxPlayerCount()
                     && InventoryHelper.hasRequiredItemStacks(this.playerEntity.getInventory(), this.handler.getRequiredItemStacks())
                     && !this.handler.getDeadDungeonPlayerUUIDs().contains(this.playerEntity.getUuid())) {
 
-                this.dungeonButton.setDisabled(false);
+                this.dungeonButton.active = true;
             } else {
-                this.dungeonButton.setDisabled(true);
+                this.dungeonButton.active = false;
             }
         }
         if (this.handler.getDifficulties().contains(this.handler.getDifficulty())) {
@@ -233,7 +234,6 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
     }
 
     public class DungeonButton extends ButtonWidget {
-        private boolean disabled;
 
         public DungeonButton(int x, int y, Text text, ButtonWidget.PressAction onPress) {
             super(x, y, 52, 20, text, onPress);
@@ -248,7 +248,7 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
             RenderSystem.defaultBlendFunc();
             RenderSystem.enableDepthTest();
             int j = 20;
-            if (this.disabled) {
+            if (!this.active) {
                 j = 0;
             } else if (this.isHovered()) {
                 j += 20;
@@ -258,8 +258,8 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
             int o = this.active ? 0xFFFFFF : 0xA0A0A0;
             ClickableWidget.drawCenteredText(matrices, textRenderer, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, o | MathHelper.ceil(this.alpha * 255.0f) << 24);
 
-            if (this.disabled && this.isHovered()) {
-                Text text;
+            if (!this.active && this.isHovered()) {
+                Text text = null;
                 if (DungeonPortalScreen.this.handler.getCooldown() > 0) {
                     int cooldown = DungeonPortalScreen.this.handler.getCooldown();
                     int seconds = cooldown % 60;
@@ -271,30 +271,23 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
                 } else if (client.player != null && !DungeonPortalScreen.this.handler.getDeadDungeonPlayerUUIDs().isEmpty()
                         && DungeonPortalScreen.this.handler.getDeadDungeonPlayerUUIDs().contains(client.player.getUuid())) {
                     text = Text.translatable("text.dungeonz.dead_player");
-                } else {
+                } else if (InventoryHelper.hasRequiredItemStacks(client.player.getInventory(), DungeonPortalScreen.this.handler.getRequiredItemStacks())) {
                     text = Text.translatable("text.dungeonz.missing");
                 }
-                DungeonPortalScreen.this.renderTooltip(matrices, text, mouseX, mouseY);
+                if (text != null) {
+                    DungeonPortalScreen.this.renderTooltip(matrices, text, mouseX, mouseY);
+                }
             }
-        }
-
-        public void setDisabled(boolean disable) {
-            this.disabled = disable;
         }
 
     }
 
     public class DungeonDifficultyButton extends ButtonWidget {
-        private boolean disabled;
         private Text text;
 
         public DungeonDifficultyButton(int x, int y, Text text, ButtonWidget.PressAction onPress) {
             super(x, y, ConfigInit.CONFIG.test5, 20, text, onPress);
             this.text = text;
-        }
-
-        public void setDisabled(boolean disable) {
-            this.disabled = disable;
         }
 
         public void setText(Text text) {
