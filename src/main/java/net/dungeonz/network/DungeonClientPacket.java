@@ -11,6 +11,7 @@ import net.dungeonz.block.screen.DungeonGateOpScreen;
 import net.dungeonz.block.screen.DungeonPortalOpScreen;
 import net.dungeonz.block.screen.DungeonPortalScreen;
 import net.dungeonz.block.screen.DungeonPortalScreenHandler;
+import net.dungeonz.item.screen.DungeonCompassScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -73,6 +74,17 @@ public class DungeonClientPacket {
                         client.setScreen(new DungeonGateOpScreen(portalOrGatePos));
                     }
                 }
+            });
+        });
+        ClientPlayNetworking.registerGlobalReceiver(DungeonServerPacket.COMPASS_SCREEN_PACKET, (client, handler, buf, sender) -> {
+            String dungeonType = buf.readString();
+            int dungeonCount = buf.readInt();
+            List<String> dungeonIds = new ArrayList<String>();
+            for (int i = 0; i < dungeonCount; i++) {
+                dungeonIds.add(buf.readString());
+            }
+            client.execute(() -> {
+                client.setScreen(new DungeonCompassScreen(dungeonType, dungeonIds));
             });
         });
         ClientPlayNetworking.registerGlobalReceiver(DungeonServerPacket.SYNC_GATE_BLOCK_PACKET, (client, handler, buf, sender) -> {
@@ -145,6 +157,13 @@ public class DungeonClientPacket {
         buf.writeString(particleId);
         buf.writeString(unlockItemId);
         CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(DungeonServerPacket.SET_GATE_BLOCK_PACKET, buf);
+        client.getNetworkHandler().sendPacket(packet);
+    }
+
+    public static void writeC2SSetDungeonCompassPacket(MinecraftClient client, String dungeonType) {
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+        buf.writeString(dungeonType);
+        CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(DungeonServerPacket.SET_DUNGEON_COMPASS_PACKET, buf);
         client.getNetworkHandler().sendPacket(packet);
     }
 }

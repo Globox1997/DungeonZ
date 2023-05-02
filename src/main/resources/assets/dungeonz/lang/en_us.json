@@ -3,6 +3,8 @@
     "block.dungeonz.dungeon_spawner": "Dungeon Spawner",
     "block.dungeonz.dungeon_gate": "Dungeon Gate",
 
+    "item.dungeonz.dungeon_compass": "Dungeon Compass",
+
     "dungeonz.difficulty": "Difficulty",
     "dungeonz.difficulty.easy": "Easy",
     "dungeonz.difficulty.normal": "Normal",
@@ -35,6 +37,9 @@
     "dungeon.op_screen.gate_block_id": "Gate Block Identifier",
     "dungeon.op_screen.gate_particle_id": "Gate Particle Identifier",
     "dungeon.op_screen.gate_unlock_item_id": "Gate Unlock Item Identifier",
+
+    "compass.compass_screen.title": "Dungeons",
+    "compass.compass_item.cartography": "Calibrate at cartography table",
 
     "text.autoconfig.dungeonz.title": "DungeonZ Config",
     "text.autoconfig.dungeonz.option.devMode": "Dev Mode"

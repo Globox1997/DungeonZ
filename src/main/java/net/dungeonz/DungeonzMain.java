@@ -11,6 +11,7 @@ import net.dungeonz.init.BlockInit;
 import net.dungeonz.init.ConfigInit;
 import net.dungeonz.init.CriteriaInit;
 import net.dungeonz.init.DimensionInit;
+import net.dungeonz.init.ItemInit;
 import net.dungeonz.init.JsonReaderInit;
 import net.dungeonz.init.SoundInit;
 import net.dungeonz.init.WorldInit;
@@ -33,6 +34,7 @@ public class DungeonzMain implements ModInitializer {
         CriteriaInit.init();
         ConfigInit.init();
         SoundInit.init();
+        ItemInit.init();
     }
 
 }

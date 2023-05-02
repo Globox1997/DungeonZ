@@ -6,14 +6,18 @@ import org.jetbrains.annotations.Nullable;
 
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
+import net.dungeonz.DungeonzMain;
 import net.dungeonz.block.DungeonPortalBlock;
 import net.dungeonz.block.entity.DungeonGateEntity;
 import net.dungeonz.block.entity.DungeonPortalEntity;
 import net.dungeonz.dungeon.Dungeon;
+import net.dungeonz.init.ItemInit;
+import net.dungeonz.item.DungeonCompassItem;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -30,11 +34,13 @@ public class DungeonServerPacket {
     public static final Identifier CHANGE_DUNGEON_PRIVATE_GROUP_PACKET = new Identifier("dungeonz", "change_dungeon_private_group");
 
     public static final Identifier SET_DUNGEON_TYPE_PACKET = new Identifier("dungeonz", "set_dungeon_type");
+    public static final Identifier SET_DUNGEON_COMPASS_PACKET = new Identifier("dungeonz", "set_dungeon_compass");
     public static final Identifier SET_GATE_BLOCK_PACKET = new Identifier("dungeonz", "set_gate_block");
     public static final Identifier SYNC_GATE_BLOCK_PACKET = new Identifier("dungeonz", "sync_gate_block");
 
     public static final Identifier SYNC_SCREEN_PACKET = new Identifier("dungeonz", "sync_screen");
     public static final Identifier OP_SCREEN_PACKET = new Identifier("dungeonz", "op_screen");
+    public static final Identifier COMPASS_SCREEN_PACKET = new Identifier("dungeonz", "compass_screen");
 
     public static void init() {
         ServerPlayNetworking.registerGlobalReceiver(CHANGE_DUNGEON_DIFFICULTY_PACKET, (server, player, handler, buffer, sender) -> {
@@ -145,6 +151,14 @@ public class DungeonServerPacket {
                 }
             });
         });
+        ServerPlayNetworking.registerGlobalReceiver(SET_DUNGEON_COMPASS_PACKET, (server, player, handler, buffer, sender) -> {
+            String dungeonType = buffer.readString();
+            server.execute(() -> {
+                if (player.getMainHandStack().isOf(ItemInit.DUNGEON_COMPASS)) {
+                    DungeonCompassItem.setCompassDungeonStructure((ServerWorld) player.world, player.getBlockPos(), player.getMainHandStack(), dungeonType);
+                }
+            });
+        });
     }
 
     public static void writeS2CDungeonInfoPacket(ServerPlayerEntity serverPlayerEntity, List<Integer> breakableBlockIdList, List<Integer> placeableBlockIdList, boolean allowElytra) {
@@ -181,6 +195,18 @@ public class DungeonServerPacket {
             buf.writeString(dungeonGateEntity.getUnlockItem() != null ? Registry.ITEM.getId(dungeonGateEntity.getUnlockItem()).toString() : "");
         }
         CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(OP_SCREEN_PACKET, buf);
+        serverPlayerEntity.networkHandler.sendPacket(packet);
+    }
+
+    public static void writeS2COpenCompassScreenPacket(ServerPlayerEntity serverPlayerEntity, String dungeonType) {
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+        buf.writeString(dungeonType);
+        int dungeonCount = DungeonzMain.dungeons.size();
+        buf.writeInt(dungeonCount);
+        for (int i = 0; i < dungeonCount; i++) {
+            buf.writeString(DungeonzMain.dungeons.get(i).getDungeonTypeId());
+        }
+        CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(COMPASS_SCREEN_PACKET, buf);
         serverPlayerEntity.networkHandler.sendPacket(packet);
     }
 

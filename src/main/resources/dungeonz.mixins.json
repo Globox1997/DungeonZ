@@ -21,6 +21,7 @@
     "block.StemBlockMixin",
     "block.SpreadableBlockMixin",
     "block.FireBlockMixin",
+    "block.CartographyTableBlockMixin",
     "item.SpawnEggItemMixin",
     "item.BoneMealItemMixin"
   ],
