@@ -66,9 +66,10 @@ public class DungeonCompassScreen extends Screen {
             }
             k += 20;
         }
-        this.doneButton = this.addDrawableChild(new ButtonWidget(this.x + this.backgroundWidth / 2 - 48, this.y + this.backgroundHeight - 25, 97, 20, ScreenTexts.DONE, button -> {
-            this.onDone();
-        }));
+        this.doneButton = this.addDrawableChild(
+                new ButtonWidget(this.x + this.backgroundWidth / 2 - 48, this.y + this.backgroundHeight - 25, 97, 20, Text.translatable("compass.compass_screen.calibrate"), button -> {
+                    this.onDone();
+                }));
         this.updateDoneButtonState();
     }
 
