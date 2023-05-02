@@ -60,6 +60,10 @@ public class PlayerManagerMixin {
             DungeonPortalEntity dungeonPortalEntity = DungeonHelper.getDungeonPortalEntity(oldPlayer);
             dungeonPortalEntity.getDungeonPlayerUUIDs().remove(oldPlayer.getUuid());
             dungeonPortalEntity.addDeadDungeonPlayerUUIDs(serverPlayerEntity.getUuid());
+            if (dungeonPortalEntity.getDungeonPlayerCount() == 0) {
+                dungeonPortalEntity.setCooldown(dungeonPortalEntity.getDungeon().getCooldown());
+            }
+            dungeonPortalEntity.markDirty();
         }
     }
 }

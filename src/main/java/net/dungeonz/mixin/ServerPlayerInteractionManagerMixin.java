@@ -54,6 +54,7 @@ public class ServerPlayerInteractionManagerMixin {
             } else {
                 if (DungeonHelper.getDungeonPortalEntity(player) != null && !DungeonHelper.getDungeonPortalEntity(player).getReplaceBlockIdMap().containsKey(pos)) {
                     DungeonHelper.getDungeonPortalEntity(player).addReplaceBlockId(pos, player.world.getBlockState(pos).getBlock());
+                    DungeonHelper.getDungeonPortalEntity(player).markDirty();
                 }
             }
         }
@@ -67,12 +68,9 @@ public class ServerPlayerInteractionManagerMixin {
                 if (!DungeonHelper.getCurrentDungeon(player).getplaceableBlockIdList().contains(Registry.BLOCK.getRawId(((BlockItem) stack.getItem()).getBlock()))) {
                     info.setReturnValue(ActionResult.PASS);
                 } else if (DungeonHelper.getDungeonPortalEntity(player) != null) {
-                    // System.out.println(itemUsageContext.getBlockPos() + ":" + itemUsageContext.getBlockPos().offset(itemUsageContext.getSide()) + " : "
-                    // + world.getBlockState(itemUsageContext.getBlockPos().offset(itemUsageContext.getSide())));
                     if (!DungeonHelper.getDungeonPortalEntity(player).getReplaceBlockIdMap().containsKey(itemUsageContext.getBlockPos().offset(itemUsageContext.getSide()))) {
-                        // DungeonHelper.getDungeonPortalEntity(player).addReplaceBlockId(itemUsageContext.getBlockPos().offset(itemUsageContext.getSide()),
-                        // world.getBlockState(itemUsageContext.getBlockPos().offset(itemUsageContext.getSide())).getBlock());
                         DungeonHelper.getDungeonPortalEntity(player).addReplaceBlockId(itemUsageContext.getBlockPos().offset(itemUsageContext.getSide()), Blocks.AIR);
+                        DungeonHelper.getDungeonPortalEntity(player).markDirty();
                     }
                 }
             }
