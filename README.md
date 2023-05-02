@@ -17,50 +17,78 @@ If you know how to create one, the folder path has to be ```data\dungeonz\dungeo
 
 ```json
 {
-    "dungeon_type": "ruin_dungeon",
+    "dungeon_type": "dark_dungeon",
     "difficulty": {
         "easy": {
             "mob_modificator": 1.0,
             "loot_table_ids": [
-                "dungeonz:chests/test_chest_loot"
+                "dungeonz:chests/dark_dungeon_low_tier_chest_loot",
+                "dungeonz:chests/dark_dungeon_mid_tier_chest_loot"
             ],
-            "boss_modificator": 3.0,
-            "boss_loot_table_id": "dungeonz:chests/test_chest_loot"
+            "boss_modificator": 1.0,
+            "boss_loot_table_id": "dungeonz:chests/dark_dungeon_easy_boss_loot"
         },
         "normal": {
             "mob_modificator": 1.5,
             "loot_table_ids": [
-                "dungeonz:chests/test_chest_loot"
+                "dungeonz:chests/dark_dungeon_low_tier_chest_loot",
+                "dungeonz:chests/dark_dungeon_mid_tier_chest_loot",
+                "dungeonz:chests/dark_dungeon_high_tier_chest_loot"
             ],
-            "boss_modificator": 5.0,
-            "boss_loot_table_id": "dungeonz:chests/test_chest_loot"
+            "boss_modificator": 2.0,
+            "boss_loot_table_id": "dungeonz:chests/dark_dungeon_normal_boss_loot"
         }
     },
     "blocks": {
-        "minecraft:grass_block": {
+        "minecraft:gold_block": {
             "spawns": [
-                "minecraft:zombie",
                 "minecraft:skeleton"
             ],
-            "chance": 0.6,
-            "replace": null
+            "chance": {
+                "easy": 0.4,
+                "normal": 0.7
+            },
+            "replace": "minecraft:air"
         },
-        "acacia_leaves": {
+        "minecraft:iron_block": {
             "spawns": [
-                "minecraft:zombie",
-                "minecraft:skeleton"
+                "minecraft:zombie"
             ],
-            "chance": 0.6,
-            "replace": "minecraft:stone"
+            "chance": {
+                "easy": 0.4,
+                "normal": 0.7
+            },
+            "replace": "minecraft:air"
         },
-        "minecraft:iron_ore": {
-            "boss_entity": "minecraft:sheep",
-            "replace": null
+        "minecraft:netherite_block": {
+            "boss_entity": "minecraft:warden",
+            "replace": "minecraft:air"
+        },
+        "minecraft:emerald_block": {
+            "boss_loot_block": true,
+            "replace": "minecraft:air"
+        },
+        "minecraft:quartz_block": {
+            "exit_block": true,
+            "replace": "minecraft:stone_bricks"
         }
     },
+    "spawner": {
+        "minecraft:zombie": 10,
+        "minecraft:skeleton": 5
+    },
+    "breakable": [],
+    "placeable": [
+        "minecraft:torch"
+    ],
+    "required": {
+        "minecraft:stick": 3
+    },
+    "elytra": false,
     "max_group_size": 5,
-    "cooldown": 10000,
-    "dungeon_structure_pool_id": "dungeonz:ruin_dungeon_start"
+    "cooldown": 108000,
+    "background_texture": "",
+    "dungeon_structure_pool_id": "dungeonz:dark_dungeon/dungeon_spawn"
 }
 ```
 
