@@ -13,6 +13,7 @@ import net.dungeonz.block.entity.DungeonPortalEntity;
 import net.dungeonz.dungeon.Dungeon;
 import net.dungeonz.init.ItemInit;
 import net.dungeonz.item.DungeonCompassItem;
+import net.dungeonz.util.InventoryHelper;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
@@ -154,7 +155,8 @@ public class DungeonServerPacket {
         ServerPlayNetworking.registerGlobalReceiver(SET_DUNGEON_COMPASS_PACKET, (server, player, handler, buffer, sender) -> {
             String dungeonType = buffer.readString();
             server.execute(() -> {
-                if (player.getMainHandStack().isOf(ItemInit.DUNGEON_COMPASS)) {
+                if (player.getMainHandStack().isOf(ItemInit.DUNGEON_COMPASS) && InventoryHelper.hasRequiredItemStacks(player.getInventory(), ItemInit.REQUIRED_DUNGEON_COMPASS_CALIBRATION_ITEMS)) {
+                    InventoryHelper.decrementRequiredItemStacks(player.getInventory(), ItemInit.REQUIRED_DUNGEON_COMPASS_CALIBRATION_ITEMS);
                     DungeonCompassItem.setCompassDungeonStructure((ServerWorld) player.world, player.getBlockPos(), player.getMainHandStack(), dungeonType);
                 }
             });

@@ -7,7 +7,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import org.apache.commons.lang3.StringUtils;
 
+import net.dungeonz.init.ItemInit;
 import net.dungeonz.network.DungeonClientPacket;
+import net.dungeonz.util.InventoryHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawableHelper;
@@ -17,6 +19,8 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.ScreenTexts;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -70,7 +74,7 @@ public class DungeonCompassScreen extends Screen {
                 new ButtonWidget(this.x + this.backgroundWidth / 2 - 48, this.y + this.backgroundHeight - 25, 97, 20, Text.translatable("compass.compass_screen.calibrate"), button -> {
                     this.onDone();
                 }));
-        this.updateDoneButtonState();
+        this.doneButton.active = false;
     }
 
     @Override
@@ -114,6 +118,10 @@ public class DungeonCompassScreen extends Screen {
                 widgetButtonPage.visible = widgetButtonPage.index < this.dungeonIds.size();
             }
             RenderSystem.enableDepthTest();
+        }
+        if (this.doneButton.isHovered() && !this.doneButton.active && !StringUtils.isEmpty(this.dungeonType) && client.player != null
+                && !InventoryHelper.hasRequiredItemStacks(client.player.getInventory(), ItemInit.REQUIRED_DUNGEON_COMPASS_CALIBRATION_ITEMS)) {
+            this.renderTooltip(matrices, Text.translatable("compass.compass_screen.required"), mouseX, mouseY);
         }
     }
 
@@ -185,11 +193,13 @@ public class DungeonCompassScreen extends Screen {
     }
 
     private void updateDoneButtonState() {
-        this.doneButton.active = !StringUtils.isEmpty(this.dungeonType);
+        this.doneButton.active = !StringUtils.isEmpty(this.dungeonType) && client.player != null
+                && InventoryHelper.hasRequiredItemStacks(client.player.getInventory(), ItemInit.REQUIRED_DUNGEON_COMPASS_CALIBRATION_ITEMS);
     }
 
     private void onDone() {
         this.client.setScreen(null);
+        this.client.player.playSound(SoundEvents.ITEM_LODESTONE_COMPASS_LOCK, SoundCategory.BLOCKS, 1.0f, 1.0f);
         DungeonClientPacket.writeC2SSetDungeonCompassPacket(this.client, this.dungeonType);
     }
 
