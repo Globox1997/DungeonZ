@@ -17,11 +17,11 @@ If you know how to create one, the folder path has to be ```data\dungeonz\dungeo
 
 ```json
 {
-    "dungeon_type": "dark_dungeon",
-    "difficulty": {
+    "dungeon_type": "dark_dungeon", // unique dungeon id, create a lang file in a resource pack "dungeon.unique_id" to have proper translation
+    "difficulty": { // set difficulties here, can be any name but have to get translated with a resource pack if you don't use "easy","normal","hard" or "extreme"
         "easy": {
-            "mob_modificator": 1.0,
-            "loot_table_ids": [
+            "mob_modificator": 1.0, // modificator to increase mob strength
+            "loot_table_ids": [ // a list of different loot tables chests and barrels will get filled with
                 "dungeonz:chests/dark_dungeon_low_tier_chest_loot",
                 "dungeonz:chests/dark_dungeon_mid_tier_chest_loot"
             ],
@@ -41,10 +41,10 @@ If you know how to create one, the folder path has to be ```data\dungeonz\dungeo
     },
     "blocks": {
         "minecraft:gold_block": {
-            "spawns": [
+            "spawns": [ // a list of entity types which can spawn at the block positions
                 "minecraft:skeleton"
             ],
-            "chance": {
+            "chance": { // an object for each difficulty which includes spawn chances at the block positions
                 "easy": 0.4,
                 "normal": 0.7
             },
@@ -61,34 +61,34 @@ If you know how to create one, the folder path has to be ```data\dungeonz\dungeo
             "replace": "minecraft:air"
         },
         "minecraft:netherite_block": {
-            "boss_entity": "minecraft:warden",
+            "boss_entity": "minecraft:warden", // required for one block id! At this block position the boss will spawn
             "replace": "minecraft:air"
         },
         "minecraft:emerald_block": {
-            "boss_loot_block": true,
+            "boss_loot_block": true, // required for one block id! This block will get replaced by a chest filled with the boss loot after completion
             "replace": "minecraft:air"
         },
         "minecraft:quartz_block": {
-            "exit_block": true,
+            "exit_block": true, // required for one block id! Those blocks will get replaced by the dungeon portal to get out from the dungeon after completion
             "replace": "minecraft:stone_bricks"
         }
     },
-    "spawner": {
+    "spawner": { // use Dungeon Spawner in your structure build to set the max spawn time for the spawner here before the spawner will automatically break
         "minecraft:zombie": 10,
         "minecraft:skeleton": 5
     },
-    "breakable": [],
-    "placeable": [
+    "breakable": [], // block ids which can be broken in the dungeon by the player
+    "placeable": [ // block ids which can be placed in the dungeon by the player
         "minecraft:torch"
     ],
-    "required": {
+    "required": { // Items which get consumed after joining the dungeon
         "minecraft:stick": 3
     },
     "elytra": false,
     "max_group_size": 5,
-    "cooldown": 108000,
-    "background_texture": "",
-    "dungeon_structure_pool_id": "dungeonz:dark_dungeon/dungeon_spawn"
+    "cooldown": 108000, // Cooldown after the dungeon is completed or failed in ticks
+    "background_texture": "", // For custom dungeon portal backgrounds, set your texture path here
+    "dungeon_structure_pool_id": "dungeonz:dark_dungeon/dungeon_spawn" // Structure part which the dungeon generates start of
 }
 ```
 
@@ -109,7 +109,7 @@ An example part for the overworld structure which leads to the dungeon:
     },
     "project_start_to_heightmap": "WORLD_SURFACE_WG",
     "spawn_overrides": {},
-    "dungeon_type": "ruin_dungeon"
+    "dungeon_type": "dark_dungeon" // set your unique dungeon id here
 }
 ```
 
@@ -124,7 +124,7 @@ DungeonZ provides a advancement criterion trigger called `dungeonz:dungeon_compl
         "completion_example": {
             "trigger": "dungeonz:dungeon_completion",
             "conditions": {
-                "dungeon_type": "ruin_dungeon",
+                "dungeon_type": "dark_dungeon",
                 "difficulty": "easy"
             }
         }
