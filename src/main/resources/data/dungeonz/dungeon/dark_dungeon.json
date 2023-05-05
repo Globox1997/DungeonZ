@@ -108,7 +108,7 @@
         },
         "minecraft:quartz_block": {
             "exit_block": true,
-            "replace": "minecraft:stone_bricks"
+            "replace": "minecraft:air"
         }
     },
     "spawner": {
