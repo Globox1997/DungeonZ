@@ -2,6 +2,7 @@ package net.dungeonz.block;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.dungeonz.DungeonzMain;
 import net.dungeonz.access.ServerPlayerAccess;
 import net.dungeonz.block.entity.DungeonPortalEntity;
 import net.dungeonz.dimension.DungeonPlacementHandler;
@@ -27,6 +28,9 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.partyaddon.access.GroupManagerAccess;
+import net.partyaddon.group.GroupManager;
+import net.partyaddon.network.PartyAddonServerPacket;
 
 @SuppressWarnings("deprecation")
 public class DungeonPortalBlock extends BlockWithEntity {
@@ -57,6 +61,9 @@ public class DungeonPortalBlock extends BlockWithEntity {
                 return ActionResult.success(world.isClient);
             } else if (dungeonPortalEntity.getDungeon() != null) {
                 if (!world.isClient) {
+                    if (DungeonzMain.isPartyAddonLoaded) {
+                        PartyAddonServerPacket.writeS2CSyncGroupManagerPacket((ServerPlayerEntity) player, ((GroupManagerAccess) player).getGroupManager());
+                    }
                     player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
                 }
                 return ActionResult.success(world.isClient);
@@ -104,6 +111,18 @@ public class DungeonPortalBlock extends BlockWithEntity {
                         if (dungeonPortalEntity.getCooldown() > 0) {
                             player.sendMessage(Text.translatable("text.dungeonz.dungeon_cooldown"), false);
                             return;
+                        }
+                        if (dungeonPortalEntity.getDungeonPlayerCount() > 0 && dungeonPortalEntity.getPrivateGroup()) {
+                            if (DungeonzMain.isPartyAddonLoaded) {
+                                GroupManager groupManager = ((GroupManagerAccess) player).getGroupManager();
+                                if (groupManager.getGroupPlayerIdList().isEmpty() || !groupManager.getGroupPlayerIdList().contains(dungeonPortalEntity.getDungeonPlayerUUIDs().get(0))) {
+                                    player.sendMessage(Text.translatable("text.dungeonz.dungeon_private"), false);
+                                    return;
+                                }
+                            } else {
+                                player.sendMessage(Text.translatable("text.dungeonz.dungeon_private"), false);
+                                return;
+                            }
                         }
                         if (InventoryHelper.hasRequiredItemStacks(player.getInventory(), DungeonHelper.getRequiredItemStackList(dungeonPortalEntity.getDungeon()))) {
                             InventoryHelper.decrementRequiredItemStacks(player.getInventory(), DungeonHelper.getRequiredItemStackList(dungeonPortalEntity.getDungeon()));

@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.dungeonz.DungeonzMain;
 import net.dungeonz.init.DimensionInit;
 import net.dungeonz.network.DungeonClientPacket;
 import net.dungeonz.util.InventoryHelper;
@@ -26,6 +27,8 @@ import net.minecraft.screen.ScreenHandlerListener;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.partyaddon.access.GroupManagerAccess;
+import net.partyaddon.group.GroupManager;
 
 @Environment(EnvType.CLIENT)
 public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandler> implements ScreenHandlerListener {
@@ -110,9 +113,15 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
             } else {
                 this.dungeonButton.active = false;
             }
-            // Here it will need party addon compat and check at the DungeonPortalBlock if the dungeon is private before teleportation
             if (this.dungeonButton.active && this.privateButton.enabled && this.handler.getDungeonPlayerUUIDs().size() > 0) {
-                this.dungeonButton.active = false;
+                if (DungeonzMain.isPartyAddonLoaded) {
+                    GroupManager groupManager = ((GroupManagerAccess) this.playerEntity).getGroupManager();
+                    if (groupManager.getGroupPlayerIdList().isEmpty() || !groupManager.getGroupPlayerIdList().contains(this.handler.getDungeonPlayerUUIDs().get(0))) {
+                        this.dungeonButton.active = false;
+                    }
+                } else {
+                    this.dungeonButton.active = false;
+                }
             }
         }
         if (this.handler.getDifficulties().contains(this.handler.getDifficulty())) {

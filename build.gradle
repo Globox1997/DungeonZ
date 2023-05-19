@@ -13,6 +13,9 @@ group = project.maven_group
 repositories {
     maven { url "https://maven.shedaniel.me/" }
     maven { url "https://maven.terraformersmc.com/" }
+	maven { url 'https://jitpack.io' }
+	maven { url "https://server.bbkr.space/artifactory/libs-release" }
+	maven { url "https://www.cursemaven.com" }
 }
 
 dependencies {
@@ -32,6 +35,10 @@ dependencies {
     modCompileOnly modRuntimeOnly("com.terraformersmc:modmenu:${project.mod_menu_version}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
+	// PartyAddon
+	modCompileOnly("com.github.Globox1997:PartyAddon:89c2007e01") {
+		exclude(group: "net.fabricmc.fabric-api")
+	}
 }
 
 configurations.all {

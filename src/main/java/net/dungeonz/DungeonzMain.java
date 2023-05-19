@@ -17,10 +17,13 @@ import net.dungeonz.init.SoundInit;
 import net.dungeonz.init.WorldInit;
 import net.dungeonz.network.DungeonServerPacket;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 
 public class DungeonzMain implements ModInitializer {
 
     public static final Logger LOGGER = LogManager.getLogger("DungeonZ");
+
+    public static final boolean isPartyAddonLoaded = FabricLoader.getInstance().isModLoaded("partyaddon");
 
     public static final List<Dungeon> dungeons = new ArrayList<Dungeon>();
 
