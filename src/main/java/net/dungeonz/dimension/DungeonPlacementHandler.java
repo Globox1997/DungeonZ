@@ -53,6 +53,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.structure.Structure;
+import net.rpgdifficulty.api.MobStrengthener;
 
 public class DungeonPlacementHandler {
 
@@ -85,7 +86,6 @@ public class DungeonPlacementHandler {
             ((DungeonPortalEntity) serverWorld.getBlockEntity(((ServerPlayerAccess) serverPlayerEntity).getDungeonPortalBlockPos())).leaveDungeon(serverPlayerEntity.getUuid());
         }
         // if (((DungeonPortalEntity) serverWorld.getBlockEntity(((ServerPlayerAccess) serverPlayerEntity).getDungeonPortalBlockPos())).getDungeonPlayerCount() == 0) {
-        // Break boss chest and back portal and maybe kill boss
         // maybe add a leave command
         // }
         return new TeleportTarget(Vec3d.of(((ServerPlayerAccess) serverPlayerEntity).getDungeonSpawnBlockPos()).add(0.5, 0, 0.5), Vec3d.ZERO, serverWorld.random.nextFloat() * 360F, 0);
@@ -217,6 +217,7 @@ public class DungeonPlacementHandler {
         });
         // Refresh boss
         MobEntity bossEntity = createMob(world, dungeon.getBossEntityType());
+        bossEntity.initialize(world, world.getLocalDifficulty(portalEntity.getBossBlockPos()), SpawnReason.STRUCTURE, null, null);
         bossEntity.setPersistent();
         ((BossEntityAccess) bossEntity).setBoss(portalEntity.getPos(), portalEntity.getWorld().getRegistryKey().getValue().toString());
         strengthenMob(bossEntity, dungeon, difficulty, true);
@@ -324,6 +325,9 @@ public class DungeonPlacementHandler {
         }
         if (hasArmorAttribute) {
             mobEntity.getAttributeInstance(EntityAttributes.GENERIC_ARMOR).setBaseValue(mobProtection);
+        }
+        if (DungeonzMain.isRpgDifficultyLoaded) {
+            MobStrengthener.setMobHealthMultiplier(mobEntity, strengthFactor);
         }
 
     }
