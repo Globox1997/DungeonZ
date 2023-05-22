@@ -38,7 +38,7 @@ public class PlayerManagerMixin {
             } else {
                 ServerWorld oldWorld = ((ServerPlayerAccess) player).getOldServerWorld();
                 if (oldWorld != null) {
-                    FabricDimensions.teleport(player, oldWorld, DungeonPlacementHandler.leave((ServerPlayerEntity) (Object) this, oldWorld));
+                    FabricDimensions.teleport(player, oldWorld, DungeonPlacementHandler.leave(player, oldWorld));
                 } else {
                     Vec3d spawnPos = null;
                     if (player.getSpawnPointPosition() != null) {
