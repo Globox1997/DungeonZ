@@ -49,6 +49,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
     private List<UUID> deadDungeonPlayerUUIDs = new ArrayList<UUID>();
     private int maxGroupSize = 0;
     private int cooldown = 0;
+    private int autoKickTimer = 0;
     private boolean disableEffects = false;
     private boolean privateGroup = false;
     private HashMap<Integer, ArrayList<BlockPos>> blockBlockPosMap = new HashMap<Integer, ArrayList<BlockPos>>();
@@ -81,6 +82,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         }
         this.maxGroupSize = nbt.getInt("MaxGroupSize");
         this.cooldown = nbt.getInt("Cooldown");
+        this.autoKickTimer = nbt.getInt("AutoKickTimer");
         this.disableEffects = nbt.getBoolean("DisableEffects");
         this.privateGroup = nbt.getBoolean("PrivateGroup");
         this.blockBlockPosMap.clear();
@@ -158,6 +160,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         }
         nbt.putInt("MaxGroupSize", this.maxGroupSize);
         nbt.putInt("Cooldown", this.cooldown);
+        nbt.putInt("AutoKickTimer", this.autoKickTimer);
         nbt.putBoolean("DisableEffects", this.disableEffects);
         nbt.putBoolean("PrivateGroup", this.privateGroup);
 
@@ -260,6 +263,16 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
     public static void serverTick(World world, BlockPos pos, BlockState state, DungeonPortalEntity blockEntity) {
         if (blockEntity.getCooldown() > 0) {
             blockEntity.setCooldown(blockEntity.getCooldown() - 1);
+        }
+        if (blockEntity.getDungeonPlayerCount() > 0) {
+            blockEntity.autoKickTimer++;
+            if (blockEntity.autoKickTimer > 432000) {
+                if (blockEntity.getDungeon() != null) {
+                    blockEntity.setCooldown(blockEntity.getDungeon().getCooldown());
+                }
+                blockEntity.getDungeonPlayerUUIDs().clear();
+                blockEntity.autoKickTimer = 0;
+            }
         }
     }
 

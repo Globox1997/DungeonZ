@@ -7,12 +7,12 @@ import org.jetbrains.annotations.Nullable;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.dungeonz.DungeonzMain;
-import net.dungeonz.block.DungeonPortalBlock;
 import net.dungeonz.block.entity.DungeonGateEntity;
 import net.dungeonz.block.entity.DungeonPortalEntity;
 import net.dungeonz.dungeon.Dungeon;
 import net.dungeonz.init.ItemInit;
 import net.dungeonz.item.DungeonCompassItem;
+import net.dungeonz.util.DungeonHelper;
 import net.dungeonz.util.InventoryHelper;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
@@ -70,7 +70,7 @@ public class DungeonServerPacket {
         ServerPlayNetworking.registerGlobalReceiver(DUNGEON_TELEPORT_PACKET, (server, player, handler, buffer, sender) -> {
             BlockPos dungeonPortalPos = buffer.readBlockPos();
             server.execute(() -> {
-                DungeonPortalBlock.teleportDungeon(player, dungeonPortalPos);
+                DungeonHelper.teleportDungeon(player, dungeonPortalPos);
             });
         });
         ServerPlayNetworking.registerGlobalReceiver(CHANGE_DUNGEON_EFFECTS_PACKET, (server, player, handler, buffer, sender) -> {

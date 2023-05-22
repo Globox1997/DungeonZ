@@ -85,9 +85,6 @@ public class DungeonPlacementHandler {
         if (serverWorld.getBlockEntity(((ServerPlayerAccess) serverPlayerEntity).getDungeonPortalBlockPos()) != null) {
             ((DungeonPortalEntity) serverWorld.getBlockEntity(((ServerPlayerAccess) serverPlayerEntity).getDungeonPortalBlockPos())).leaveDungeon(serverPlayerEntity.getUuid());
         }
-        // if (((DungeonPortalEntity) serverWorld.getBlockEntity(((ServerPlayerAccess) serverPlayerEntity).getDungeonPortalBlockPos())).getDungeonPlayerCount() == 0) {
-        // maybe add a leave command
-        // }
         return new TeleportTarget(Vec3d.of(((ServerPlayerAccess) serverPlayerEntity).getDungeonSpawnBlockPos()).add(0.5, 0, 0.5), Vec3d.ZERO, serverWorld.random.nextFloat() * 360F, 0);
     }
 
@@ -268,6 +265,7 @@ public class DungeonPlacementHandler {
             Entry<BlockPos, Integer> entry = replaceBlockIterator.next();
             world.setBlockState(entry.getKey(), Registry.BLOCK.get(entry.getValue()).getDefaultState(), 3);
         }
+        portalEntity.getDungeonPlayerUUIDs().clear();
         portalEntity.getDeadDungeonPlayerUUIDs().clear();
         portalEntity.markDirty();
     }
