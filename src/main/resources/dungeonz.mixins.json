@@ -12,6 +12,7 @@
     "ServerPlayerInteractionManagerMixin",
     "ExplosionMixin",
     "EnderPearlEntityMixin",
+    "WardenEntityMixin",
     "block.VineBlockMixin",
     "block.SaplingBlockMixin",
     "block.AbstractPlantStemBlockMixin",
