@@ -120,7 +120,7 @@
         "minecraft:torch"
     ],
     "required": {
-        "minecraft:stick": 3
+        "minecraft:diamond": 3
     },
     "elytra": false,
     "max_group_size": 5,
