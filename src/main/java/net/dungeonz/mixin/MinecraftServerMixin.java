@@ -26,6 +26,8 @@ public class MinecraftServerMixin {
 
     @Inject(method = "updateMobSpawnOptions", at = @At("TAIL"))
     private void updateMobSpawnOptionsMixin(CallbackInfo info) {
-        worlds.get(DimensionInit.DUNGEON_WORLD).setMobSpawnOptions(false, false);
+        if (worlds.get(DimensionInit.DUNGEON_WORLD) != null) {
+            worlds.get(DimensionInit.DUNGEON_WORLD).setMobSpawnOptions(false, false);
+        }
     }
 }
