@@ -39,5 +39,11 @@
   },
   "suggests": {
     "another-mod": "*"
+  },
+  "custom": {
+    "mc-publish": {
+      "modrinth": "11jwniuC",
+      "curseforge": 864150
+    }
   }
 }

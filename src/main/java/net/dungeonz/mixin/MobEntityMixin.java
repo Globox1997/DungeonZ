@@ -14,11 +14,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 @Mixin(MobEntity.class)
@@ -57,13 +57,13 @@ public abstract class MobEntityMixin extends LivingEntity implements BossEntityA
 
     @Override
     public void onDeath(DamageSource damageSource) {
-        if (!this.world.isClient && this.isDungeonBossEntity) {
-            ServerWorld nonDungeonWorld = world.getServer().getWorld(RegistryKey.of(Registry.WORLD_KEY, new Identifier(this.worldRegistryKey)));
+        if (!this.getWorld().isClient() && this.isDungeonBossEntity) {
+            ServerWorld nonDungeonWorld = getWorld().getServer().getWorld(RegistryKey.of(RegistryKeys.WORLD, new Identifier(this.worldRegistryKey)));
 
             if (nonDungeonWorld != null && nonDungeonWorld.getBlockEntity(this.portalPos) != null && nonDungeonWorld.getBlockEntity(this.portalPos) instanceof DungeonPortalEntity) {
-                ((DungeonPortalEntity) nonDungeonWorld.getBlockEntity(this.portalPos)).finishDungeon((ServerWorld) this.world, this.getBlockPos());
+                ((DungeonPortalEntity) nonDungeonWorld.getBlockEntity(this.portalPos)).finishDungeon((ServerWorld) this.getWorld(), this.getBlockPos());
             } else {
-                this.world.setBlockState(this.getBlockPos(), BlockInit.DUNGEON_PORTAL.getDefaultState());
+                this.getWorld().setBlockState(this.getBlockPos(), BlockInit.DUNGEON_PORTAL.getDefaultState());
             }
 
         }

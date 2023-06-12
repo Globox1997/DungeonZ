@@ -14,11 +14,9 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -61,7 +59,7 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
 
         ((DungeonPortalScreenHandler) this.handler).addListener(this);
 
-        final boolean playerIsInDungeonWorld = playerEntity.world.getRegistryKey() == DimensionInit.DUNGEON_WORLD;
+        final boolean playerIsInDungeonWorld = playerEntity.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD;
         Text buttonText = playerIsInDungeonWorld ? LEAVE : JOIN;
 
         this.dungeonButton = this.addDrawableChild(new DungeonButton(this.x + this.backgroundWidth / 2 - 26, this.y + this.backgroundHeight - 28, buttonText, (button) -> {
@@ -149,18 +147,18 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        this.renderBackground(matrices);
-        super.render(matrices, mouseX, mouseY, delta);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        this.renderBackground(context);
+        super.render(context, mouseX, mouseY, delta);
 
         // Title
-        this.textRenderer.draw(matrices, this.title, this.x + this.backgroundWidth / 2 - this.textRenderer.getWidth(this.title) / 2, this.y + 8, 0x404040);
+        context.drawText(this.textRenderer, this.title, this.x + this.backgroundWidth / 2 - this.textRenderer.getWidth(this.title) / 2, this.y + 8, 0x404040, false);
 
         // Dungeon player list
         int k = this.y + 37;
-        this.textRenderer.draw(matrices,
+        context.drawText(this.textRenderer,
                 Text.translatable("text.dungeonz.player_list", this.handler.getDungeonPlayerUUIDs().size() + this.handler.getDeadDungeonPlayerUUIDs().size(), this.handler.getMaxPlayerCount()),
-                this.x + 8, this.y + 24, 0x3F3F3F);
+                this.x + 8, this.y + 24, 0x3F3F3F, false);
         for (int i = 0; i < this.handler.getDungeonPlayerUUIDs().size() && i < 13; i++) {
             String playerName = getPlayerName(this.handler.getDungeonPlayerUUIDs().get(i), 102, 15).getString();
             if (i == 12) {
@@ -170,44 +168,42 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
                     for (int u = 12; u < this.handler.getDungeonPlayerUUIDs().size(); u++) {
                         otherPlayerNames.add(getPlayerName(this.handler.getDungeonPlayerUUIDs().get(u), 102, 15));
                     }
-                    this.renderTooltip(matrices, otherPlayerNames, mouseX, mouseY);
+                    context.drawTooltip(this.textRenderer, otherPlayerNames, mouseX, mouseY);
                 }
             }
-            this.textRenderer.draw(matrices, playerName, this.x + 13, k, 0xFFFFFF);
+            context.drawText(this.textRenderer, playerName, this.x + 13, k, 0xFFFFFF, false);
             k += 13;
         }
         // Required items
-        this.textRenderer.draw(matrices, Text.translatable("text.dungeonz.required"), this.x + 139, this.y + 100, 0x3F3F3F);
-        RenderSystem.setShaderTexture(0, ICONS);
-        this.drawTexture(matrices, this.x + 142 + this.textRenderer.getWidth(Text.translatable("text.dungeonz.required")), this.y + 97,
+        context.drawText(this.textRenderer, Text.translatable("text.dungeonz.required"), this.x + 139, this.y + 100, 0x3F3F3F, false);
+        context.drawTexture(ICONS, this.x + 142 + this.textRenderer.getWidth(Text.translatable("text.dungeonz.required")), this.y + 97,
                 52 + (InventoryHelper.hasRequiredItemStacks(this.playerEntity.getInventory(), this.handler.getRequiredItemStacks()) ? 0 : 14), 0, 14, 14);
 
         if (this.handler.getRequiredItemStacks().size() > 0) {
             int l = 0;
             for (int i = 0; i < this.handler.getRequiredItemStacks().size(); i++) {
-                this.itemRenderer.renderInGuiWithOverrides(this.handler.getRequiredItemStacks().get(i), this.x + 144 + l, this.y + 112);
-                this.itemRenderer.renderGuiItemOverlay(this.textRenderer, this.handler.getRequiredItemStacks().get(i), this.x + 144 + l, this.y + 112);
+                context.drawItem(this.handler.getRequiredItemStacks().get(i), this.x + 144 + l, this.y + 112);
+                context.drawItemInSlot(this.textRenderer, this.handler.getRequiredItemStacks().get(i), this.x + 144 + l, this.y + 112);
                 if (this.isPointWithinBounds(144 + l, 112, 16, 16, mouseX, mouseY)) {
-                    this.renderTooltip(matrices, this.handler.getRequiredItemStacks().get(i).getName(), mouseX, mouseY);
+                    context.drawTooltip(this.textRenderer, this.handler.getRequiredItemStacks().get(i).getName(), mouseX, mouseY);
                 }
                 l += 18;
             }
         } else {
-            this.textRenderer.draw(matrices, Text.translatable("text.dungeonz.nothing_required"), this.x + 144, this.y + 112, 0x3F3F3F);
+            context.drawText(this.textRenderer, Text.translatable("text.dungeonz.nothing_required"), this.x + 144, this.y + 112, 0x3F3F3F, false);
         }
         // Possible loot
-        this.textRenderer.draw(matrices, Text.translatable("text.dungeonz.possible"), this.x + 139, this.y + 134, 0x3F3F3F);
+        context.drawText(this.textRenderer, Text.translatable("text.dungeonz.possible"), this.x + 139, this.y + 134, 0x3F3F3F, false);
         if (this.handler.getPossibleLootDifficultyItemStackMap().size() > 0 && this.handler.getPossibleLootDifficultyItemStackMap().containsKey(this.handler.getDifficulty())
                 && this.handler.getPossibleLootDifficultyItemStackMap().get(this.handler.getDifficulty()).size() > 0) {
             int l = 0;
             int o = 0;
             for (int i = 0; i < this.handler.getPossibleLootDifficultyItemStackMap().get(this.handler.getDifficulty()).size() && i < 10; i++) {
-                this.itemRenderer.renderInGuiWithOverrides(this.handler.getPossibleLootDifficultyItemStackMap().get(this.handler.getDifficulty()).get(i), this.x + 144 + l, this.y + o + 146);
-                this.itemRenderer.renderGuiItemOverlay(this.textRenderer, this.handler.getPossibleLootDifficultyItemStackMap().get(this.handler.getDifficulty()).get(i), this.x + 144 + l,
-                        this.y + o + 146);
+                context.drawItem(this.handler.getPossibleLootDifficultyItemStackMap().get(this.handler.getDifficulty()).get(i), this.x + 144 + l, this.y + o + 146);
+                context.drawItemInSlot(this.textRenderer, this.handler.getPossibleLootDifficultyItemStackMap().get(this.handler.getDifficulty()).get(i), this.x + 144 + l, this.y + o + 146);
 
                 if (this.isPointWithinBounds(144 + l, o + 146, 16, 16, mouseX, mouseY)) {
-                    this.renderTooltip(matrices, this.handler.getPossibleLootDifficultyItemStackMap().get(this.handler.getDifficulty()).get(i).getName(), mouseX, mouseY);
+                    context.drawTooltip(this.textRenderer, this.handler.getPossibleLootDifficultyItemStackMap().get(this.handler.getDifficulty()).get(i).getName(), mouseX, mouseY);
                 }
                 l += 18;
                 if (i == 4) {
@@ -216,27 +212,23 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
                 }
             }
         }
-        this.textRenderer.draw(matrices, Text.translatable("dungeonz.difficulty"), this.x + 139, this.y + 24, 0x3F3F3F);
-        this.textRenderer.draw(matrices, Text.translatable("text.dungeonz.effects"), this.x + 169, this.y + 65, 0x3F3F3F);
-        this.textRenderer.draw(matrices, Text.translatable("text.dungeonz.private"), this.x + 169, this.y + 81, 0x3F3F3F);
+        context.drawText(this.textRenderer, Text.translatable("dungeonz.difficulty"), this.x + 139, this.y + 24, 0x3F3F3F, false);
+        context.drawText(this.textRenderer, Text.translatable("text.dungeonz.effects"), this.x + 169, this.y + 65, 0x3F3F3F, false);
+        context.drawText(this.textRenderer, Text.translatable("text.dungeonz.private"), this.x + 169, this.y + 81, 0x3F3F3F, false);
 
-        // RenderSystem.setShaderTexture(0, ICONS);
         // this.drawTexture(matrices, this.x + 144, this.y + 63, 0, 60, 20, 12);
         // this.drawTexture(matrices, this.x + 144, this.y + 79, 0, 60, 20, 12);
 
-        this.drawMouseoverTooltip(matrices, mouseX, mouseY);
+        this.drawMouseoverTooltip(context, mouseX, mouseY);
     }
 
     @Override
-    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.setShaderTexture(0, TEXTURE);
-        this.drawTexture(matrices, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
+    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
+        context.drawTexture(TEXTURE, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
     }
 
     @Override
-    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
+    protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
     }
 
     @Override
@@ -255,27 +247,21 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
     public class DungeonButton extends ButtonWidget {
 
         public DungeonButton(int x, int y, Text text, ButtonWidget.PressAction onPress) {
-            super(x, y, 52, 20, text, onPress);
+            super(x, y, 52, 20, text, onPress, DEFAULT_NARRATION_SUPPLIER);
         }
 
         @Override
-        public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            RenderSystem.setShaderTexture(0, ICONS);
-            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-            RenderSystem.enableDepthTest();
+        public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
             int j = 20;
             if (!this.active) {
                 j = 0;
             } else if (this.isHovered()) {
                 j = 40;
             }
-            this.drawTexture(matrices, this.x, this.y, 0, j, this.width, this.height);
+            context.drawTexture(ICONS, this.getX(), this.getY(), 0, j, this.width, this.height);
 
             int o = this.active ? 0xFFFFFF : 0xA0A0A0;
-            ClickableWidget.drawCenteredText(matrices, textRenderer, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, o | MathHelper.ceil(this.alpha * 255.0f) << 24);
+            context.drawCenteredTextWithShadow(textRenderer, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, o | MathHelper.ceil(this.alpha * 255.0f) << 24);
 
             if (!this.active && this.isHovered()) {
                 Text text = null;
@@ -295,7 +281,7 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
                     text = Text.translatable("text.dungeonz.missing");
                 }
                 if (text != null) {
-                    DungeonPortalScreen.this.renderTooltip(matrices, text, mouseX, mouseY);
+                    context.drawTooltip(textRenderer, text, mouseX, mouseY);
                 }
             }
         }
@@ -306,7 +292,7 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
         private Text text;
 
         public DungeonDifficultyButton(int x, int y, Text text, ButtonWidget.PressAction onPress) {
-            super(x, y, 60, 20, text, onPress);
+            super(x, y, 60, 20, text, onPress, DEFAULT_NARRATION_SUPPLIER);
             this.text = text;
         }
 
@@ -315,21 +301,30 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
         }
 
         @Override
-        public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
             MinecraftClient minecraftClient = MinecraftClient.getInstance();
             TextRenderer textRenderer = minecraftClient.textRenderer;
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            RenderSystem.setShaderTexture(0, WIDGETS_TEXTURE);
+
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, this.alpha);
-            int i = this.getYImage(this.isHovered());
+            int i = this.getTextureY();
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.enableDepthTest();
-            this.drawTexture(matrices, this.x, this.y, 0, 46 + i * 20, this.width / 2, this.height);
-            this.drawTexture(matrices, this.x + this.width / 2, this.y, 200 - this.width / 2, 46 + i * 20, this.width / 2, this.height);
-            this.renderBackground(matrices, minecraftClient, mouseX, mouseY);
+            context.drawTexture(WIDGETS_TEXTURE, this.getX(), this.getY(), 0, 46 + i * 20, this.width / 2, this.height);
+            context.drawTexture(WIDGETS_TEXTURE, this.getX() + this.width / 2, this.getY(), 200 - this.width / 2, 46 + i * 20, this.width / 2, this.height);
             int j = this.active ? 0xFFFFFF : 0xA0A0A0;
-            ClickableWidget.drawCenteredText(matrices, textRenderer, this.text, this.x + this.width / 2, this.y + (this.height - 8) / 2, j | MathHelper.ceil(this.alpha * 255.0f) << 24);
+            context.drawCenteredTextWithShadow(textRenderer, this.text, this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, j | MathHelper.ceil(this.alpha * 255.0f) << 24);
+            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        }
+
+        private int getTextureY() {
+            int i = 1;
+            if (!this.active) {
+                i = 0;
+            } else if (this.isSelected()) {
+                i = 2;
+            }
+            return i;
         }
 
     }
@@ -338,7 +333,7 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
         private boolean enabled = false;
 
         public DungeonSliderButton(int x, int y, ButtonWidget.PressAction onPress) {
-            super(x, y, 20, 12, Text.of(""), onPress);
+            super(x, y, 20, 12, Text.of(""), onPress, DEFAULT_NARRATION_SUPPLIER);
         }
 
         public void cycleEnabled() {
@@ -350,9 +345,7 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
         }
 
         @Override
-        public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            RenderSystem.setShaderTexture(0, ICONS);
+        public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
@@ -367,7 +360,7 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
             } else if (this.isHovered()) {
                 j = 20;
             }
-            this.drawTexture(matrices, this.x, this.y, j, i, this.width, this.height);
+            context.drawTexture(ICONS, this.getX(), this.getY(), j, i, this.width, this.height);
         }
 
     }

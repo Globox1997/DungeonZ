@@ -8,17 +8,16 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.JigsawBlockScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.NarratorManager;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 
 @Environment(EnvType.CLIENT)
 public class DungeonGateOpScreen extends Screen {
@@ -47,13 +46,13 @@ public class DungeonGateOpScreen extends Screen {
         if (client.world != null && client.world.getBlockEntity(this.dungeonGatePos) != null && client.world.getBlockEntity(this.dungeonGatePos) instanceof DungeonGateEntity) {
             DungeonGateEntity dungeonGateEntity = (DungeonGateEntity) client.world.getBlockEntity(this.dungeonGatePos);
             if (!dungeonGateEntity.getBlockState().getBlock().equals(Blocks.AIR)) {
-                defaultBlockId = Registry.BLOCK.getId(dungeonGateEntity.getBlockState().getBlock()).toString();
+                defaultBlockId = Registries.BLOCK.getId(dungeonGateEntity.getBlockState().getBlock()).toString();
             }
             if (dungeonGateEntity.getParticleEffect() != null) {
                 defaultParticleId = dungeonGateEntity.getParticleEffect().asString();
             }
             if (dungeonGateEntity.getUnlockItem() != null) {
-                defaultItemId = Registry.ITEM.getId(dungeonGateEntity.getUnlockItem()).toString();
+                defaultItemId = Registries.ITEM.getId(dungeonGateEntity.getUnlockItem()).toString();
             }
         }
 
@@ -75,9 +74,9 @@ public class DungeonGateOpScreen extends Screen {
         this.gateUnlockItemIdTextFieldWidget.setChangedListener(name -> this.updateDoneButtonState());
         this.addSelectableChild(this.gateUnlockItemIdTextFieldWidget);
 
-        this.doneButton = this.addDrawableChild(new ButtonWidget(this.width / 2 - 75, 156, 150, 20, ScreenTexts.DONE, button -> {
+        this.doneButton = this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, button -> {
             this.onDone();
-        }));
+        }).dimensions(this.width / 2 - 75, 156, 150, 20).build());
         this.setInitialFocus(this.gateBlockIdTextFieldWidget);
         this.updateDoneButtonState();
     }
@@ -102,20 +101,21 @@ public class DungeonGateOpScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        this.renderBackground(matrices);
-        JigsawBlockScreen.drawTextWithShadow(matrices, this.textRenderer, GATE_BLOCK_ID_TEXT, this.width / 2 - 153, 40, 0xA0A0A0);
-        this.gateBlockIdTextFieldWidget.render(matrices, mouseX, mouseY, delta);
-        JigsawBlockScreen.drawTextWithShadow(matrices, this.textRenderer, GATE_PARTICLE_ID_TEXT, this.width / 2 - 153, 75, 0xA0A0A0);
-        this.gateParticleIdTextFieldWidget.render(matrices, mouseX, mouseY, delta);
-        JigsawBlockScreen.drawTextWithShadow(matrices, this.textRenderer, GATE_UNLOCK_ITEM_ID_TEXT, this.width / 2 - 153, 110, 0xA0A0A0);
-        this.gateUnlockItemIdTextFieldWidget.render(matrices, mouseX, mouseY, delta);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        this.renderBackground(context);
+        context.drawTextWithShadow(this.textRenderer, GATE_BLOCK_ID_TEXT, this.width / 2 - 153, 40, 0xA0A0A0);
+        this.gateBlockIdTextFieldWidget.render(context, mouseX, mouseY, delta);
+        context.drawTextWithShadow(this.textRenderer, GATE_PARTICLE_ID_TEXT, this.width / 2 - 153, 75, 0xA0A0A0);
+        this.gateParticleIdTextFieldWidget.render(context, mouseX, mouseY, delta);
+        context.drawTextWithShadow(this.textRenderer, GATE_UNLOCK_ITEM_ID_TEXT, this.width / 2 - 153, 110, 0xA0A0A0);
+        this.gateUnlockItemIdTextFieldWidget.render(context, mouseX, mouseY, delta);
 
-        super.render(matrices, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, delta);
     }
 
     private void updateDoneButtonState() {
-        this.doneButton.active = !StringUtils.isEmpty(this.gateBlockIdTextFieldWidget.getText()) && !Registry.BLOCK.get(new Identifier(this.gateBlockIdTextFieldWidget.getText())).equals(Blocks.AIR);
+        this.doneButton.active = !StringUtils.isEmpty(this.gateBlockIdTextFieldWidget.getText())
+                && !Registries.BLOCK.get(new Identifier(this.gateBlockIdTextFieldWidget.getText())).equals(Blocks.AIR);
     }
 
     private void onDone() {

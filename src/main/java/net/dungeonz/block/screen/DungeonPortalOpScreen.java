@@ -7,12 +7,11 @@ import net.dungeonz.network.DungeonClientPacket;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.JigsawBlockScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.NarratorManager;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
@@ -59,9 +58,9 @@ public class DungeonPortalOpScreen extends Screen {
         this.dungeonDefaultDifficultyTextFieldWidget.setChangedListener(name -> this.updateDoneButtonState());
         this.addSelectableChild(this.dungeonDefaultDifficultyTextFieldWidget);
 
-        this.doneButton = this.addDrawableChild(new ButtonWidget(this.width / 2 - 75, 126, 150, 20, ScreenTexts.DONE, button -> {
+        this.doneButton = this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, button -> {
             this.onDone();
-        }));
+        }).dimensions(this.width / 2 - 75, 126, 150, 20).build());
         this.setInitialFocus(this.dungeonTypeTextFieldWidget);
         this.updateDoneButtonState();
     }
@@ -83,14 +82,14 @@ public class DungeonPortalOpScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        this.renderBackground(matrices);
-        JigsawBlockScreen.drawTextWithShadow(matrices, this.textRenderer, DUNGEON_TYPE_TEXT, this.width / 2 - 153, 40, 0xA0A0A0);
-        this.dungeonTypeTextFieldWidget.render(matrices, mouseX, mouseY, delta);
-        JigsawBlockScreen.drawTextWithShadow(matrices, this.textRenderer, DEFAULT_DIFFICULTY_TEXT, this.width / 2 - 153, 75, 0xA0A0A0);
-        this.dungeonDefaultDifficultyTextFieldWidget.render(matrices, mouseX, mouseY, delta);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        this.renderBackground(context);
+        context.drawTextWithShadow(this.textRenderer, DUNGEON_TYPE_TEXT, this.width / 2 - 153, 40, 0xA0A0A0);
+        this.dungeonTypeTextFieldWidget.render(context, mouseX, mouseY, delta);
+        context.drawTextWithShadow(this.textRenderer, DEFAULT_DIFFICULTY_TEXT, this.width / 2 - 153, 75, 0xA0A0A0);
+        this.dungeonDefaultDifficultyTextFieldWidget.render(context, mouseX, mouseY, delta);
 
-        super.render(matrices, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, delta);
     }
 
     private void updateDoneButtonState() {

@@ -22,9 +22,10 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootTable;
-import net.minecraft.loot.context.LootContext;
+import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.context.LootContextTypes;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -32,7 +33,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.TeleportTarget;
 import net.partyaddon.access.GroupManagerAccess;
 import net.partyaddon.group.GroupManager;
@@ -41,7 +41,7 @@ public class DungeonHelper {
 
     @Nullable
     public static Dungeon getCurrentDungeon(ServerPlayerEntity playerEntity) {
-        if (playerEntity.world.getRegistryKey() == DimensionInit.DUNGEON_WORLD && ((ServerPlayerAccess) playerEntity).getOldServerWorld() != null) {
+        if (playerEntity.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD && ((ServerPlayerAccess) playerEntity).getOldServerWorld() != null) {
             BlockEntity blockEntity = ((ServerPlayerAccess) playerEntity).getOldServerWorld().getBlockEntity(((ServerPlayerAccess) playerEntity).getDungeonPortalBlockPos());
             if (blockEntity == null) {
                 return null;
@@ -72,7 +72,7 @@ public class DungeonHelper {
         Iterator<Entry<Integer, Integer>> requiredItemIterator = dungeon.getRequiredItemCountMap().entrySet().iterator();
         while (requiredItemIterator.hasNext()) {
             Entry<Integer, Integer> entry = requiredItemIterator.next();
-            requiredItemStackList.add(new ItemStack(Registry.ITEM.get(entry.getKey()), entry.getValue()));
+            requiredItemStackList.add(new ItemStack(Registries.ITEM.get(entry.getKey()), entry.getValue()));
         }
         return requiredItemStackList;
     }
@@ -83,13 +83,12 @@ public class DungeonHelper {
         while (lootTableIterator.hasNext()) {
             Entry<String, String> entry = lootTableIterator.next();
 
-            LootTable lootTable = server.getLootManager().getTable(new Identifier(entry.getValue()));
+            LootTable lootTable = server.getLootManager().getLootTable(new Identifier(entry.getValue()));
 
-            LootContext.Builder builder = new LootContext.Builder(server.getOverworld())
-                    .parameter(LootContextParameters.ORIGIN, server.getOverworld().getPlayers().get(server.getOverworld().getRandom().nextInt(server.getOverworld().getPlayers().size())).getPos())
-                    .random(server.getOverworld().getRandom().nextLong());
+            LootContextParameterSet.Builder builder = new LootContextParameterSet.Builder(server.getOverworld()).add(LootContextParameters.ORIGIN,
+                    server.getOverworld().getPlayers().get(server.getOverworld().getRandom().nextInt(server.getOverworld().getPlayers().size())).getPos());
             Inventory inventory = new SimpleInventory(27);
-            lootTable.supplyInventory(inventory, builder.build(LootContextTypes.CHEST));
+            lootTable.supplyInventory(inventory, builder.build(LootContextTypes.CHEST), server.getOverworld().getRandom().nextLong());
 
             List<ItemStack> itemStacks = new ArrayList<ItemStack>();
             for (int i = 0; i < inventory.size(); i++) {
@@ -114,17 +113,17 @@ public class DungeonHelper {
     }
 
     public static void teleportDungeon(ServerPlayerEntity player, BlockPos dungeonPortalPos) {
-        if (player.world.getBlockEntity(dungeonPortalPos) != null && player.world.getBlockEntity(dungeonPortalPos) instanceof DungeonPortalEntity) {
-            DungeonPortalEntity dungeonPortalEntity = (DungeonPortalEntity) player.world.getBlockEntity(dungeonPortalPos);
+        if (player.getWorld().getBlockEntity(dungeonPortalPos) != null && player.getWorld().getBlockEntity(dungeonPortalPos) instanceof DungeonPortalEntity) {
+            DungeonPortalEntity dungeonPortalEntity = (DungeonPortalEntity) player.getWorld().getBlockEntity(dungeonPortalPos);
 
-            if (player.world.getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
+            if (player.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
                 ServerWorld oldWorld = ((ServerPlayerAccess) player).getOldServerWorld();
                 if (oldWorld != null) {
                     FabricDimensions.teleport(player, oldWorld, DungeonPlacementHandler.leave(player, oldWorld));
                     return;
                 }
             } else {
-                ServerWorld dungeonWorld = player.world.getServer().getWorld(DimensionInit.DUNGEON_WORLD);
+                ServerWorld dungeonWorld = player.getWorld().getServer().getWorld(DimensionInit.DUNGEON_WORLD);
                 if (dungeonWorld == null) {
                     player.sendMessage(Text.literal("Failed to find world, was it registered?"), false);
                     return;
@@ -154,7 +153,7 @@ public class DungeonHelper {
                             player.sendMessage(Text.translatable("text.dungeonz.missing"), false);
                             return;
                         }
-                        FabricDimensions.teleport(player, dungeonWorld, DungeonPlacementHandler.enter(player, dungeonWorld, (ServerWorld) player.world, dungeonPortalEntity, dungeonPortalPos,
+                        FabricDimensions.teleport(player, dungeonWorld, DungeonPlacementHandler.enter(player, dungeonWorld, (ServerWorld) player.getWorld(), dungeonPortalEntity, dungeonPortalPos,
                                 dungeonPortalEntity.getDifficulty(), dungeonPortalEntity.getDisableEffects()));
                     } else {
                         player.sendMessage(Text.translatable("text.dungeonz.dungeon_full"), false);

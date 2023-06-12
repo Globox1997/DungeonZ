@@ -11,7 +11,7 @@ import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.RotationAxis;
 
 @Environment(EnvType.CLIENT)
 public class DungeonSpawnerRenderer implements BlockEntityRenderer<DungeonSpawnerEntity> {
@@ -35,9 +35,9 @@ public class DungeonSpawnerRenderer implements BlockEntityRenderer<DungeonSpawne
             }
             matrixStack.translate(0.0, 0.4f, 0.0);
             matrixStack.multiply(
-                    Vec3f.POSITIVE_Y.getDegreesQuaternion((float) MathHelper.lerp((double) f, dungeonSpawnerLogic.randomParticleValueTwo(), dungeonSpawnerLogic.randomParticleValueOne()) * 10.0f));
+                    RotationAxis.POSITIVE_Y.rotationDegrees((float) MathHelper.lerp((double) f, dungeonSpawnerLogic.randomParticleValueTwo(), dungeonSpawnerLogic.randomParticleValueOne()) * 10.0f));
             matrixStack.translate(0.0, -0.2f, 0.0);
-            matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-30.0f));
+            matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-30.0f));
             matrixStack.scale(g, g, g);
             this.entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, 0.0f, f, matrixStack, vertexConsumerProvider, i);
         }

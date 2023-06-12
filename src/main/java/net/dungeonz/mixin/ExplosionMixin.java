@@ -29,7 +29,7 @@ public class ExplosionMixin {
     @Inject(method = "affectWorld", at = @At("HEAD"))
     private void affectWorldMixin(boolean particles, CallbackInfo info) {
         if (world.getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
-            destructionType = DestructionType.NONE;
+            destructionType = DestructionType.KEEP;
         }
     }
 

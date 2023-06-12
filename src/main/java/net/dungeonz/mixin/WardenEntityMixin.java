@@ -16,7 +16,7 @@ public class WardenEntityMixin {
 
     @Inject(method = "isValidTarget", at = @At("HEAD"), cancellable = true)
     private void isValidTargetMixin(@Nullable Entity entity, CallbackInfoReturnable<Boolean> info) {
-        if (entity != null && entity.world.getRegistryKey() == DimensionInit.DUNGEON_WORLD && entity instanceof HostileEntity) {
+        if (entity != null && entity.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD && entity instanceof HostileEntity) {
             info.setReturnValue(false);
         }
     }

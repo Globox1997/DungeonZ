@@ -16,13 +16,13 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 @Mixin(ServerPlayerInteractionManager.class)
@@ -47,13 +47,13 @@ public class ServerPlayerInteractionManagerMixin {
 
     @Inject(method = "tryBreakBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/Block;onBreak(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;)V"), cancellable = true)
     private void tryBreakBlockMixin(BlockPos pos, CallbackInfoReturnable<Boolean> info) {
-        if (!player.world.isClient && player.world.getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
+        if (!player.getWorld().isClient() && player.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
             if (!player.isCreative() && DungeonHelper.getCurrentDungeon(player) != null
-                    && !DungeonHelper.getCurrentDungeon(player).getBreakableBlockIdList().contains(Registry.BLOCK.getRawId(player.world.getBlockState(pos).getBlock()))) {
+                    && !DungeonHelper.getCurrentDungeon(player).getBreakableBlockIdList().contains(Registries.BLOCK.getRawId(player.getWorld().getBlockState(pos).getBlock()))) {
                 info.setReturnValue(false);
             } else {
                 if (DungeonHelper.getDungeonPortalEntity(player) != null && !DungeonHelper.getDungeonPortalEntity(player).getReplaceBlockIdMap().containsKey(pos)) {
-                    DungeonHelper.getDungeonPortalEntity(player).addReplaceBlockId(pos, player.world.getBlockState(pos).getBlock());
+                    DungeonHelper.getDungeonPortalEntity(player).addReplaceBlockId(pos, player.getWorld().getBlockState(pos).getBlock());
                     DungeonHelper.getDungeonPortalEntity(player).markDirty();
                 }
             }
@@ -65,7 +65,7 @@ public class ServerPlayerInteractionManagerMixin {
             BlockState blockState, boolean bl, boolean bl2, ItemStack itemStack, ItemUsageContext itemUsageContext) {
         if (world.getRegistryKey() == DimensionInit.DUNGEON_WORLD && !player.isCreative() && stack.getItem() instanceof BlockItem) {
             if (DungeonHelper.getCurrentDungeon(player) != null) {
-                if (!DungeonHelper.getCurrentDungeon(player).getplaceableBlockIdList().contains(Registry.BLOCK.getRawId(((BlockItem) stack.getItem()).getBlock()))) {
+                if (!DungeonHelper.getCurrentDungeon(player).getplaceableBlockIdList().contains(Registries.BLOCK.getRawId(((BlockItem) stack.getItem()).getBlock()))) {
                     info.setReturnValue(ActionResult.PASS);
                 } else if (DungeonHelper.getDungeonPortalEntity(player) != null) {
                     if (!DungeonHelper.getDungeonPortalEntity(player).getReplaceBlockIdMap().containsKey(itemUsageContext.getBlockPos().offset(itemUsageContext.getSide()))) {

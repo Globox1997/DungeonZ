@@ -6,7 +6,7 @@ import net.minecraft.advancement.criterion.AbstractCriterion;
 import net.minecraft.advancement.criterion.AbstractCriterionConditions;
 import net.minecraft.predicate.entity.AdvancementEntityPredicateDeserializer;
 import net.minecraft.predicate.entity.AdvancementEntityPredicateSerializer;
-import net.minecraft.predicate.entity.EntityPredicate;
+import net.minecraft.predicate.entity.LootContextPredicate;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -20,10 +20,10 @@ public class DungeonBossCriterion extends AbstractCriterion<DungeonBossCriterion
     }
 
     @Override
-    public Conditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended extended, AdvancementEntityPredicateDeserializer advancementEntityPredicateDeserializer) {
+    protected Conditions conditionsFromJson(JsonObject jsonObject, LootContextPredicate lootContextPredicate, AdvancementEntityPredicateDeserializer advancementEntityPredicateDeserializer) {
         String dungeonType = JsonHelper.getString(jsonObject, "dungeon_type");
         String difficulty = JsonHelper.getString(jsonObject, "difficulty");
-        return new Conditions(extended, dungeonType, difficulty);
+        return new Conditions(lootContextPredicate, dungeonType, difficulty);
     }
 
     public void trigger(ServerPlayerEntity player, String dungeonType, String difficulty) {
@@ -34,8 +34,8 @@ public class DungeonBossCriterion extends AbstractCriterion<DungeonBossCriterion
         private final String dungeonType;
         private final String difficulty;
 
-        public Conditions(EntityPredicate.Extended player, String dungeonType, String difficulty) {
-            super(ID, player);
+        public Conditions(LootContextPredicate lootContextPredicate, String dungeonType, String difficulty) {
+            super(ID, lootContextPredicate);
             this.dungeonType = dungeonType;
             this.difficulty = difficulty;
         }

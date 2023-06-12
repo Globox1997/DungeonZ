@@ -29,7 +29,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     @Inject(method = "canPlaceOn", at = @At(value = "HEAD"), cancellable = true)
     public void canPlaceOnMixin(BlockPos pos, Direction facing, ItemStack stack, CallbackInfoReturnable<Boolean> info) {
         PlayerEntity playerEntity = (PlayerEntity) (Object) this;
-        if (playerEntity != null && !playerEntity.isCreative() && world.getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
+        if (playerEntity != null && !playerEntity.isCreative() && this.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
             info.setReturnValue(false);
         }
     }
@@ -37,8 +37,8 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     @Inject(method = "checkFallFlying", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getEquippedStack(Lnet/minecraft/entity/EquipmentSlot;)Lnet/minecraft/item/ItemStack;"), cancellable = true)
     public void checkFallFlyingMixin(CallbackInfoReturnable<Boolean> info) {
         PlayerEntity playerEntity = (PlayerEntity) (Object) this;
-        if (playerEntity != null && !playerEntity.isCreative() && world.getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
-            if (!world.isClient) {
+        if (playerEntity != null && !playerEntity.isCreative() && this.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
+            if (!this.getWorld().isClient()) {
                 if (DungeonHelper.getCurrentDungeon((ServerPlayerEntity) playerEntity) != null && !DungeonHelper.getCurrentDungeon((ServerPlayerEntity) playerEntity).isElytraAllowed()) {
                     info.setReturnValue(false);
                 }
@@ -52,7 +52,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @Override
     public boolean teleport(double x, double y, double z, boolean particleEffects) {
-        if (world.getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
+        if (this.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
             return false;
         }
         return super.teleport(x, y, z, particleEffects);
@@ -60,7 +60,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @Override
     public boolean addStatusEffect(StatusEffectInstance effect, Entity source) {
-        if (!world.isClient && effect.getEffectType().isBeneficial() && world.getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
+        if (!this.getWorld().isClient() && effect.getEffectType().isBeneficial() && this.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
             if (DungeonHelper.getDungeonPortalEntity((ServerPlayerEntity) (Object) this).getDisableEffects()) {
                 return false;
             }

@@ -6,7 +6,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootTable;
-import net.minecraft.loot.context.LootContext;
+import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.server.MinecraftServer;
@@ -21,12 +21,12 @@ public class InventoryHelper {
         // Clear inventory
         ((Inventory) world.getBlockEntity(pos)).clear();
         // Generate loot
-        LootTable lootTable = server.getLootManager().getTable(new Identifier(lootTableString));
-        LootContext.Builder builder = new LootContext.Builder(world).parameter(LootContextParameters.ORIGIN, new Vec3d(pos.getX(), pos.getY(), pos.getZ())).random(world.getRandom().nextLong());
+        LootTable lootTable = server.getLootManager().getLootTable(new Identifier(lootTableString));
+        LootContextParameterSet.Builder builder = new LootContextParameterSet.Builder(world).add(LootContextParameters.ORIGIN, new Vec3d(pos.getX(), pos.getY(), pos.getZ()));
         if (luck) {
             builder.luck(1.1f);
         }
-        lootTable.supplyInventory((Inventory) world.getBlockEntity(pos), builder.build(LootContextTypes.CHEST));
+        lootTable.supplyInventory((Inventory) world.getBlockEntity(pos), builder.build(LootContextTypes.CHEST), world.getRandom().nextLong());
     }
 
     public static boolean hasRequiredItemStacks(PlayerInventory playerInventory, List<ItemStack> requiredItemStacks) {

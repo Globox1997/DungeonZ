@@ -21,7 +21,7 @@ public abstract class EnderPearlEntityMixin extends ThrownItemEntity {
 
     @Inject(method = "onCollision", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;hasVehicle()Z"), cancellable = true)
     protected void onCollisionMixin(HitResult hitResult, CallbackInfo info) {
-        if (this.world.getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
+        if (this.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
             this.discard();
             info.cancel();
         }

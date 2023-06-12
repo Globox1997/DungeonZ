@@ -5,15 +5,12 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.structure.StructureSet;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryOps;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.structure.StructureTemplateManager;
 import net.minecraft.util.collection.Pool;
-import net.minecraft.util.dynamic.RegistryOps;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.DynamicRegistryManager;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryEntry;
-import net.minecraft.util.registry.RegistryEntryList;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.Heightmap.Type;
@@ -29,25 +26,21 @@ import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.Blender;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.VerticalBlockSample;
+import net.minecraft.world.gen.chunk.placement.StructurePlacementCalculator;
 import net.minecraft.world.gen.noise.NoiseConfig;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 public class DungeonChunkGenerator extends ChunkGenerator {
 
-    public static final Codec<DungeonChunkGenerator> CODEC = RecordCodecBuilder.create((instance) -> createStructureSetRegistryGetter(instance)
-            .and(RegistryOps.createRegistryCodec(Registry.BIOME_KEY).forGetter((generator) -> generator.biomeRegistry)).apply(instance, instance.stable(DungeonChunkGenerator::new)));
+    public static final Codec<DungeonChunkGenerator> CODEC = RecordCodecBuilder
+            .create(instance -> instance.group(RegistryOps.getEntryCodec(BiomeKeys.PLAINS)).apply(instance, instance.stable(DungeonChunkGenerator::new)));
 
-    private final Registry<Biome> biomeRegistry;
-
-    public DungeonChunkGenerator(Registry<StructureSet> registry, Registry<Biome> biomeRegistry) {
-        super(registry, Optional.of(RegistryEntryList.of(Collections.emptyList())), new FixedBiomeSource(biomeRegistry.getOrCreateEntry(BiomeKeys.PLAINS)));
-        this.biomeRegistry = biomeRegistry;
+    public DungeonChunkGenerator(RegistryEntry.Reference<Biome> biomeEntry) {
+        super(new FixedBiomeSource(biomeEntry));
     }
 
     @Override
@@ -64,8 +57,8 @@ public class DungeonChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public void setStructureStarts(DynamicRegistryManager registryManager, NoiseConfig noiseConfig, StructureAccessor structureAccessor, Chunk chunk,
-            StructureTemplateManager structureTemplateManager, long seed) {
+    public void setStructureStarts(DynamicRegistryManager registryManager, StructurePlacementCalculator placementCalculator, StructureAccessor structureAccessor, Chunk chunk,
+            StructureTemplateManager structureTemplateManager) {
     }
 
     @Override

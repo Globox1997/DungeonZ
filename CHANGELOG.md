@@ -1,7 +1,6 @@
 ### Added:
 - 
 ### Fixed:
-- Fixed player connection issue
-- Fixed boss despawn
+- 
 ### Changed:
-- Tweaked structure spawn chance
+- Updated to mc 1.20

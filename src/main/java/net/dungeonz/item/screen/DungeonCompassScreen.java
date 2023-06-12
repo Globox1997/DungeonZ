@@ -12,12 +12,10 @@ import net.dungeonz.network.DungeonClientPacket;
 import net.dungeonz.util.InventoryHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.NarratorManager;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -70,34 +68,29 @@ public class DungeonCompassScreen extends Screen {
             }
             k += 20;
         }
-        this.doneButton = this.addDrawableChild(
-                new ButtonWidget(this.x + this.backgroundWidth / 2 - 48, this.y + this.backgroundHeight - 25, 97, 20, Text.translatable("compass.compass_screen.calibrate"), button -> {
-                    this.onDone();
-                }));
+
+        this.doneButton = this.addDrawableChild(ButtonWidget.builder(Text.translatable("compass.compass_screen.calibrate"), button -> {
+            this.onDone();
+        }).dimensions(this.x + this.backgroundWidth / 2 - 48, this.y + this.backgroundHeight - 25, 97, 20).build());
         this.doneButton.active = false;
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        this.renderBackground(matrices);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        this.renderBackground(context);
 
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.setShaderTexture(0, TEXTURE);
         int i = (this.width - this.backgroundWidth) / 2;
         int j = (this.height - this.backgroundHeight) / 2;
-        DrawableHelper.drawTexture(matrices, i, j, this.getZOffset(), 0.0f, 0.0f, this.backgroundWidth, this.backgroundHeight, 256, 256);
+        context.drawTexture(TEXTURE, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight, 256, 256);
 
-        this.textRenderer.draw(matrices, this.title, this.x + this.backgroundWidth / 2 - this.textRenderer.getWidth(this.title) / 2, this.y + 6, 0x404040);
+        context.drawText(this.textRenderer, this.title, this.x + this.backgroundWidth / 2 - this.textRenderer.getWidth(this.title) / 2, this.y + 6, 0x404040, false);
 
-        super.render(matrices, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, delta);
 
         if (!this.dungeonIds.isEmpty()) {
             int k = this.y + 16 + 1;
             int l = this.x + 5 + 5;
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            RenderSystem.setShaderTexture(0, TEXTURE);
-            this.renderScrollbar(matrices, i, j, this.dungeonIds);
+            this.renderScrollbar(context, i, j, this.dungeonIds);
             int m = 0;
             for (String dungeon : this.dungeonIds) {
                 if (this.canScroll(this.dungeonIds.size()) && (m < this.indexStartOffset || m >= 7 + this.indexStartOffset)) {
@@ -106,14 +99,14 @@ public class DungeonCompassScreen extends Screen {
                 }
 
                 int n = k + 7;
-                this.textRenderer.draw(matrices, getDungeonName(dungeon, 78, 9), l, n, 0xE5E5E5);
+                context.drawText(this.textRenderer, getDungeonName(dungeon, 78, 9), l, n, 0xE5E5E5, false);
                 k += 20;
                 ++m;
             }
 
             for (WidgetButtonPage widgetButtonPage : this.dungeons) {
                 if (widgetButtonPage.isHovered()) {
-                    widgetButtonPage.renderTooltip(matrices, mouseX, mouseY);
+                    widgetButtonPage.renderTooltip(context, mouseX, mouseY);
                 }
                 widgetButtonPage.visible = widgetButtonPage.index < this.dungeonIds.size();
             }
@@ -121,11 +114,11 @@ public class DungeonCompassScreen extends Screen {
         }
         if (this.doneButton.isHovered() && !this.doneButton.active && !StringUtils.isEmpty(this.dungeonType) && client.player != null
                 && !InventoryHelper.hasRequiredItemStacks(client.player.getInventory(), ItemInit.REQUIRED_DUNGEON_COMPASS_CALIBRATION_ITEMS)) {
-            this.renderTooltip(matrices, Text.translatable("compass.compass_screen.required"), mouseX, mouseY);
+            context.drawTooltip(this.textRenderer, Text.translatable("compass.compass_screen.required"), mouseX, mouseY);
         }
     }
 
-    private void renderScrollbar(MatrixStack matrices, int x, int y, List<String> dungeonIds) {
+    private void renderScrollbar(DrawContext context, int x, int y, List<String> dungeonIds) {
         int i = dungeonIds.size() + 1 - 7;
         if (i > 1) {
             int j = 139 - (27 + (i - 1) * 139 / i);
@@ -134,9 +127,9 @@ public class DungeonCompassScreen extends Screen {
             if (this.indexStartOffset == i - 1) {
                 m = 113;
             }
-            DrawableHelper.drawTexture(matrices, x + 94, y + 18 + m, this.getZOffset(), 105.0f, 0.0f, 6, 27, 256, 256);
+            context.drawTexture(TEXTURE, x + 94, y + 18 + m, 105.0f, 0.0f, 6, 27, 256, 256);
         } else {
-            DrawableHelper.drawTexture(matrices, x + 94, y + 18, this.getZOffset(), 111.0f, 0.0f, 6, 27, 256, 256);
+            context.drawTexture(TEXTURE, x + 94, y + 18, 111.0f, 0.0f, 6, 27, 256, 256);
         }
     }
 
@@ -207,7 +200,7 @@ public class DungeonCompassScreen extends Screen {
         final int index;
 
         public WidgetButtonPage(int x, int y, int index, ButtonWidget.PressAction onPress) {
-            super(x, y, 89, 20, ScreenTexts.EMPTY, onPress);
+            super(x, y, 89, 20, ScreenTexts.EMPTY, onPress, DEFAULT_NARRATION_SUPPLIER);
             this.index = index;
             this.visible = false;
         }
@@ -216,12 +209,11 @@ public class DungeonCompassScreen extends Screen {
             return this.index;
         }
 
-        @Override
-        public void renderTooltip(MatrixStack matrices, int mouseX, int mouseY) {
+        public void renderTooltip(DrawContext context, int mouseX, int mouseY) {
             if (this.hovered) {
                 Text text = Text.translatable("dungeon." + DungeonCompassScreen.this.dungeonIds.get(this.index + DungeonCompassScreen.this.indexStartOffset));
                 if (client.textRenderer.getWidth(text) > 78) {
-                    DungeonCompassScreen.this.renderTooltip(matrices, text, mouseX, mouseY);
+                    context.drawTooltip(textRenderer, text, mouseX, mouseY);
                 }
             }
         }

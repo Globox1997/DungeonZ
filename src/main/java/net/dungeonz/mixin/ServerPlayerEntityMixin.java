@@ -14,14 +14,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.dungeonz.access.ServerPlayerAccess;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.encryption.PlayerPublicKey;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 @Mixin(ServerPlayerEntity.class)
@@ -36,8 +35,8 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
     private BlockPos dungeonSpawnBlockPos = new BlockPos(0, 0, 0);
     private ServerWorld oldWorld = null;
 
-    public ServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile gameProfile, PlayerPublicKey publicKey) {
-        super(world, pos, yaw, gameProfile, publicKey);
+    public ServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile gameProfile) {
+        super(world, pos, yaw, gameProfile);
     }
 
     @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
@@ -45,7 +44,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
         this.dungeonPortalBlockPos = new BlockPos(nbt.getInt("DungeonPortalBlockPosX"), nbt.getInt("DungeonPortalBlockPosY"), nbt.getInt("DungeonPortalBlockPosZ"));
         this.dungeonSpawnBlockPos = new BlockPos(nbt.getInt("DungeonSpawnBlockPosX"), nbt.getInt("DungeonSpawnBlockPosY"), nbt.getInt("DungeonSpawnBlockPosZ"));
         if (nbt.contains("DungeonRegistryKey")) {
-            this.oldWorld = this.server.getWorld(RegistryKey.of(Registry.WORLD_KEY, new Identifier(nbt.getString("DungeonRegistryKey"))));
+            this.oldWorld = this.server.getWorld(RegistryKey.of(RegistryKeys.WORLD, new Identifier(nbt.getString("DungeonRegistryKey"))));
         }
     }
 

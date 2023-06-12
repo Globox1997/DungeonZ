@@ -12,15 +12,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Vanishable;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.TagKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.GlobalPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -106,7 +106,7 @@ public class DungeonCompassItem extends Item implements Vanishable {
 
     @Nullable
     private static BlockPos getDungeonStructurePos(ServerWorld world, String dungeonType, BlockPos playerPos) {
-        return world.locateStructure(TagKey.of(Registry.STRUCTURE_KEY, new Identifier("dungeonz", dungeonType)), playerPos, 100, false);
+        return world.locateStructure(TagKey.of(RegistryKeys.STRUCTURE, new Identifier("dungeonz", dungeonType)), playerPos, 100, false);
     }
 
     @Override

@@ -18,12 +18,12 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.collection.DataPool;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.EntityView;
 import net.minecraft.world.MobSpawnerEntry;
 import net.minecraft.world.World;
@@ -117,7 +117,7 @@ public abstract class DungeonSpawnerLogic {
             f = j >= 3 ? nbtList.getDouble(2) : (double) pos.getZ() + (random.nextDouble() - random.nextDouble()) * (double) this.spawnRange + 0.5;
             if (!world.isSpaceEmpty(optional.get().createSimpleBoundingBox(d, e, f)))
                 continue;
-            BlockPos blockPos = new BlockPos(d, e, f);
+            BlockPos blockPos = BlockPos.ofFloored(d, e, f);
             // if (!this.spawnEntry.getCustomSpawnRules().isPresent() ? !SpawnRestriction.canSpawn(optional.get(), world, SpawnReason.SPAWNER, blockPos, world.getRandom())
             // : !optional.get().getSpawnGroup().isPeaceful() && world.getDifficulty() == Difficulty.PEACEFUL
             // || !(customSpawnRules = this.spawnEntry.getCustomSpawnRules().get()).blockLightLimit().contains(world.getLightLevel(LightType.BLOCK, blockPos))
@@ -273,8 +273,8 @@ public abstract class DungeonSpawnerLogic {
     }
 
     public void setEntityId(EntityType<?> type) {
-        this.spawnEntry.getNbt().putString("id", Registry.ENTITY_TYPE.getId(type).toString());
-        this.entityTypeId = Registry.ENTITY_TYPE.getRawId(type);
+        this.spawnEntry.getNbt().putString("id", Registries.ENTITY_TYPE.getId(type).toString());
+        this.entityTypeId = Registries.ENTITY_TYPE.getRawId(type);
     }
 
     public int getEntityId() {

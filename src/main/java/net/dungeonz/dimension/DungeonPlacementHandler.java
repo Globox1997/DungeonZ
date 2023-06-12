@@ -28,6 +28,11 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.Entity.RemovalReason;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -44,9 +49,6 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryEntry;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
@@ -89,10 +91,10 @@ public class DungeonPlacementHandler {
     }
 
     private static void spawnDungeonStructure(World world, BlockPos pos, DungeonPortalEntity portalEntity) {
-        Registry<StructurePool> registry = world.getRegistryManager().get(Registry.STRUCTURE_POOL_KEY);
+        Registry<StructurePool> registry = world.getRegistryManager().get(RegistryKeys.TEMPLATE_POOL);
 
         // has to be the template_pool name
-        RegistryEntry<StructurePool> registryEntry = registry.entryOf(RegistryKey.of(Registry.STRUCTURE_POOL_KEY, portalEntity.getDungeon().getStructurePoolId()));
+        RegistryEntry<StructurePool> registryEntry = registry.entryOf(RegistryKey.of(RegistryKeys.TEMPLATE_POOL, portalEntity.getDungeon().getStructurePoolId()));
         // has to be the first jigsaw block to generate of
         generate((ServerWorld) world, portalEntity, portalEntity.getDungeon(), registryEntry, new Identifier("dungeonz:spawn"), 64, pos, false);
     }
@@ -112,8 +114,8 @@ public class DungeonPlacementHandler {
             ArrayList<BlockPos> exitPosList = new ArrayList<BlockPos>();
             ArrayList<BlockPos> gatePosList = new ArrayList<BlockPos>();
             HashMap<BlockPos, Integer> spawnerPosEntityIdMap = new HashMap<BlockPos, Integer>();
-            Block exitBlock = Registry.BLOCK.get(dungeon.getExitBlockId());
-            Block bossLootBlock = Registry.BLOCK.get(dungeon.getBossLootBlockId());
+            Block exitBlock = Registries.BLOCK.get(dungeon.getExitBlockId());
+            Block bossLootBlock = Registries.BLOCK.get(dungeon.getBossLootBlockId());
 
             StructurePiecesCollector structurePiecesCollector = optional.get().generate();
             for (StructurePiece structurePiece : structurePiecesCollector.toList().pieces()) {
@@ -130,7 +132,7 @@ public class DungeonPlacementHandler {
                         for (int o = poolStructurePiece.getBoundingBox().getMinZ(); o <= poolStructurePiece.getBoundingBox().getMaxZ(); o++) {
                             BlockPos checkPos = new BlockPos(i, u, o);
                             if (!world.getBlockState(checkPos).isAir()) {
-                                int blockId = Registry.BLOCK.getRawId(world.getBlockState(checkPos).getBlock());
+                                int blockId = Registries.BLOCK.getRawId(world.getBlockState(checkPos).getBlock());
                                 if (dungeon.containsBlockId(blockId)) {
                                     if (!blockIdPosMap.containsKey(blockId)) {
                                         ArrayList<BlockPos> newList = new ArrayList<BlockPos>();
@@ -196,7 +198,7 @@ public class DungeonPlacementHandler {
                     if (dungeon.getBlockIdBlockReplacementMap().get(blockId) == 0) {
                         world.removeBlock(list.get(i), false);
                     } else {
-                        world.setBlockState(list.get(i), Registry.BLOCK.get(dungeon.getBlockIdBlockReplacementMap().get(blockId)).getDefaultState(), 3);
+                        world.setBlockState(list.get(i), Registries.BLOCK.get(dungeon.getBlockIdBlockReplacementMap().get(blockId)).getDefaultState(), 3);
                     }
                 }
                 // dungeon.getBlockIdEntitySpawnChanceMap().containsKey(blockId) &&
@@ -223,7 +225,7 @@ public class DungeonPlacementHandler {
             if (dungeon.getBlockIdBlockReplacementMap().get(dungeon.getBossBlockId()) == 0) {
                 world.removeBlock(portalEntity.getBossBlockPos(), false);
             } else {
-                world.setBlockState(portalEntity.getBossBlockPos(), Registry.BLOCK.get(dungeon.getBlockIdBlockReplacementMap().get(dungeon.getBossBlockId())).getDefaultState(), 3);
+                world.setBlockState(portalEntity.getBossBlockPos(), Registries.BLOCK.get(dungeon.getBlockIdBlockReplacementMap().get(dungeon.getBossBlockId())).getDefaultState(), 3);
             }
         }
         bossEntity.refreshPositionAndAngles(portalEntity.getBossBlockPos(), 360f * world.getRandom().nextFloat(), 0.0f);
@@ -238,8 +240,8 @@ public class DungeonPlacementHandler {
         for (int i = 0; i < portalEntity.getExitPosList().size(); i++) {
             world.setBlockState(portalEntity.getExitPosList().get(i),
                     dungeon.getBlockIdBlockReplacementMap().containsKey(dungeon.getExitBlockId()) && dungeon.getBlockIdBlockReplacementMap().get(dungeon.getExitBlockId()) != -1
-                            ? Registry.BLOCK.get(dungeon.getBlockIdBlockReplacementMap().get(dungeon.getExitBlockId())).getDefaultState()
-                            : Registry.BLOCK.get(dungeon.getExitBlockId()).getDefaultState(),
+                            ? Registries.BLOCK.get(dungeon.getBlockIdBlockReplacementMap().get(dungeon.getExitBlockId())).getDefaultState()
+                            : Registries.BLOCK.get(dungeon.getExitBlockId()).getDefaultState(),
                     3);
         } // Refresh gates
         for (int i = 0; i < portalEntity.getGatePosList().size(); i++) {
@@ -248,8 +250,8 @@ public class DungeonPlacementHandler {
         // Refresh boss loot
         world.setBlockState(portalEntity.getBossLootBlockPos(),
                 dungeon.getBlockIdBlockReplacementMap().containsKey(dungeon.getBossLootBlockId()) && dungeon.getBlockIdBlockReplacementMap().get(dungeon.getBossLootBlockId()) != -1
-                        ? Registry.BLOCK.get(dungeon.getBlockIdBlockReplacementMap().get(dungeon.getBossLootBlockId())).getDefaultState()
-                        : Registry.BLOCK.get(dungeon.getBossLootBlockId()).getDefaultState(),
+                        ? Registries.BLOCK.get(dungeon.getBlockIdBlockReplacementMap().get(dungeon.getBossLootBlockId())).getDefaultState()
+                        : Registries.BLOCK.get(dungeon.getBossLootBlockId()).getDefaultState(),
                 3);
         // Refresh spawner
         Iterator<Entry<BlockPos, Integer>> spawnerPosIterator = portalEntity.getSpawnerPosEntityIdMap().entrySet().iterator();
@@ -257,13 +259,13 @@ public class DungeonPlacementHandler {
             Entry<BlockPos, Integer> entry = spawnerPosIterator.next();
             world.setBlockState(entry.getKey(), BlockInit.DUNGEON_SPAWNER.getDefaultState(), 3);
             ((DungeonSpawnerEntity) world.getBlockEntity(entry.getKey())).getLogic().setDungeonInfo(dungeon, difficulty,
-                    dungeon.getSpawnerEntityIdMap().containsKey(entry.getValue()) ? dungeon.getSpawnerEntityIdMap().get(entry.getValue()) : 0, Registry.ENTITY_TYPE.get(entry.getValue()));
+                    dungeon.getSpawnerEntityIdMap().containsKey(entry.getValue()) ? dungeon.getSpawnerEntityIdMap().get(entry.getValue()) : 0, Registries.ENTITY_TYPE.get(entry.getValue()));
         }
         // Refresh blocks
         Iterator<Entry<BlockPos, Integer>> replaceBlockIterator = portalEntity.getReplaceBlockIdMap().entrySet().iterator();
         while (replaceBlockIterator.hasNext()) {
             Entry<BlockPos, Integer> entry = replaceBlockIterator.next();
-            world.setBlockState(entry.getKey(), Registry.BLOCK.get(entry.getValue()).getDefaultState(), 3);
+            world.setBlockState(entry.getKey(), Registries.BLOCK.get(entry.getValue()).getDefaultState(), 3);
         }
         portalEntity.getDungeonPlayerUUIDs().clear();
         portalEntity.getDeadDungeonPlayerUUIDs().clear();
@@ -276,7 +278,7 @@ public class DungeonPlacementHandler {
         try {
             Object entity = type.create(world);
             if (!(entity instanceof MobEntity)) {
-                throw new IllegalStateException("Trying to spawn a non-mob: " + Registry.ENTITY_TYPE.getId(type));
+                throw new IllegalStateException("Trying to spawn a non-mob: " + Registries.ENTITY_TYPE.getId(type));
             }
             mobEntity = (MobEntity) entity;
         } catch (Exception exception) {

@@ -28,6 +28,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -36,7 +37,6 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
@@ -531,7 +531,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
     }
 
     public void addReplaceBlockId(BlockPos pos, Block block) {
-        this.replacePosBlockIdMap.put(pos, Registry.BLOCK.getRawId(block));
+        this.replacePosBlockIdMap.put(pos, Registries.BLOCK.getRawId(block));
     }
 
     public HashMap<BlockPos, Integer> getReplaceBlockIdMap() {

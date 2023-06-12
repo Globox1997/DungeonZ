@@ -18,6 +18,7 @@ import net.minecraft.client.util.ParticleUtil;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -28,7 +29,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
@@ -57,11 +57,11 @@ public class DungeonGateBlock extends BlockWithEntity {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (player.world.getBlockEntity(pos) != null && player.world.getBlockEntity(pos) instanceof DungeonGateEntity) {
-            DungeonGateEntity dungeonGateEntity = (DungeonGateEntity) player.world.getBlockEntity(pos);
+        if (player.getWorld().getBlockEntity(pos) != null && player.getWorld().getBlockEntity(pos) instanceof DungeonGateEntity) {
+            DungeonGateEntity dungeonGateEntity = (DungeonGateEntity) player.getWorld().getBlockEntity(pos);
             if (player.isCreativeLevelTwoOp()) {
                 if (!player.getStackInHand(hand).isEmpty() && player.getStackInHand(hand).getItem() instanceof BlockItem) {
-                    dungeonGateEntity.setBlockId(Registry.BLOCK.getId(((BlockItem) player.getStackInHand(hand).getItem()).getBlock()));
+                    dungeonGateEntity.setBlockId(Registries.BLOCK.getId(((BlockItem) player.getStackInHand(hand).getItem()).getBlock()));
                     dungeonGateEntity.markDirty();
                 } else if (player.isSneaking()) {
                     if (!world.isClient) {
@@ -102,11 +102,11 @@ public class DungeonGateBlock extends BlockWithEntity {
     }
 
     @Override
-    public boolean isTranslucent(BlockState state, BlockView world, BlockPos pos) {
+    public boolean isTransparent(BlockState state, BlockView world, BlockPos pos) {
         if (!state.get(ENABLED)) {
             return true;
         }
-        return super.isTranslucent(state, world, pos);
+        return super.isTransparent(state, world, pos);
     }
 
     @Override

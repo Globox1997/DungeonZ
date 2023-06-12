@@ -33,7 +33,7 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
     private List<ItemStack> requiredItemStacks = new ArrayList<ItemStack>();
 
     public DungeonPortalScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
-        this(syncId, playerInventory, new DungeonPortalEntity(buf.readBlockPos(), playerInventory.player.world.getBlockState(buf.readBlockPos())), ScreenHandlerContext.EMPTY);
+        this(syncId, playerInventory, new DungeonPortalEntity(buf.readBlockPos(), playerInventory.player.getWorld().getBlockState(buf.readBlockPos())), ScreenHandlerContext.EMPTY);
         this.pos = buf.readBlockPos();
         int dungeonPlayerCount = buf.readInt();
         List<UUID> dungeonPlayerUUIDs = new ArrayList<UUID>();
@@ -94,7 +94,7 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
     public DungeonPortalScreenHandler(int syncId, PlayerInventory playerInventory, DungeonPortalEntity dungeonPortalEntity, ScreenHandlerContext context) {
         super(BlockInit.PORTAL, syncId);
         this.context = context;
-        this.world = playerInventory.player.world;
+        this.world = playerInventory.player.getWorld();
         this.dungeonPortalEntity = dungeonPortalEntity;
         this.pos = dungeonPortalEntity.getPos();
 
@@ -106,7 +106,7 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
     }
 
     @Override
-    public ItemStack transferSlot(PlayerEntity var1, int var2) {
+    public ItemStack quickMove(PlayerEntity var1, int var2) {
         return null;
     }
 

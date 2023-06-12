@@ -22,12 +22,12 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.registry.Registries;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public class DungeonGateEntity extends BlockEntity {
@@ -164,7 +164,7 @@ public class DungeonGateEntity extends BlockEntity {
         if (this.unlockItemId.equals("")) {
             return null;
         }
-        return Registry.ITEM.get(new Identifier(this.unlockItemId));
+        return Registries.ITEM.get(new Identifier(this.unlockItemId));
     }
 
     public void setBlockId(Identifier gateBlockId) {
@@ -172,7 +172,7 @@ public class DungeonGateEntity extends BlockEntity {
     }
 
     public BlockState getBlockState() {
-        return Registry.BLOCK.get(this.gateBlockId).getDefaultState();
+        return Registries.BLOCK.get(this.gateBlockId).getDefaultState();
     }
 
     public void setParticleEffectId(String gateParticleId) {
@@ -185,7 +185,7 @@ public class DungeonGateEntity extends BlockEntity {
             return null;
         }
         try {
-            return ParticleEffectArgumentType.readParameters(new StringReader(this.gateParticleId.toString()));
+            return ParticleEffectArgumentType.readParameters(new StringReader(this.gateParticleId.toString()), Registries.PARTICLE_TYPE.getReadOnlyWrapper());
         } catch (CommandSyntaxException commandSyntaxException) {
         }
         return null;

@@ -26,7 +26,7 @@ public class PlayerManagerMixin {
 
     @Inject(method = "onPlayerConnect", at = @At("TAIL"))
     private void onPlayerConnectMixin(ClientConnection connection, ServerPlayerEntity player, CallbackInfo info) {
-        if (player.world.getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
+        if (player.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
             if (DungeonHelper.getCurrentDungeon(player) != null && DungeonHelper.getDungeonPortalEntity(player).getDungeonPlayerUUIDs().contains(player.getUuid())
                     && DungeonHelper.getDungeonPortalEntity(player).getCooldown() <= 0) {
                 Dungeon dungeon = DungeonHelper.getCurrentDungeon(player);
@@ -40,7 +40,7 @@ public class PlayerManagerMixin {
     @Inject(method = "respawnPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;onPlayerRespawned(Lnet/minecraft/server/network/ServerPlayerEntity;)V"), locals = LocalCapture.CAPTURE_FAILSOFT)
     private void respawnPlayerMixin(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfoReturnable<ServerPlayerEntity> info, BlockPos blockPos, float f, boolean bl, ServerWorld serverWorld,
             Optional<Vec3d> optional2, ServerWorld serverWorld2, ServerPlayerEntity serverPlayerEntity) {
-        if (!alive && oldPlayer.world.getRegistryKey() == DimensionInit.DUNGEON_WORLD && DungeonHelper.getDungeonPortalEntity(oldPlayer) != null) {
+        if (!alive && oldPlayer.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD && DungeonHelper.getDungeonPortalEntity(oldPlayer) != null) {
             DungeonPortalEntity dungeonPortalEntity = DungeonHelper.getDungeonPortalEntity(oldPlayer);
             dungeonPortalEntity.getDungeonPlayerUUIDs().remove(oldPlayer.getUuid());
             dungeonPortalEntity.addDeadDungeonPlayerUUIDs(serverPlayerEntity.getUuid());
