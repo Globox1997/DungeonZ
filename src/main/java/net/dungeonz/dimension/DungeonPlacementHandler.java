@@ -202,7 +202,7 @@ public class DungeonPlacementHandler {
                     }
                 }
                 // dungeon.getBlockIdEntitySpawnChanceMap().containsKey(blockId) &&
-                if (dungeon.getBlockIdEntitySpawnChanceMap().get(blockId).get(difficulty) <= world.getRandom().nextFloat()) {
+                if (world.getRandom().nextFloat() <= dungeon.getBlockIdEntitySpawnChanceMap().get(blockId).get(difficulty)) {
                     MobEntity mobEntity = createMob(world, dungeon.getBlockIdEntityMap().get(blockId).get(world.getRandom().nextInt(dungeon.getBlockIdEntityMap().get(blockId).size())));
                     // hopefully initialize doesn't lead to problems
                     mobEntity.initialize(world, world.getLocalDifficulty(list.get(i)), SpawnReason.STRUCTURE, null, null);
