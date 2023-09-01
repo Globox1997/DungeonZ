@@ -11,8 +11,9 @@ import net.dungeonz.init.BlockInit;
 import net.dungeonz.init.ConfigInit;
 import net.dungeonz.init.CriteriaInit;
 import net.dungeonz.init.DimensionInit;
+import net.dungeonz.init.EventInit;
 import net.dungeonz.init.ItemInit;
-import net.dungeonz.init.JsonReaderInit;
+import net.dungeonz.init.LoaderInit;
 import net.dungeonz.init.SoundInit;
 import net.dungeonz.init.WorldInit;
 import net.dungeonz.network.DungeonServerPacket;
@@ -34,11 +35,12 @@ public class DungeonzMain implements ModInitializer {
         DimensionInit.init();
         DungeonServerPacket.init();
         WorldInit.init();
-        JsonReaderInit.init();
+        LoaderInit.init();
         CriteriaInit.init();
         ConfigInit.init();
         SoundInit.init();
         ItemInit.init();
+        EventInit.init();
     }
 
 }

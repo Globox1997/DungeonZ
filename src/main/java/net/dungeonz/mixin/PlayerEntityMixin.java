@@ -5,7 +5,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.At;
 
-import net.dungeonz.access.ClientPlayerAccess;
 import net.dungeonz.init.DimensionInit;
 import net.dungeonz.util.DungeonHelper;
 import net.minecraft.entity.Entity;
@@ -31,22 +30,6 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         PlayerEntity playerEntity = (PlayerEntity) (Object) this;
         if (playerEntity != null && !playerEntity.isCreative() && this.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
             info.setReturnValue(false);
-        }
-    }
-
-    @Inject(method = "checkFallFlying", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getEquippedStack(Lnet/minecraft/entity/EquipmentSlot;)Lnet/minecraft/item/ItemStack;"), cancellable = true)
-    public void checkFallFlyingMixin(CallbackInfoReturnable<Boolean> info) {
-        PlayerEntity playerEntity = (PlayerEntity) (Object) this;
-        if (playerEntity != null && !playerEntity.isCreative() && this.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
-            if (!this.getWorld().isClient()) {
-                if (DungeonHelper.getCurrentDungeon((ServerPlayerEntity) playerEntity) != null && !DungeonHelper.getCurrentDungeon((ServerPlayerEntity) playerEntity).isElytraAllowed()) {
-                    info.setReturnValue(false);
-                }
-            } else {
-                if (!((ClientPlayerAccess) playerEntity).isElytraAllowed()) {
-                    info.setReturnValue(false);
-                }
-            }
         }
     }
 
