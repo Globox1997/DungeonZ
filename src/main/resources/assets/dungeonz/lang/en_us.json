@@ -44,7 +44,7 @@
     "compass.compass_screen.title": "Dungeons",
     "compass.compass_screen.calibrate": "Calibrate",
     "compass.compass_screen.required": "Requires 3 amethyst shards",
-    "compass.compass_item.cartography": "Calibrate at cartography table",
+    "compass.compass_item.cartography": "§7Calibrate at cartography table",
 
     "text.autoconfig.dungeonz.title": "DungeonZ Config",
     "text.autoconfig.dungeonz.option.devMode": "Dev Mode"
