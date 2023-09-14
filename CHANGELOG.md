@@ -1,6 +1,7 @@
 ### Added:
 - 
 ### Fixed:
-- Fixed mob spawn
+- Fixed null crash
+- Fixed timer display
 ### Changed:
-- Updated to mc 1.20.1
+- 
