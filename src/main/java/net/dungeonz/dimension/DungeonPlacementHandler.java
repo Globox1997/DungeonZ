@@ -28,6 +28,7 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.Entity.RemovalReason;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -203,7 +204,7 @@ public class DungeonPlacementHandler {
                 }
                 // dungeon.getBlockIdEntitySpawnChanceMap().containsKey(blockId) &&
                 if (world.getRandom().nextFloat() <= dungeon.getBlockIdEntitySpawnChanceMap().get(blockId).get(difficulty)) {
-                    MobEntity mobEntity = createMob(world, dungeon.getBlockIdEntityMap().get(blockId).get(world.getRandom().nextInt(dungeon.getBlockIdEntityMap().get(blockId).size())));
+                    MobEntity mobEntity = createMob(world, dungeon.getBlockIdEntityMap().get(blockId).get(world.getRandom().nextInt(dungeon.getBlockIdEntityMap().get(blockId).size())), null);
                     // hopefully initialize doesn't lead to problems
                     mobEntity.initialize(world, world.getLocalDifficulty(list.get(i)), SpawnReason.STRUCTURE, null, null);
                     mobEntity.setPersistent();
@@ -215,7 +216,7 @@ public class DungeonPlacementHandler {
             }
         });
         // Refresh boss
-        MobEntity bossEntity = createMob(world, dungeon.getBossEntityType());
+        MobEntity bossEntity = createMob(world, dungeon.getBossEntityType(), dungeon.getBossNbtCompound());
         bossEntity.initialize(world, world.getLocalDifficulty(portalEntity.getBossBlockPos()), SpawnReason.STRUCTURE, null, null);
         bossEntity.setPersistent();
         ((BossEntityAccess) bossEntity).setBoss(portalEntity.getPos(), portalEntity.getWorld().getRegistryKey().getValue().toString());
@@ -273,7 +274,7 @@ public class DungeonPlacementHandler {
     }
 
     @Nullable
-    private static MobEntity createMob(ServerWorld world, EntityType<?> type) {
+    private static MobEntity createMob(ServerWorld world, EntityType<?> type, @Nullable NbtCompound nbt) {
         MobEntity mobEntity;
         try {
             Object entity = type.create(world);
@@ -284,6 +285,11 @@ public class DungeonPlacementHandler {
         } catch (Exception exception) {
             DungeonzMain.LOGGER.warn("Failed to create mob", exception);
             return null;
+        }
+        if (nbt != null) {
+            NbtCompound nbtCompound = mobEntity.writeNbt(new NbtCompound());
+            nbtCompound.copyFrom(nbt);
+            mobEntity.readNbt(nbtCompound);
         }
         return mobEntity;
     }

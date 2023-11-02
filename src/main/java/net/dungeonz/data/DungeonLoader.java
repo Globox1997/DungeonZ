@@ -8,13 +8,20 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
+import org.jetbrains.annotations.Nullable;
 
 import net.dungeonz.DungeonzMain;
 import net.dungeonz.dungeon.Dungeon;
 import net.dungeonz.init.ConfigInit;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.entity.EntityType;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
@@ -77,6 +84,7 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                 int bossLootBlockId = -1;
                 int exitBlockId = -1;
                 EntityType<?> bossEntityType = null;
+                NbtCompound bossNbtCompound = null;
 
                 while (blockIterator.hasNext()) {
                     String block = blockIterator.next();
@@ -110,6 +118,7 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                             DungeonzMain.LOGGER.warn("{} is not a valid entity identifier", specificBlockObject.get("boss_entity").getAsString());
                         }
                         bossEntityType = Registries.ENTITY_TYPE.get(new Identifier(specificBlockObject.get("boss_entity").getAsString()));
+                        bossNbtCompound = tryReadNbtData(specificBlockObject);
                         bossBlockId = rawBlockId;
                     } else if (specificBlockObject.has("exit_block") && specificBlockObject.get("exit_block").getAsBoolean()) {
                         exitBlockId = rawBlockId;
@@ -195,12 +204,25 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                 }
 
                 Dungeon.addDungeon(new Dungeon(dungeonTypeId, blockIdEntityMap, blockIdEntitySpawnChance, blockIdBlockReplacement, spawnerEntityIdCountMap, requiredItemCountMap, breakableBlockIds,
-                        placeableBlockIds, difficultyMobModificator, difficultyLootTableIds, difficultyBossModificator, difficultyBossLootTable, bossEntityType, bossBlockId, bossLootBlockId,
-                        exitBlockId, allowElytra, maxGroupSize, cooldown, dungeonBackgroundId, dungeonStructurePoolId));
+                        placeableBlockIds, difficultyMobModificator, difficultyLootTableIds, difficultyBossModificator, difficultyBossLootTable, bossEntityType, bossNbtCompound, bossBlockId,
+                        bossLootBlockId, exitBlockId, allowElytra, maxGroupSize, cooldown, dungeonBackgroundId, dungeonStructurePoolId));
             } catch (Exception e) {
                 DungeonzMain.LOGGER.error("Error occurred while loading resource {}. {}", id.toString(), e.toString());
             }
         });
+    }
+
+    @Nullable
+    private static NbtCompound tryReadNbtData(JsonObject json) {
+        if (json.has("data") && json.get("data") != null && !json.get("data").getAsString().equals("")) {
+            try {
+                return new StringNbtReader(new StringReader(json.get("data").getAsString())).parseCompound();
+            } catch (CommandSyntaxException e) {
+                e.printStackTrace();
+                throw new JsonParseException("Failed to load nbt data of json object " + json);
+            }
+        }
+        return null;
     }
 
 }

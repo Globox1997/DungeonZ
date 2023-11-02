@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import net.dungeonz.DungeonzMain;
 import net.minecraft.entity.EntityType;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 
 public class Dungeon {
@@ -31,6 +32,8 @@ public class Dungeon {
     private final HashMap<String, String> difficultyBossLootTable;
 
     private final EntityType<?> bossEntityType;
+    @Nullable
+    private final NbtCompound bossNbtCompound;
     private final int bossBlockId;
     private final int bossLootBlockId;
 
@@ -47,8 +50,8 @@ public class Dungeon {
     public Dungeon(String dungeonTypeId, HashMap<Integer, List<EntityType<?>>> blockIdEntityMap, HashMap<Integer, HashMap<String, Float>> blockIdEntitySpawnChance,
             HashMap<Integer, Integer> blockIdBlockReplacement, HashMap<Integer, Integer> spawnerEntityIdCountMap, HashMap<Integer, Integer> requiredItemCountMap, List<Integer> breakableBlockIds,
             List<Integer> placeableBlockIds, HashMap<String, Float> difficultyMobModificator, HashMap<String, List<String>> difficultyLootTableIds, HashMap<String, Float> difficultyBossModificator,
-            HashMap<String, String> difficultyBossLootTable, EntityType<?> bossEntityType, int bossBlockId, int bossLootBlockId, int exitBlockId, boolean allowElytra, int maxGroupSize, int cooldown,
-            Identifier dungeonBackgroundId, Identifier dungeonStructurePoolId) {
+            HashMap<String, String> difficultyBossLootTable, EntityType<?> bossEntityType, NbtCompound bossNbtCompound, int bossBlockId, int bossLootBlockId, int exitBlockId, boolean allowElytra,
+            int maxGroupSize, int cooldown, Identifier dungeonBackgroundId, Identifier dungeonStructurePoolId) {
         this.dungeonTypeId = dungeonTypeId;
         this.blockIdEntityMap = blockIdEntityMap;
         this.blockIdEntitySpawnChance = blockIdEntitySpawnChance;
@@ -62,6 +65,7 @@ public class Dungeon {
         this.difficultyBossModificator = difficultyBossModificator;
         this.difficultyBossLootTable = difficultyBossLootTable;
         this.bossEntityType = bossEntityType;
+        this.bossNbtCompound = bossNbtCompound;
         this.bossBlockId = bossBlockId;
         this.bossLootBlockId = bossLootBlockId;
         this.exitBlockId = exitBlockId;
@@ -134,6 +138,11 @@ public class Dungeon {
 
     public EntityType<?> getBossEntityType() {
         return this.bossEntityType;
+    }
+
+    @Nullable
+    public NbtCompound getBossNbtCompound() {
+        return this.bossNbtCompound;
     }
 
     public int getBossBlockId() {

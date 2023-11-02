@@ -62,6 +62,7 @@ If you know how to create one, the folder path has to be ```data\dungeonz\dungeo
         },
         "minecraft:netherite_block": {
             "boss_entity": "minecraft:warden", // required for one block id! At this block position the boss will spawn
+            "data": "", // optional add nbt info to the boss entity
             "replace": "minecraft:air"
         },
         "minecraft:emerald_block": {
