@@ -47,5 +47,6 @@
     "compass.compass_item.cartography": "§7Calibrate at cartography table",
 
     "text.autoconfig.dungeonz.title": "DungeonZ Config",
-    "text.autoconfig.dungeonz.option.devMode": "Dev Mode"
+    "text.autoconfig.dungeonz.option.devMode": "Dev Mode",
+    "text.autoconfig.dungeonz.option.defaultDungeons": "Default Dungeons"
 }

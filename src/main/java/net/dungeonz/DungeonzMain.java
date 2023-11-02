@@ -27,7 +27,7 @@ public class DungeonzMain implements ModInitializer {
     public static final boolean isPartyAddonLoaded = FabricLoader.getInstance().isModLoaded("partyaddon");
     public static final boolean isRpgDifficultyLoaded = FabricLoader.getInstance().isModLoaded("rpgdifficulty");
 
-    public static final List<Dungeon> dungeons = new ArrayList<Dungeon>();
+    public static final List<Dungeon> DUNGEONS = new ArrayList<Dungeon>();
 
     @Override
     public void onInitialize() {

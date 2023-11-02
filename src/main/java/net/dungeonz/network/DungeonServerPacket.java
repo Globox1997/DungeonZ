@@ -204,10 +204,10 @@ public class DungeonServerPacket {
     public static void writeS2COpenCompassScreenPacket(ServerPlayerEntity serverPlayerEntity, String dungeonType) {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         buf.writeString(dungeonType);
-        int dungeonCount = DungeonzMain.dungeons.size();
+        int dungeonCount = DungeonzMain.DUNGEONS.size();
         buf.writeInt(dungeonCount);
         for (int i = 0; i < dungeonCount; i++) {
-            buf.writeString(DungeonzMain.dungeons.get(i).getDungeonTypeId());
+            buf.writeString(DungeonzMain.DUNGEONS.get(i).getDungeonTypeId());
         }
         CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(COMPASS_SCREEN_PACKET, buf);
         serverPlayerEntity.networkHandler.sendPacket(packet);

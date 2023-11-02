@@ -168,16 +168,16 @@ public class Dungeon {
     }
 
     public static void addDungeon(Dungeon dungeon) {
-        if (!DungeonzMain.dungeons.contains(dungeon)) {
-            DungeonzMain.dungeons.add(dungeon);
+        if (!DungeonzMain.DUNGEONS.contains(dungeon)) {
+            DungeonzMain.DUNGEONS.add(dungeon);
         }
     }
 
     @Nullable
     public static Dungeon getDungeon(String dungeonTypeId) {
-        for (int i = 0; i < DungeonzMain.dungeons.size(); i++) {
-            if (DungeonzMain.dungeons.get(i).getDungeonTypeId().equals(dungeonTypeId)) {
-                return DungeonzMain.dungeons.get(i);
+        for (int i = 0; i < DungeonzMain.DUNGEONS.size(); i++) {
+            if (DungeonzMain.DUNGEONS.get(i).getDungeonTypeId().equals(dungeonTypeId)) {
+                return DungeonzMain.DUNGEONS.get(i);
             }
         }
         return null;

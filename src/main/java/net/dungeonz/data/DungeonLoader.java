@@ -12,6 +12,7 @@ import com.google.gson.JsonParser;
 
 import net.dungeonz.DungeonzMain;
 import net.dungeonz.dungeon.Dungeon;
+import net.dungeonz.init.ConfigInit;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.entity.EntityType;
 import net.minecraft.registry.Registries;
@@ -33,6 +34,9 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                 JsonObject data = JsonParser.parseReader(new InputStreamReader(stream)).getAsJsonObject();
 
                 String dungeonTypeId = data.get("dungeon_type").getAsString();
+                if (!ConfigInit.CONFIG.defaultDungeons && (dungeonTypeId.equals("dark_dungeon") || dungeonTypeId.equals("jungle_dungeon"))) {
+                    return;
+                }
                 int maxGroupSize = data.get("max_group_size").getAsInt();
                 int cooldown = data.get("cooldown").getAsInt();
                 boolean allowElytra = data.has("elytra") ? data.get("elytra").getAsBoolean() : false;

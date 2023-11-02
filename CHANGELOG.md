@@ -1,7 +1,6 @@
 ### Added:
-- 
+- Added default dungeon config option
 ### Fixed:
-- Fixed null crash
-- Fixed timer display
+- 
 ### Changed:
 - 
