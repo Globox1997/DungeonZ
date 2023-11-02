@@ -147,11 +147,13 @@ public class DungeonHelper {
                                 return;
                             }
                         }
-                        if (InventoryHelper.hasRequiredItemStacks(player.getInventory(), DungeonHelper.getRequiredItemStackList(dungeonPortalEntity.getDungeon()))) {
-                            InventoryHelper.decrementRequiredItemStacks(player.getInventory(), DungeonHelper.getRequiredItemStackList(dungeonPortalEntity.getDungeon()));
-                        } else {
-                            player.sendMessage(Text.translatable("text.dungeonz.missing"), false);
-                            return;
+                        if (!player.isCreative()) {
+                            if (InventoryHelper.hasRequiredItemStacks(player.getInventory(), DungeonHelper.getRequiredItemStackList(dungeonPortalEntity.getDungeon()))) {
+                                InventoryHelper.decrementRequiredItemStacks(player.getInventory(), DungeonHelper.getRequiredItemStackList(dungeonPortalEntity.getDungeon()));
+                            } else {
+                                player.sendMessage(Text.translatable("text.dungeonz.missing"), false);
+                                return;
+                            }
                         }
                         FabricDimensions.teleport(player, dungeonWorld, DungeonPlacementHandler.enter(player, dungeonWorld, (ServerWorld) player.getWorld(), dungeonPortalEntity, dungeonPortalPos,
                                 dungeonPortalEntity.getDifficulty(), dungeonPortalEntity.getDisableEffects()));
