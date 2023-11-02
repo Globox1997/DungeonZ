@@ -10,15 +10,15 @@ public class EventInit {
 
     public static void init() {
         EntityElytraEvents.ALLOW.register((entity) -> {
-            PlayerEntity playerEntity = (PlayerEntity) entity;
-            if (playerEntity != null && !playerEntity.isCreative() && playerEntity.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
-                if (!playerEntity.getWorld().isClient()) {
-                    if (DungeonHelper.getCurrentDungeon((ServerPlayerEntity) playerEntity) != null && !DungeonHelper.getCurrentDungeon((ServerPlayerEntity) playerEntity).isElytraAllowed()) {
-                        return true;
-                    }
-                } else {
-                    if (!((ClientPlayerAccess) playerEntity).isElytraAllowed()) {
-                        return true;
+            if (entity instanceof PlayerEntity) {
+                PlayerEntity playerEntity = (PlayerEntity) entity;
+                if (playerEntity != null && !playerEntity.isCreative() && playerEntity.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
+                    if (!playerEntity.getWorld().isClient()) {
+                        if (DungeonHelper.getCurrentDungeon((ServerPlayerEntity) playerEntity) != null) {
+                            return DungeonHelper.getCurrentDungeon((ServerPlayerEntity) playerEntity).isElytraAllowed();
+                        }
+                    } else {
+                        return ((ClientPlayerAccess) playerEntity).isElytraAllowed();
                     }
                 }
             }
