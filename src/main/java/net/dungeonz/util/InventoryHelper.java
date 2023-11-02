@@ -30,6 +30,9 @@ public class InventoryHelper {
     }
 
     public static boolean hasRequiredItemStacks(PlayerInventory playerInventory, List<ItemStack> requiredItemStacks) {
+        if (playerInventory.player.isCreative()) {
+            return true;
+        }
         for (int i = 0; i < requiredItemStacks.size(); i++) {
             int requiredCount = requiredItemStacks.get(i).getCount();
             for (int u = 0; u < playerInventory.main.size(); u++) {

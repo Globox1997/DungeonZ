@@ -105,8 +105,7 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
                 this.privateButton.active = true;
             }
             if ((this.handler.getDungeonPortalEntity().getDungeonPlayerUuids().size() + this.handler.getDungeonPortalEntity().getDeadDungeonPlayerUUIDs().size()) < this.handler
-                    .getDungeonPortalEntity().getMaxGroupSize()
-                    && (this.playerEntity.isCreative() || InventoryHelper.hasRequiredItemStacks(this.playerEntity.getInventory(), this.handler.getRequiredItemStacks()))
+                    .getDungeonPortalEntity().getMaxGroupSize() && InventoryHelper.hasRequiredItemStacks(this.playerEntity.getInventory(), this.handler.getRequiredItemStacks())
                     && !this.handler.getDungeonPortalEntity().getDeadDungeonPlayerUUIDs().contains(this.playerEntity.getUuid())) {
                 this.dungeonButton.active = true;
             } else {
