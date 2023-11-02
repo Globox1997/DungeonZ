@@ -42,13 +42,12 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
     private DungeonSliderButton privateButton;
     private final PlayerEntity playerEntity;
 
-    private int backgroundWidth = 256;
-    private int backgroundHeight = 222;
-
     public DungeonPortalScreen(DungeonPortalScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
         this.playerEntity = inventory.player;
         TEXTURE = handler.getBackgroundId() != null ? handler.getBackgroundId() : TEXTURE;
+        this.backgroundWidth = 256;
+        this.backgroundHeight = 222;
     }
 
     @Override

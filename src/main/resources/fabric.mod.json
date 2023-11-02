@@ -25,6 +25,12 @@
     ],
     "modmenu": [
       "net.dungeonz.config.ModMenuIntegration"
+    ],
+    "emi": [
+      "net.dungeonz.compat.DungeonEmiPlugin"
+    ],
+    "rei_client": [
+      "net.dungeonz.compat.DungeonReiPlugin"
     ]
   },
   "mixins": [

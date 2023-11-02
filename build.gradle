@@ -31,13 +31,18 @@ dependencies {
         exclude(group: "net.fabricmc.fabric-api")
     }
 	// PartyAddon
-	modCompileOnly ('maven.modrinth:partyaddon:1.0.3+1.20') {
+	modCompileOnly ('maven.modrinth:partyaddon:1.0.4+1.20.1') {
 		exclude(group: "net.fabricmc.fabric-api")
 	}
 	// RpgDifficulty
-	modCompileOnly ('maven.modrinth:rpgdifficulty:1.3.12+1.20') {
+	modCompileOnly ('maven.modrinth:rpgdifficulty:1.3.13+1.20.1') {
 		exclude(group: "net.fabricmc.fabric-api")
 	}
+	// REI
+    modCompileOnly 'me.shedaniel:RoughlyEnoughItems-fabric:12.0.674'
+    // EMI
+    modCompileOnly 'maven.modrinth:emi:1.0.11+1.20.1+fabric'
+
 }
 
 processResources {
