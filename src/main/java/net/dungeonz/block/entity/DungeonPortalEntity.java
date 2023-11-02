@@ -45,9 +45,11 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
     private String dungeonType = "";
     private String difficulty = "";
     private boolean dungeonStructureGenerated = false;
-    private List<UUID> dungeonPlayerUUIDs = new ArrayList<UUID>();
-    private List<UUID> deadDungeonPlayerUUIDs = new ArrayList<UUID>();
+    private List<UUID> dungeonPlayerUuids = new ArrayList<UUID>();
+    private List<UUID> deadDungeonPlayerUuids = new ArrayList<UUID>();
     private int maxGroupSize = 0;
+    private int minGroupSize = 0;
+    private List<UUID> waitingUuids = new ArrayList<UUID>();
     private int cooldownTime = 0;
     private int autoKickTime = 0;
     private boolean disableEffects = false;
@@ -72,15 +74,16 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         this.dungeonType = nbt.getString("DungeonType");
         this.difficulty = nbt.getString("Difficulty");
         this.dungeonStructureGenerated = nbt.getBoolean("DungeonStructureGenerated");
-        this.dungeonPlayerUUIDs.clear();
+        this.dungeonPlayerUuids.clear();
         for (int i = 0; i < nbt.getInt("DungeonPlayerCount"); i++) {
-            this.dungeonPlayerUUIDs.add(nbt.getUuid("PlayerUUID" + i));
+            this.dungeonPlayerUuids.add(nbt.getUuid("PlayerUUID" + i));
         }
-        this.deadDungeonPlayerUUIDs.clear();
+        this.deadDungeonPlayerUuids.clear();
         for (int i = 0; i < nbt.getInt("DeadDungeonPlayerCount"); i++) {
-            this.deadDungeonPlayerUUIDs.add(nbt.getUuid("DeadPlayerUUID" + i));
+            this.deadDungeonPlayerUuids.add(nbt.getUuid("DeadPlayerUUID" + i));
         }
         this.maxGroupSize = nbt.getInt("MaxGroupSize");
+        this.minGroupSize = nbt.getInt("MinGroupSize");
         this.cooldownTime = nbt.getInt("CooldownTime");
         this.autoKickTime = nbt.getInt("AutoKickTime");
         this.disableEffects = nbt.getBoolean("DisableEffects");
@@ -150,15 +153,16 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         nbt.putString("DungeonType", this.dungeonType);
         nbt.putString("Difficulty", this.difficulty);
         nbt.putBoolean("DungeonStructureGenerated", this.dungeonStructureGenerated);
-        nbt.putInt("DungeonPlayerCount", this.dungeonPlayerUUIDs.size());
-        for (int i = 0; i < this.dungeonPlayerUUIDs.size(); i++) {
-            nbt.putUuid("PlayerUUID" + i, this.dungeonPlayerUUIDs.get(i));
+        nbt.putInt("DungeonPlayerCount", this.dungeonPlayerUuids.size());
+        for (int i = 0; i < this.dungeonPlayerUuids.size(); i++) {
+            nbt.putUuid("PlayerUUID" + i, this.dungeonPlayerUuids.get(i));
         }
-        nbt.putInt("DeadDungeonPlayerCount", this.deadDungeonPlayerUUIDs.size());
-        for (int i = 0; i < this.deadDungeonPlayerUUIDs.size(); i++) {
-            nbt.putUuid("DeadPlayerUUID" + i, this.deadDungeonPlayerUUIDs.get(i));
+        nbt.putInt("DeadDungeonPlayerCount", this.deadDungeonPlayerUuids.size());
+        for (int i = 0; i < this.deadDungeonPlayerUuids.size(); i++) {
+            nbt.putUuid("DeadPlayerUUID" + i, this.deadDungeonPlayerUuids.get(i));
         }
         nbt.putInt("MaxGroupSize", this.maxGroupSize);
+        nbt.putInt("MinGroupSize", this.minGroupSize);
         nbt.putInt("CooldownTime", this.cooldownTime);
         nbt.putInt("AutoKickTime", this.autoKickTime);
         nbt.putBoolean("DisableEffects", this.disableEffects);
@@ -264,15 +268,15 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
             } else if (blockEntity.autoKickTime < (int) world.getTime()) {
                 if (blockEntity.getDungeon() != null) {
                     blockEntity.setCooldownTime(blockEntity.getDungeon().getCooldown() + (int) blockEntity.getWorld().getTime());
-                    for (int i = 0; i < blockEntity.getDungeonPlayerUUIDs().size(); i++) {
-                        ServerPlayerEntity player = (ServerPlayerEntity) world.getPlayerByUuid(blockEntity.getDungeonPlayerUUIDs().get(i));
+                    for (int i = 0; i < blockEntity.getDungeonPlayerUuids().size(); i++) {
+                        ServerPlayerEntity player = (ServerPlayerEntity) world.getPlayerByUuid(blockEntity.getDungeonPlayerUuids().get(i));
                         if (DungeonHelper.getCurrentDungeon(player) != null) {
                             DungeonHelper.teleportOutOfDungeon(player);
                             player.sendMessage(Text.translatable("text.dungeonz.dungeon_autokick"));
                         }
                     }
                 }
-                blockEntity.getDungeonPlayerUUIDs().clear();
+                blockEntity.getDungeonPlayerUuids().clear();
                 blockEntity.getDeadDungeonPlayerUUIDs().clear();
                 blockEntity.autoKickTime = 0;
             }
@@ -307,7 +311,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
 
         buf.writeInt(this.getDungeonPlayerCount());
         for (int i = 0; i < this.getDungeonPlayerCount(); i++) {
-            buf.writeUuid(this.getDungeonPlayerUUIDs().get(i));
+            buf.writeUuid(this.getDungeonPlayerUuids().get(i));
         }
         buf.writeInt(this.getDeadDungeonPlayerUUIDs().size());
         for (int i = 0; i < this.getDeadDungeonPlayerUUIDs().size(); i++) {
@@ -344,6 +348,8 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         }
 
         buf.writeInt(this.getMaxGroupSize());
+        buf.writeInt(this.getMinGroupSize());
+        buf.writeInt(this.getWaitingUuids().size());
         buf.writeInt(this.getCooldownTime());
         buf.writeString(this.getDifficulty());
         buf.writeBoolean(this.getDisableEffects());
@@ -398,38 +404,38 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         return this.dungeonStructureGenerated;
     }
 
-    public void joinDungeon(UUID playerUUID) {
-        if (!this.dungeonPlayerUUIDs.contains(playerUUID)) {
-            this.dungeonPlayerUUIDs.add(playerUUID);
+    public void joinDungeon(UUID playerUuid) {
+        if (!this.dungeonPlayerUuids.contains(playerUuid)) {
+            this.dungeonPlayerUuids.add(playerUuid);
         }
     }
 
-    public void leaveDungeon(UUID playerUUID) {
-        this.dungeonPlayerUUIDs.remove(playerUUID);
+    public void leaveDungeon(UUID playerUuid) {
+        this.dungeonPlayerUuids.remove(playerUuid);
     }
 
     public int getDungeonPlayerCount() {
-        return this.dungeonPlayerUUIDs.size();
+        return this.dungeonPlayerUuids.size();
     }
 
-    public void setDungeonPlayerUUIDs(List<UUID> dungeonPlayerUUIDs) {
-        this.dungeonPlayerUUIDs = dungeonPlayerUUIDs;
+    public void setDungeonPlayerUuids(List<UUID> dungeonPlayerUuids) {
+        this.dungeonPlayerUuids = dungeonPlayerUuids;
     }
 
-    public List<UUID> getDungeonPlayerUUIDs() {
-        return this.dungeonPlayerUUIDs;
+    public List<UUID> getDungeonPlayerUuids() {
+        return this.dungeonPlayerUuids;
     }
 
-    public void addDeadDungeonPlayerUUIDs(UUID deadDungeonPlayerUUID) {
-        this.deadDungeonPlayerUUIDs.add(deadDungeonPlayerUUID);
+    public void addDeadDungeonPlayerUuids(UUID deadDungeonPlayerUuids) {
+        this.deadDungeonPlayerUuids.add(deadDungeonPlayerUuids);
     }
 
-    public void setDeadDungeonPlayerUUIDs(List<UUID> deadDungeonPlayerUUIDs) {
-        this.deadDungeonPlayerUUIDs = deadDungeonPlayerUUIDs;
+    public void setDeadDungeonPlayerUuids(List<UUID> deadDungeonPlayerUuids) {
+        this.deadDungeonPlayerUuids = deadDungeonPlayerUuids;
     }
 
     public List<UUID> getDeadDungeonPlayerUUIDs() {
-        return this.deadDungeonPlayerUUIDs;
+        return this.deadDungeonPlayerUuids;
     }
 
     // Might lead to issues if using "="
@@ -449,8 +455,8 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         return this.cooldownTime;
     }
 
-    public boolean isOnCooldown() {
-        if (this.cooldownTime <= this.getWorld().getTime()) {
+    public boolean isOnCooldown(int currentTime) {
+        if (this.cooldownTime <= currentTime) {
             return false;
         }
         return true;
@@ -460,8 +466,26 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         this.maxGroupSize = maxGroupSize;
     }
 
+    public void setMinGroupSize(int minGroupSize) {
+        this.minGroupSize = minGroupSize;
+    }
+
+    public List<UUID> getWaitingUuids() {
+        return this.waitingUuids;
+    }
+
+    public void addWaitingUuid(UUID uuid) {
+        if (!this.waitingUuids.contains(uuid)) {
+            this.waitingUuids.add(uuid);
+        }
+    }
+
     public int getMaxGroupSize() {
         return this.maxGroupSize;
+    }
+
+    public int getMinGroupSize() {
+        return this.minGroupSize;
     }
 
     public void setDisableEffects(boolean disableEffects) {

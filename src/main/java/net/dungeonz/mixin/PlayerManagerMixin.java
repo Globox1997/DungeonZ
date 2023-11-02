@@ -27,8 +27,8 @@ public class PlayerManagerMixin {
     @Inject(method = "onPlayerConnect", at = @At("TAIL"))
     private void onPlayerConnectMixin(ClientConnection connection, ServerPlayerEntity player, CallbackInfo info) {
         if (player.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
-            if (DungeonHelper.getCurrentDungeon(player) != null && DungeonHelper.getDungeonPortalEntity(player).getDungeonPlayerUUIDs().contains(player.getUuid())
-                    && !DungeonHelper.getDungeonPortalEntity(player).isOnCooldown()) {
+            if (DungeonHelper.getCurrentDungeon(player) != null && DungeonHelper.getDungeonPortalEntity(player).getDungeonPlayerUuids().contains(player.getUuid())
+                    && !DungeonHelper.getDungeonPortalEntity(player).isOnCooldown((int) player.getWorld().getTime())) {
                 Dungeon dungeon = DungeonHelper.getCurrentDungeon(player);
                 DungeonServerPacket.writeS2CDungeonInfoPacket(player, dungeon.getBreakableBlockIdList(), dungeon.getplaceableBlockIdList(), dungeon.isElytraAllowed());
             } else {
@@ -42,8 +42,8 @@ public class PlayerManagerMixin {
             Optional<Vec3d> optional2, ServerWorld serverWorld2, ServerPlayerEntity serverPlayerEntity) {
         if (!alive && oldPlayer.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD && DungeonHelper.getDungeonPortalEntity(oldPlayer) != null) {
             DungeonPortalEntity dungeonPortalEntity = DungeonHelper.getDungeonPortalEntity(oldPlayer);
-            dungeonPortalEntity.getDungeonPlayerUUIDs().remove(oldPlayer.getUuid());
-            dungeonPortalEntity.addDeadDungeonPlayerUUIDs(serverPlayerEntity.getUuid());
+            dungeonPortalEntity.getDungeonPlayerUuids().remove(oldPlayer.getUuid());
+            dungeonPortalEntity.addDeadDungeonPlayerUuids(serverPlayerEntity.getUuid());
             if (dungeonPortalEntity.getDungeonPlayerCount() == 0) {
                 dungeonPortalEntity.setCooldownTime(dungeonPortalEntity.getDungeon().getCooldown() + (int) serverWorld.getTime());
             }

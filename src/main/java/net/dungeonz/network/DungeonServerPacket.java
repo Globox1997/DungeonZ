@@ -1,6 +1,7 @@
 package net.dungeonz.network;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -69,8 +70,10 @@ public class DungeonServerPacket {
         });
         ServerPlayNetworking.registerGlobalReceiver(DUNGEON_TELEPORT_PACKET, (server, player, handler, buffer, sender) -> {
             BlockPos dungeonPortalPos = buffer.readBlockPos();
+            Boolean isMinGroupRequired = buffer.readBoolean();
+            UUID uuid = isMinGroupRequired ? buffer.readUuid() : null;
             server.execute(() -> {
-                DungeonHelper.teleportDungeon(player, dungeonPortalPos);
+                DungeonHelper.teleportDungeon(player, dungeonPortalPos, uuid);
             });
         });
         ServerPlayNetworking.registerGlobalReceiver(CHANGE_DUNGEON_EFFECTS_PACKET, (server, player, handler, buffer, sender) -> {
@@ -115,9 +118,9 @@ public class DungeonServerPacket {
                                 dungeonPortalEntity.setDungeonType(dungeonType);
                                 dungeonPortalEntity.setDifficulty(defaultDifficulty);
                                 dungeonPortalEntity.setMaxGroupSize(dungeon.getMaxGroupSize());
+                                dungeonPortalEntity.setMinGroupSize(dungeon.getMinGroupSize());
                                 dungeonPortalEntity.markDirty();
                                 player.sendMessage(Text.of("Set dungeon type successfully!"), false);
-                                // player.openHandledScreen(dungeonPortalEntity.getCachedState().createScreenHandlerFactory(player.getWorld(), dungeonPortalPos));
                                 return;
                             }
                         } else {

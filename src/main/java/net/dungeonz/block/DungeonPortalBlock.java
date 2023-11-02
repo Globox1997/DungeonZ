@@ -69,7 +69,7 @@ public class DungeonPortalBlock extends BlockWithEntity {
     public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
         if (!world.isClient && !entity.hasVehicle() && !entity.hasPassengers() && entity.canUsePortals() && entity instanceof ServerPlayerEntity) {
             if (!entity.hasPortalCooldown()) {
-                DungeonHelper.teleportDungeon((ServerPlayerEntity) entity, pos);
+                DungeonHelper.teleportDungeon((ServerPlayerEntity) entity, pos, entity.getUuid());
                 entity.resetPortalCooldown();
             }
         }

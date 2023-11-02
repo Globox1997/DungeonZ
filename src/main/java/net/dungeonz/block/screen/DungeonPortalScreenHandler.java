@@ -31,6 +31,7 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
     private List<String> difficulties = new ArrayList<String>();
     private Map<String, List<ItemStack>> possibleLootDifficultyItemStackMap = new HashMap<String, List<ItemStack>>();
     private List<ItemStack> requiredItemStacks = new ArrayList<ItemStack>();
+    private int waitingGroupSize = 0;
 
     public DungeonPortalScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
         this(syncId, playerInventory, new DungeonPortalEntity(buf.readBlockPos(), playerInventory.player.getWorld().getBlockState(buf.readBlockPos())), ScreenHandlerContext.EMPTY);
@@ -74,21 +75,26 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
             }
         }
         int maxGroupSize = buf.readInt();
+        int minGroupSize = buf.readInt();
+        int waitingGroupSize = buf.readInt();
         int cooldownTime = buf.readInt();
         String difficulty = buf.readString();
         boolean disableEffects = buf.readBoolean();
         boolean privateGroup = buf.readBoolean();
 
-        this.setDungeonPlayerUUIDs(dungeonPlayerUUIDs);
-        this.setDeadDungeonPlayerUUIDs(deadDungeonPlayerUUIDs);
         this.setDifficulties(difficulties);
         this.setPossibleLootItemStacks(possibleLootDifficultyItemStacks);
         this.setRequiredItemStacks(requiredItemStacks);
-        this.setMaxPlayerCount(maxGroupSize);
-        this.setCooldownTime(cooldownTime);
-        this.setDifficulty(difficulty);
-        this.setDisableEffects(disableEffects);
-        this.setPrivateGroup(privateGroup);
+        this.setWaitingGroupSize(waitingGroupSize);
+
+        this.getDungeonPortalEntity().setDungeonPlayerUuids(dungeonPlayerUUIDs);
+        this.getDungeonPortalEntity().setDeadDungeonPlayerUuids(deadDungeonPlayerUUIDs);
+        this.getDungeonPortalEntity().setMaxGroupSize(maxGroupSize);
+        this.getDungeonPortalEntity().setMinGroupSize(minGroupSize);
+        this.getDungeonPortalEntity().setCooldownTime(cooldownTime);
+        this.getDungeonPortalEntity().setDifficulty(difficulty);
+        this.getDungeonPortalEntity().setDisableEffects(disableEffects);
+        this.getDungeonPortalEntity().setPrivateGroup(privateGroup);
     }
 
     public DungeonPortalScreenHandler(int syncId, PlayerInventory playerInventory, DungeonPortalEntity dungeonPortalEntity, ScreenHandlerContext context) {
@@ -128,20 +134,8 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         return this.dungeonPortalEntity.getDungeon().getBackgroundId();
     }
 
-    public List<UUID> getDungeonPlayerUUIDs() {
-        return this.dungeonPortalEntity.getDungeonPlayerUUIDs();
-    }
-
-    public void setDungeonPlayerUUIDs(List<UUID> dungeonPlayerUUIDs) {
-        this.dungeonPortalEntity.setDungeonPlayerUUIDs(dungeonPlayerUUIDs);
-    }
-
-    public List<UUID> getDeadDungeonPlayerUUIDs() {
-        return this.dungeonPortalEntity.getDeadDungeonPlayerUUIDs();
-    }
-
-    public void setDeadDungeonPlayerUUIDs(List<UUID> deadDungeonPlayerUUIDs) {
-        this.dungeonPortalEntity.setDeadDungeonPlayerUUIDs(deadDungeonPlayerUUIDs);
+    public DungeonPortalEntity getDungeonPortalEntity() {
+        return this.dungeonPortalEntity;
     }
 
     public List<String> getDifficulties() {
@@ -168,51 +162,12 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         this.requiredItemStacks = requiredItemStacks;
     }
 
-    public int getMaxPlayerCount() {
-        return this.dungeonPortalEntity.getMaxGroupSize();
+    public int getWaitingGroupSize() {
+        return this.waitingGroupSize;
     }
 
-    public void setMaxPlayerCount(int maxPlayerCount) {
-        this.dungeonPortalEntity.setMaxGroupSize(maxPlayerCount);
-    }
-
-    public int getCooldownTime() {
-        return this.dungeonPortalEntity.getCooldownTime();
-    }
-
-    public void setCooldownTime(int cooldownTime) {
-        this.dungeonPortalEntity.setCooldownTime(cooldownTime);
-    }
-
-    public boolean isOnCooldown() {
-        if (this.getCooldownTime() <= this.world.getTime()) {
-            return false;
-        }
-        return true;
-    }
-
-    public String getDifficulty() {
-        return this.dungeonPortalEntity.getDifficulty();
-    }
-
-    public void setDifficulty(String difficulty) {
-        this.dungeonPortalEntity.setDifficulty(difficulty);
-    }
-
-    public boolean getDisableEffects() {
-        return this.dungeonPortalEntity.getDisableEffects();
-    }
-
-    public void setDisableEffects(boolean disableEffects) {
-        this.dungeonPortalEntity.setDisableEffects(disableEffects);
-    }
-
-    public boolean getPrivateGroup() {
-        return this.dungeonPortalEntity.getPrivateGroup();
-    }
-
-    public void setPrivateGroup(boolean privateGroup) {
-        this.dungeonPortalEntity.setPrivateGroup(privateGroup);
+    public void setWaitingGroupSize(int waitingGroupSize) {
+        this.waitingGroupSize = waitingGroupSize;
     }
 
     public BlockPos getPos() {

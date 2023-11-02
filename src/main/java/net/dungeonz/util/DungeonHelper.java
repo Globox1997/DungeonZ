@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.Map.Entry;
 
 import org.jetbrains.annotations.Nullable;
@@ -112,7 +113,7 @@ public class DungeonHelper {
         return possibleLootItemStackMap;
     }
 
-    public static void teleportDungeon(ServerPlayerEntity player, BlockPos dungeonPortalPos) {
+    public static void teleportDungeon(ServerPlayerEntity player, BlockPos dungeonPortalPos, @Nullable UUID requiredMinGroupUuid) {
         if (player.getWorld().getBlockEntity(dungeonPortalPos) != null && player.getWorld().getBlockEntity(dungeonPortalPos) instanceof DungeonPortalEntity) {
             DungeonPortalEntity dungeonPortalEntity = (DungeonPortalEntity) player.getWorld().getBlockEntity(dungeonPortalPos);
 
@@ -131,14 +132,14 @@ public class DungeonHelper {
                 if (dungeonPortalEntity.getDungeon() != null) {
                     if ((dungeonPortalEntity.getDungeonPlayerCount() + dungeonPortalEntity.getDeadDungeonPlayerUUIDs().size()) < dungeonPortalEntity.getMaxGroupSize()) {
 
-                        if (dungeonPortalEntity.isOnCooldown()) {
+                        if (dungeonPortalEntity.isOnCooldown((int) dungeonWorld.getTime())) {
                             player.sendMessage(Text.translatable("text.dungeonz.dungeon_cooldown"), false);
                             return;
                         }
                         if (dungeonPortalEntity.getDungeonPlayerCount() > 0 && dungeonPortalEntity.getPrivateGroup()) {
                             if (DungeonzMain.isPartyAddonLoaded) {
                                 GroupManager groupManager = ((GroupManagerAccess) player).getGroupManager();
-                                if (groupManager.getGroupPlayerIdList().isEmpty() || !groupManager.getGroupPlayerIdList().contains(dungeonPortalEntity.getDungeonPlayerUUIDs().get(0))) {
+                                if (groupManager.getGroupPlayerIdList().isEmpty() || !groupManager.getGroupPlayerIdList().contains(dungeonPortalEntity.getDungeonPlayerUuids().get(0))) {
                                     player.sendMessage(Text.translatable("text.dungeonz.dungeon_private"), false);
                                     return;
                                 }
@@ -155,7 +156,24 @@ public class DungeonHelper {
                                 return;
                             }
                         }
-                        FabricDimensions.teleport(player, dungeonWorld, DungeonPlacementHandler.enter(player, dungeonWorld, (ServerWorld) player.getWorld(), dungeonPortalEntity, dungeonPortalPos,
+                        if (dungeonPortalEntity.getDungeonPlayerCount() <= 0 && requiredMinGroupUuid != null && dungeonPortalEntity.getMinGroupSize() > 1) {
+                            dungeonPortalEntity.addWaitingUuid(requiredMinGroupUuid);
+                            if (dungeonPortalEntity.getMinGroupSize() > dungeonPortalEntity.getWaitingUuids().size()) {
+                                player.sendMessage(Text.translatable("text.dungeonz.dungeon_min_group_size", (dungeonPortalEntity.getMinGroupSize() - dungeonPortalEntity.getWaitingUuids().size())),
+                                        false);
+                                return;
+                            } else {
+                                for (int i = 0; i < dungeonPortalEntity.getWaitingUuids().size(); i++) {
+                                    if (player.getServerWorld().getPlayerByUuid(dungeonPortalEntity.getWaitingUuids().get(i)) != null) {
+                                        FabricDimensions.teleport(player.getServerWorld().getPlayerByUuid(dungeonPortalEntity.getWaitingUuids().get(i)), dungeonWorld,
+                                                DungeonPlacementHandler.enter((ServerPlayerEntity) player.getServerWorld().getPlayerByUuid(dungeonPortalEntity.getWaitingUuids().get(i)), dungeonWorld,
+                                                        player.getServerWorld(), dungeonPortalEntity, dungeonPortalPos, dungeonPortalEntity.getDifficulty(), dungeonPortalEntity.getDisableEffects()));
+                                    }
+                                }
+                                dungeonPortalEntity.getWaitingUuids().clear();
+                            }
+                        }
+                        FabricDimensions.teleport(player, dungeonWorld, DungeonPlacementHandler.enter(player, dungeonWorld, player.getServerWorld(), dungeonPortalEntity, dungeonPortalPos,
                                 dungeonPortalEntity.getDifficulty(), dungeonPortalEntity.getDisableEffects()));
                     } else {
                         player.sendMessage(Text.translatable("text.dungeonz.dungeon_full"), false);

@@ -42,6 +42,7 @@ public class Dungeon {
     private final boolean allowElytra;
 
     private final int maxGroupSize;
+    private final int minGroupSize;
     private final int cooldown;
 
     private final Identifier dungeonBackgroundId;
@@ -51,7 +52,7 @@ public class Dungeon {
             HashMap<Integer, Integer> blockIdBlockReplacement, HashMap<Integer, Integer> spawnerEntityIdCountMap, HashMap<Integer, Integer> requiredItemCountMap, List<Integer> breakableBlockIds,
             List<Integer> placeableBlockIds, HashMap<String, Float> difficultyMobModificator, HashMap<String, List<String>> difficultyLootTableIds, HashMap<String, Float> difficultyBossModificator,
             HashMap<String, String> difficultyBossLootTable, EntityType<?> bossEntityType, NbtCompound bossNbtCompound, int bossBlockId, int bossLootBlockId, int exitBlockId, boolean allowElytra,
-            int maxGroupSize, int cooldown, Identifier dungeonBackgroundId, Identifier dungeonStructurePoolId) {
+            int maxGroupSize, int minGroupSize, int cooldown, Identifier dungeonBackgroundId, Identifier dungeonStructurePoolId) {
         this.dungeonTypeId = dungeonTypeId;
         this.blockIdEntityMap = blockIdEntityMap;
         this.blockIdEntitySpawnChance = blockIdEntitySpawnChance;
@@ -71,6 +72,7 @@ public class Dungeon {
         this.exitBlockId = exitBlockId;
         this.allowElytra = allowElytra;
         this.maxGroupSize = maxGroupSize;
+        this.minGroupSize = minGroupSize;
         this.cooldown = cooldown;
         this.dungeonBackgroundId = dungeonBackgroundId;
         this.dungeonStructurePoolId = dungeonStructurePoolId;
@@ -159,6 +161,10 @@ public class Dungeon {
 
     public int getMaxGroupSize() {
         return this.maxGroupSize;
+    }
+
+    public int getMinGroupSize() {
+        return this.minGroupSize;
     }
 
     public int getCooldown() {

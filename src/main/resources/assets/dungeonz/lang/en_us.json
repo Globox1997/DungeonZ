@@ -29,11 +29,13 @@
     "text.dungeonz.dead_player": "Rejoin not allowed",
     "text.dungeonz.empty_name": "-",
     "text.dungeonz.player_list": "Players (%d/%d)",
+    "text.dungeonz.waiting_player_list": "Min Players: %d/%d",
     "text.dungeonz.dungeon_full": "Dungeon is full",
     "text.dungeonz.dungeon_private": "Dungeon is on private mode",
     "text.dungeonz.dungeon_cooldown": "Dungeon is on cooldown",
     "text.dungeonz.dungeon_cooldown_time": "Dungeon is on cooldown for %dh %dm %ds",
     "text.dungeonz.dungeon_missing": "No dungeon found",
+    "text.dungeonz.dungeon_min_group_size": "Wait for %s more dungeon party member!",
     "text.dungeonz.dungeon_autokick": "You got autokicked cause it took you to long to finish the dungeon!",
 
     "dungeon.op_screen.dungeon_type": "Dungeon Type",

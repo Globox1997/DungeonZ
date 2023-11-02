@@ -45,6 +45,7 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                     return;
                 }
                 int maxGroupSize = data.get("max_group_size").getAsInt();
+                int minGroupSize = data.has("min_group_size") ? data.get("min_group_size").getAsInt() : 0;
                 int cooldown = data.get("cooldown").getAsInt();
                 boolean allowElytra = data.has("elytra") ? data.get("elytra").getAsBoolean() : false;
                 Identifier dungeonBackgroundId = new Identifier(data.has("background_texture") ? data.get("background_texture").getAsString() : "");
@@ -205,7 +206,7 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
 
                 Dungeon.addDungeon(new Dungeon(dungeonTypeId, blockIdEntityMap, blockIdEntitySpawnChance, blockIdBlockReplacement, spawnerEntityIdCountMap, requiredItemCountMap, breakableBlockIds,
                         placeableBlockIds, difficultyMobModificator, difficultyLootTableIds, difficultyBossModificator, difficultyBossLootTable, bossEntityType, bossNbtCompound, bossBlockId,
-                        bossLootBlockId, exitBlockId, allowElytra, maxGroupSize, cooldown, dungeonBackgroundId, dungeonStructurePoolId));
+                        bossLootBlockId, exitBlockId, allowElytra, maxGroupSize, minGroupSize, cooldown, dungeonBackgroundId, dungeonStructurePoolId));
             } catch (Exception e) {
                 DungeonzMain.LOGGER.error("Error occurred while loading resource {}. {}", id.toString(), e.toString());
             }

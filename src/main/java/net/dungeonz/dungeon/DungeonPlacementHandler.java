@@ -268,7 +268,7 @@ public class DungeonPlacementHandler {
             Entry<BlockPos, Integer> entry = replaceBlockIterator.next();
             world.setBlockState(entry.getKey(), Registries.BLOCK.get(entry.getValue()).getDefaultState(), 3);
         }
-        portalEntity.getDungeonPlayerUUIDs().clear();
+        portalEntity.getDungeonPlayerUuids().clear();
         portalEntity.getDeadDungeonPlayerUUIDs().clear();
         portalEntity.markDirty();
     }

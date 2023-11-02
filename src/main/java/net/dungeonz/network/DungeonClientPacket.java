@@ -2,6 +2,9 @@ package net.dungeonz.network;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
+import org.jetbrains.annotations.Nullable;
 
 import io.netty.buffer.Unpooled;
 import net.dungeonz.access.ClientPlayerAccess;
@@ -47,7 +50,7 @@ public class DungeonClientPacket {
                         ((DungeonPortalScreen) client.currentScreen).difficultyButton.setText(Text.translatable("dungeonz.difficulty." + difficulty));
                     }
                     if (client.player.currentScreenHandler instanceof DungeonPortalScreenHandler) {
-                        ((DungeonPortalScreenHandler) client.player.currentScreenHandler).setDifficulty(difficulty);
+                        ((DungeonPortalScreenHandler) client.player.currentScreenHandler).getDungeonPortalEntity().setDifficulty(difficulty);
                     }
                 }
             });
@@ -134,9 +137,13 @@ public class DungeonClientPacket {
         client.getNetworkHandler().sendPacket(packet);
     }
 
-    public static void writeC2SDungeonTeleportPacket(MinecraftClient client, BlockPos portalBlockPos) {
+    public static void writeC2SDungeonTeleportPacket(MinecraftClient client, BlockPos portalBlockPos, @Nullable UUID requiredMinGroupUuid) {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         buf.writeBlockPos(portalBlockPos);
+        buf.writeBoolean(requiredMinGroupUuid != null);
+        if (requiredMinGroupUuid != null) {
+            buf.writeUuid(requiredMinGroupUuid);
+        }
         CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(DungeonServerPacket.DUNGEON_TELEPORT_PACKET, buf);
         client.getNetworkHandler().sendPacket(packet);
     }
