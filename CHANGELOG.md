@@ -4,6 +4,6 @@
 - Added zombification tag
 - Added min group size option
 ### Fixed:
-- 
+- Fixed elytra crash
 ### Changed:
 - 
