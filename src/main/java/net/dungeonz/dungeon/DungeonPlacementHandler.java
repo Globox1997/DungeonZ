@@ -1,4 +1,4 @@
-package net.dungeonz.dimension;
+package net.dungeonz.dungeon;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,8 +16,8 @@ import net.dungeonz.block.DungeonGateBlock;
 import net.dungeonz.block.entity.DungeonGateEntity;
 import net.dungeonz.block.entity.DungeonPortalEntity;
 import net.dungeonz.block.entity.DungeonSpawnerEntity;
-import net.dungeonz.dungeon.Dungeon;
 import net.dungeonz.init.BlockInit;
+import net.dungeonz.init.TagInit;
 import net.dungeonz.network.DungeonServerPacket;
 import net.dungeonz.util.InventoryHelper;
 import net.minecraft.block.Block;
@@ -282,6 +282,7 @@ public class DungeonPlacementHandler {
                 throw new IllegalStateException("Trying to spawn a non-mob: " + Registries.ENTITY_TYPE.getId(type));
             }
             mobEntity = (MobEntity) entity;
+
         } catch (Exception exception) {
             DungeonzMain.LOGGER.warn("Failed to create mob", exception);
             return null;
@@ -289,6 +290,11 @@ public class DungeonPlacementHandler {
         if (nbt != null) {
             NbtCompound nbtCompound = mobEntity.writeNbt(new NbtCompound());
             nbtCompound.copyFrom(nbt);
+            mobEntity.readNbt(nbtCompound);
+        }
+        if (mobEntity.getType().isIn(TagInit.IMMUNE_TO_ZOMBIFICATION)) {
+            NbtCompound nbtCompound = mobEntity.writeNbt(new NbtCompound());
+            nbtCompound.putBoolean("IsImmuneToZombification", true);
             mobEntity.readNbt(nbtCompound);
         }
         return mobEntity;

@@ -15,6 +15,7 @@ import net.dungeonz.init.EventInit;
 import net.dungeonz.init.ItemInit;
 import net.dungeonz.init.LoaderInit;
 import net.dungeonz.init.SoundInit;
+import net.dungeonz.init.TagInit;
 import net.dungeonz.init.WorldInit;
 import net.dungeonz.network.DungeonServerPacket;
 import net.fabricmc.api.ModInitializer;
@@ -41,6 +42,7 @@ public class DungeonzMain implements ModInitializer {
         SoundInit.init();
         ItemInit.init();
         EventInit.init();
+        TagInit.init();
     }
 
 }

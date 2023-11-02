@@ -4,8 +4,8 @@ import com.mojang.logging.LogUtils;
 import java.util.Optional;
 import java.util.function.Function;
 
-import net.dungeonz.dimension.DungeonPlacementHandler;
 import net.dungeonz.dungeon.Dungeon;
+import net.dungeonz.dungeon.DungeonPlacementHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;

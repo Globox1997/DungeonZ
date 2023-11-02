@@ -1,4 +1,4 @@
-package net.dungeonz.dimension;
+package net.dungeonz.dungeon;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

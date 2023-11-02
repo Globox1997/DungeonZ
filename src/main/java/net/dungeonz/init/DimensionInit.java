@@ -1,6 +1,6 @@
 package net.dungeonz.init;
 
-import net.dungeonz.dimension.DungeonChunkGenerator;
+import net.dungeonz.dungeon.DungeonChunkGenerator;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
