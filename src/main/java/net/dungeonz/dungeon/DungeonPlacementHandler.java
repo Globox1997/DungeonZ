@@ -18,7 +18,6 @@ import net.dungeonz.block.entity.DungeonPortalEntity;
 import net.dungeonz.block.entity.DungeonSpawnerEntity;
 import net.dungeonz.init.BlockInit;
 import net.dungeonz.init.TagInit;
-import net.dungeonz.network.DungeonServerPacket;
 import net.dungeonz.util.InventoryHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -78,8 +77,6 @@ public class DungeonPlacementHandler {
             refreshDungeon(serverPlayerEntity.server, dungeonWorld, portalEntity, dungeon, difficulty, disableEffects);
         }
         portalEntity.joinDungeon(serverPlayerEntity.getUuid());
-        // Sync breakable and other stuff to client
-        DungeonServerPacket.writeS2CDungeonInfoPacket(serverPlayerEntity, dungeon.getBreakableBlockIdList(), dungeon.getplaceableBlockIdList(), dungeon.isElytraAllowed());
 
         return new TeleportTarget(Vec3d.of(newPos).add(0.5, 0, 0.5), Vec3d.ZERO, 0, 0);
     }

@@ -16,6 +16,7 @@ import net.dungeonz.block.entity.DungeonPortalEntity;
 import net.dungeonz.dungeon.Dungeon;
 import net.dungeonz.dungeon.DungeonPlacementHandler;
 import net.dungeonz.init.DimensionInit;
+import net.dungeonz.network.DungeonServerPacket;
 import net.fabricmc.fabric.api.dimension.v1.FabricDimensions;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -165,16 +166,14 @@ public class DungeonHelper {
                             } else {
                                 for (int i = 0; i < dungeonPortalEntity.getWaitingUuids().size(); i++) {
                                     if (player.getServerWorld().getPlayerByUuid(dungeonPortalEntity.getWaitingUuids().get(i)) != null) {
-                                        FabricDimensions.teleport(player.getServerWorld().getPlayerByUuid(dungeonPortalEntity.getWaitingUuids().get(i)), dungeonWorld,
-                                                DungeonPlacementHandler.enter((ServerPlayerEntity) player.getServerWorld().getPlayerByUuid(dungeonPortalEntity.getWaitingUuids().get(i)), dungeonWorld,
-                                                        player.getServerWorld(), dungeonPortalEntity, dungeonPortalPos, dungeonPortalEntity.getDifficulty(), dungeonPortalEntity.getDisableEffects()));
+                                        teleportPlayer((ServerPlayerEntity) player.getServerWorld().getPlayerByUuid(dungeonPortalEntity.getWaitingUuids().get(i)), dungeonWorld, dungeonPortalEntity,
+                                                dungeonPortalPos);
                                     }
                                 }
                                 dungeonPortalEntity.getWaitingUuids().clear();
                             }
                         }
-                        FabricDimensions.teleport(player, dungeonWorld, DungeonPlacementHandler.enter(player, dungeonWorld, player.getServerWorld(), dungeonPortalEntity, dungeonPortalPos,
-                                dungeonPortalEntity.getDifficulty(), dungeonPortalEntity.getDisableEffects()));
+                        teleportPlayer(player, dungeonWorld, dungeonPortalEntity, dungeonPortalPos);
                     } else {
                         player.sendMessage(Text.translatable("text.dungeonz.dungeon_full"), false);
                     }
@@ -183,6 +182,14 @@ public class DungeonHelper {
                 }
             }
         }
+    }
+
+    private static void teleportPlayer(ServerPlayerEntity serverPlayerEntity, ServerWorld dungeonWorld, DungeonPortalEntity dungeonPortalEntity, BlockPos dungeonPortalPos) {
+        ServerPlayerEntity playerEntity = FabricDimensions.teleport(serverPlayerEntity, dungeonWorld, DungeonPlacementHandler.enter(serverPlayerEntity, dungeonWorld,
+                serverPlayerEntity.getServerWorld(), dungeonPortalEntity, dungeonPortalPos, dungeonPortalEntity.getDifficulty(), dungeonPortalEntity.getDisableEffects()));
+
+        DungeonServerPacket.writeS2CDungeonInfoPacket(playerEntity, dungeonPortalEntity.getDungeon().getBreakableBlockIdList(), dungeonPortalEntity.getDungeon().getplaceableBlockIdList(),
+                dungeonPortalEntity.getDungeon().isElytraAllowed());
     }
 
     public static void teleportOutOfDungeon(ServerPlayerEntity player) {
