@@ -49,7 +49,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
     private List<UUID> deadDungeonPlayerUUIDs = new ArrayList<UUID>();
     private int maxGroupSize = 0;
     private int cooldownTime = 0;
-    private int autoKickTimer = 0;
+    private int autoKickTime = 0;
     private boolean disableEffects = false;
     private boolean privateGroup = false;
     private HashMap<Integer, ArrayList<BlockPos>> blockBlockPosMap = new HashMap<Integer, ArrayList<BlockPos>>();
@@ -82,7 +82,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         }
         this.maxGroupSize = nbt.getInt("MaxGroupSize");
         this.cooldownTime = nbt.getInt("CooldownTime");
-        this.autoKickTimer = nbt.getInt("AutoKickTimer");
+        this.autoKickTime = nbt.getInt("AutoKickTime");
         this.disableEffects = nbt.getBoolean("DisableEffects");
         this.privateGroup = nbt.getBoolean("PrivateGroup");
         this.blockBlockPosMap.clear();
@@ -160,7 +160,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         }
         nbt.putInt("MaxGroupSize", this.maxGroupSize);
         nbt.putInt("CooldownTime", this.cooldownTime);
-        nbt.putInt("AutoKickTimer", this.autoKickTimer);
+        nbt.putInt("AutoKickTime", this.autoKickTime);
         nbt.putBoolean("DisableEffects", this.disableEffects);
         nbt.putBoolean("PrivateGroup", this.privateGroup);
 
@@ -259,14 +259,25 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
 
     public static void serverTick(World world, BlockPos pos, BlockState state, DungeonPortalEntity blockEntity) {
         if (blockEntity.getDungeonPlayerCount() > 0) {
-            blockEntity.autoKickTimer++;
-            if (blockEntity.autoKickTimer > 432000) {
+            if (blockEntity.autoKickTime == 0) {
+                blockEntity.autoKickTime = (int) world.getTime() + 432000;
+            } else if (blockEntity.autoKickTime < (int) world.getTime()) {
                 if (blockEntity.getDungeon() != null) {
                     blockEntity.setCooldownTime(blockEntity.getDungeon().getCooldown() + (int) blockEntity.getWorld().getTime());
+                    for (int i = 0; i < blockEntity.getDungeonPlayerUUIDs().size(); i++) {
+                        ServerPlayerEntity player = (ServerPlayerEntity) world.getPlayerByUuid(blockEntity.getDungeonPlayerUUIDs().get(i));
+                        if (DungeonHelper.getCurrentDungeon(player) != null) {
+                            DungeonHelper.teleportOutOfDungeon(player);
+                            player.sendMessage(Text.translatable("text.dungeonz.dungeon_autokick"));
+                        }
+                    }
                 }
                 blockEntity.getDungeonPlayerUUIDs().clear();
-                blockEntity.autoKickTimer = 0;
+                blockEntity.getDeadDungeonPlayerUUIDs().clear();
+                blockEntity.autoKickTime = 0;
             }
+        } else if (blockEntity.autoKickTime != 0) {
+            blockEntity.autoKickTime = 0;
         }
     }
 

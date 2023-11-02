@@ -34,6 +34,7 @@
     "text.dungeonz.dungeon_cooldown": "Dungeon is on cooldown",
     "text.dungeonz.dungeon_cooldown_time": "Dungeon is on cooldown for %dh %dm %ds",
     "text.dungeonz.dungeon_missing": "No dungeon found",
+    "text.dungeonz.dungeon_autokick": "You got autokicked cause it took you to long to finish the dungeon!",
 
     "dungeon.op_screen.dungeon_type": "Dungeon Type",
     "dungeon.op_screen.default_difficulty": "Default Difficulty",
