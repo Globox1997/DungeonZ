@@ -28,7 +28,7 @@ public class PlayerManagerMixin {
     private void onPlayerConnectMixin(ClientConnection connection, ServerPlayerEntity player, CallbackInfo info) {
         if (player.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
             if (DungeonHelper.getCurrentDungeon(player) != null && DungeonHelper.getDungeonPortalEntity(player).getDungeonPlayerUUIDs().contains(player.getUuid())
-                    && DungeonHelper.getDungeonPortalEntity(player).getCooldown() <= 0) {
+                    && !DungeonHelper.getDungeonPortalEntity(player).isOnCooldown()) {
                 Dungeon dungeon = DungeonHelper.getCurrentDungeon(player);
                 DungeonServerPacket.writeS2CDungeonInfoPacket(player, dungeon.getBreakableBlockIdList(), dungeon.getplaceableBlockIdList(), dungeon.isElytraAllowed());
             } else {
@@ -45,7 +45,7 @@ public class PlayerManagerMixin {
             dungeonPortalEntity.getDungeonPlayerUUIDs().remove(oldPlayer.getUuid());
             dungeonPortalEntity.addDeadDungeonPlayerUUIDs(serverPlayerEntity.getUuid());
             if (dungeonPortalEntity.getDungeonPlayerCount() == 0) {
-                dungeonPortalEntity.setCooldown(dungeonPortalEntity.getDungeon().getCooldown());
+                dungeonPortalEntity.setCooldownTime(dungeonPortalEntity.getDungeon().getCooldown() + (int) serverWorld.getTime());
             }
             dungeonPortalEntity.markDirty();
         }

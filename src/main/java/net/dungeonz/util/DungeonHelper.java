@@ -131,7 +131,7 @@ public class DungeonHelper {
                 if (dungeonPortalEntity.getDungeon() != null) {
                     if ((dungeonPortalEntity.getDungeonPlayerCount() + dungeonPortalEntity.getDeadDungeonPlayerUUIDs().size()) < dungeonPortalEntity.getMaxGroupSize()) {
 
-                        if (dungeonPortalEntity.getCooldown() > 0) {
+                        if (dungeonPortalEntity.isOnCooldown()) {
                             player.sendMessage(Text.translatable("text.dungeonz.dungeon_cooldown"), false);
                             return;
                         }

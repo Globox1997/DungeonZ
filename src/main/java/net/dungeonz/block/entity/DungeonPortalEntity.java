@@ -48,7 +48,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
     private List<UUID> dungeonPlayerUUIDs = new ArrayList<UUID>();
     private List<UUID> deadDungeonPlayerUUIDs = new ArrayList<UUID>();
     private int maxGroupSize = 0;
-    private int cooldown = 0;
+    private int cooldownTime = 0;
     private int autoKickTimer = 0;
     private boolean disableEffects = false;
     private boolean privateGroup = false;
@@ -81,7 +81,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
             this.deadDungeonPlayerUUIDs.add(nbt.getUuid("DeadPlayerUUID" + i));
         }
         this.maxGroupSize = nbt.getInt("MaxGroupSize");
-        this.cooldown = nbt.getInt("Cooldown");
+        this.cooldownTime = nbt.getInt("CooldownTime");
         this.autoKickTimer = nbt.getInt("AutoKickTimer");
         this.disableEffects = nbt.getBoolean("DisableEffects");
         this.privateGroup = nbt.getBoolean("PrivateGroup");
@@ -159,7 +159,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
             nbt.putUuid("DeadPlayerUUID" + i, this.deadDungeonPlayerUUIDs.get(i));
         }
         nbt.putInt("MaxGroupSize", this.maxGroupSize);
-        nbt.putInt("Cooldown", this.cooldown);
+        nbt.putInt("CooldownTime", this.cooldownTime);
         nbt.putInt("AutoKickTimer", this.autoKickTimer);
         nbt.putBoolean("DisableEffects", this.disableEffects);
         nbt.putBoolean("PrivateGroup", this.privateGroup);
@@ -255,20 +255,14 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
     }
 
     public static void clientTick(World world, BlockPos pos, BlockState state, DungeonPortalEntity blockEntity) {
-        if (blockEntity.getCooldown() > 0) {
-            blockEntity.setCooldown(blockEntity.getCooldown() - 1);
-        }
     }
 
     public static void serverTick(World world, BlockPos pos, BlockState state, DungeonPortalEntity blockEntity) {
-        if (blockEntity.getCooldown() > 0) {
-            blockEntity.setCooldown(blockEntity.getCooldown() - 1);
-        }
         if (blockEntity.getDungeonPlayerCount() > 0) {
             blockEntity.autoKickTimer++;
             if (blockEntity.autoKickTimer > 432000) {
                 if (blockEntity.getDungeon() != null) {
-                    blockEntity.setCooldown(blockEntity.getDungeon().getCooldown());
+                    blockEntity.setCooldownTime(blockEntity.getDungeon().getCooldown() + (int) blockEntity.getWorld().getTime());
                 }
                 blockEntity.getDungeonPlayerUUIDs().clear();
                 blockEntity.autoKickTimer = 0;
@@ -339,7 +333,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         }
 
         buf.writeInt(this.getMaxGroupSize());
-        buf.writeInt(this.getCooldown());
+        buf.writeInt(this.getCooldownTime());
         buf.writeString(this.getDifficulty());
         buf.writeBoolean(this.getDisableEffects());
         buf.writeBoolean(this.getPrivateGroup());
@@ -360,7 +354,7 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         InventoryHelper.fillInventoryWithLoot(world.getServer(), world, this.getBossLootBlockPos(), this.getDungeon().getDifficultyBossLootTableMap().get(this.getDifficulty()),
                 this.getDisableEffects());
 
-        this.setCooldown(this.getDungeon().getCooldown());
+        this.setCooldownTime(this.getDungeon().getCooldown() + (int) this.getWorld().getTime());
         markDirty();
     }
 
@@ -436,12 +430,19 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
         return this.blockBlockPosMap;
     }
 
-    public void setCooldown(int cooldown) {
-        this.cooldown = cooldown;
+    public void setCooldownTime(int cooldownTime) {
+        this.cooldownTime = cooldownTime;
     }
 
-    public int getCooldown() {
-        return this.cooldown;
+    public int getCooldownTime() {
+        return this.cooldownTime;
+    }
+
+    public boolean isOnCooldown() {
+        if (this.cooldownTime <= this.getWorld().getTime()) {
+            return false;
+        }
+        return true;
     }
 
     public void setMaxGroupSize(int maxGroupSize) {

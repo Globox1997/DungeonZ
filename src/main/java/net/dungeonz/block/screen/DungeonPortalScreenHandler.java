@@ -74,7 +74,7 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
             }
         }
         int maxGroupSize = buf.readInt();
-        int cooldown = buf.readInt();
+        int cooldownTime = buf.readInt();
         String difficulty = buf.readString();
         boolean disableEffects = buf.readBoolean();
         boolean privateGroup = buf.readBoolean();
@@ -85,7 +85,7 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         this.setPossibleLootItemStacks(possibleLootDifficultyItemStacks);
         this.setRequiredItemStacks(requiredItemStacks);
         this.setMaxPlayerCount(maxGroupSize);
-        this.setCooldown(cooldown);
+        this.setCooldownTime(cooldownTime);
         this.setDifficulty(difficulty);
         this.setDisableEffects(disableEffects);
         this.setPrivateGroup(privateGroup);
@@ -176,12 +176,19 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         this.dungeonPortalEntity.setMaxGroupSize(maxPlayerCount);
     }
 
-    public int getCooldown() {
-        return this.dungeonPortalEntity.getCooldown();
+    public int getCooldownTime() {
+        return this.dungeonPortalEntity.getCooldownTime();
     }
 
-    public void setCooldown(int cooldown) {
-        this.dungeonPortalEntity.setCooldown(cooldown);
+    public void setCooldownTime(int cooldownTime) {
+        this.dungeonPortalEntity.setCooldownTime(cooldownTime);
+    }
+
+    public boolean isOnCooldown() {
+        if (this.getCooldownTime() <= this.world.getTime()) {
+            return false;
+        }
+        return true;
     }
 
     public String getDifficulty() {

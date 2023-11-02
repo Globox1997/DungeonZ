@@ -265,8 +265,8 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
 
             if (!this.active && this.isHovered()) {
                 Text text = null;
-                if (DungeonPortalScreen.this.handler.getCooldown() > 0) {
-                    int cooldown = DungeonPortalScreen.this.handler.getCooldown() / 20;
+                if (DungeonPortalScreen.this.handler.isOnCooldown()) {
+                    int cooldown = (DungeonPortalScreen.this.handler.getCooldownTime() - (int) DungeonPortalScreen.this.client.world.getTime()) / 20;
                     int seconds = cooldown % 60;
                     int minutes = cooldown / 60 % 60;
                     int hours = cooldown / 60 / 60;
