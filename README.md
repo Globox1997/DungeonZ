@@ -1,17 +1,13 @@
 # DungeonZ
-
 DungeonZ is a mod which adds the basement for creating explorable dungeons.
 
 ### Installation
-
 DungeonZ is a mod built for the [Fabric Loader](https://fabricmc.net/). It requires [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api) and [Cloth Config API](https://www.curseforge.com/minecraft/mc-mods/cloth-config) to be installed separately; all other dependencies are installed with the mod.
 
 ### License
-
 DungeonZ is licensed under MIT.
 
 ### Datapacks
-
 If you don't know how to create a datapack check out [Data Pack Wiki](https://minecraft.fandom.com/wiki/Data_Pack) website and try to create your first one for the vanilla game.
 If you know how to create one, the folder path has to be ```data\dungeonz\dungeon\YOURFILE.json```
 
@@ -118,7 +114,6 @@ An example part for the overworld structure which leads to the dungeon:
 DungeonZ has an extra field called `"dungeon_type"` which has to be one of the defined dungeon types.
 
 ### Advancement
-
 DungeonZ provides a advancement criterion trigger called `dungeonz:dungeon_completion`.
 
 ```json
@@ -132,3 +127,7 @@ DungeonZ provides a advancement criterion trigger called `dungeonz:dungeon_compl
         }
     }
 ```
+
+### Commands
+`/dungeon leave`
+- Leave the current dungeon (if unable to finish the dungeon)

@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import net.dungeonz.dungeon.Dungeon;
 import net.dungeonz.init.BlockInit;
+import net.dungeonz.init.CommandInit;
 import net.dungeonz.init.ConfigInit;
 import net.dungeonz.init.CriteriaInit;
 import net.dungeonz.init.DimensionInit;
@@ -43,6 +44,7 @@ public class DungeonzMain implements ModInitializer {
         ItemInit.init();
         EventInit.init();
         TagInit.init();
+        CommandInit.init();
     }
 
 }
