@@ -1,0 +1,49 @@
+{
+    "block.dungeonz.dungeon_portal": "Портал подземелья",
+    "block.dungeonz.dungeon_spawner": "Спавнер подземелья",
+    "block.dungeonz.dungeon_gate": "Блок портала подземелья",
+
+    "item.dungeonz.dungeon_compass": "Компас подземелья",
+
+    "dungeonz.difficulty": "Сложность",
+    "dungeonz.difficulty.easy": "Лёгкая",
+    "dungeonz.difficulty.normal": "Нормальная",
+    "dungeonz.difficulty.hard": "Сложная",
+    "dungeonz.difficulty.extreme": "Экстрим",
+
+    "container.dungeon_portal": "Портал подземелья",
+
+    "dungeon.task.join": "Войти",
+    "dungeon.task.leave": "Выйти",
+    "dungeon.ruin_dungeon": "Руинное подземелье",
+    "dungeon.dark_dungeon": "Тёмное подземелье",
+
+    "text.dungeonz.possible": "Возможная добыча",
+    "text.dungeonz.required": "Необходимые предметы",
+    "text.dungeonz.missing": "Отсутствуют предметы",
+    "text.dungeonz.effects": "Положительные эффекты",
+    "text.dungeonz.private": "Приватная группа",
+    "text.dungeonz.nothing_required": "-",
+    "text.dungeonz.dead_player": "Повторное присоединение запрещено",
+    "text.dungeonz.empty_name": "-",
+    "text.dungeonz.player_list": "Игроки (%d/%d)",
+    "text.dungeonz.dungeon_full": "Подземелье заполнено",
+    "text.dungeonz.dungeon_private": "Подземелье в приватном режиме",
+    "text.dungeonz.dungeon_cooldown": "Подземелье на перезарядке",
+    "text.dungeonz.dungeon_cooldown_time": "Подземелье на перезарядке на %dч %dм %dс",
+    "text.dungeonz.dungeon_missing": "Подземелье не найдено!",
+
+    "dungeon.op_screen.dungeon_type": "Тип подземелья",
+    "dungeon.op_screen.default_difficulty": "Сложность по умолчанию",
+    "dungeon.op_screen.gate_block_id": "Идентификатор блока портала",
+    "dungeon.op_screen.gate_particle_id": "Идентификатор частиц портала",
+    "dungeon.op_screen.gate_unlock_item_id": "Идентификатор предмета разблокировки портала",
+
+    "compass.compass_screen.title": "Подземелья",
+    "compass.compass_screen.calibrate": "Откалибровать",
+    "compass.compass_screen.required": "Требуется 3 осколка аметиста",
+    "compass.compass_item.cartography": "Откалибруйте на столе картографа",
+
+    "text.autoconfig.dungeonz.title": "Конфигурация DungeonZ",
+    "text.autoconfig.dungeonz.option.devMode": "Режим разработчика",
+}
