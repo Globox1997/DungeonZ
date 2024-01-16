@@ -27,6 +27,7 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.Entity.RemovalReason;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -47,6 +48,7 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.StructureWorldAccess;
@@ -61,7 +63,25 @@ public class DungeonPlacementHandler {
 
     public static TeleportTarget enter(ServerPlayerEntity serverPlayerEntity, ServerWorld dungeonWorld, ServerWorld oldWorld, DungeonPortalEntity portalEntity, BlockPos portalPos, String difficulty,
             boolean disableEffects) {
-        ((ServerPlayerAccess) serverPlayerEntity).setDungeonInfo(oldWorld, portalPos, serverPlayerEntity.getBlockPos());
+        BlockPos playerBlockPos = serverPlayerEntity.getBlockPos().mutableCopy();
+
+        if (oldWorld.getBlockState(playerBlockPos).isOf(BlockInit.DUNGEON_PORTAL) || oldWorld.getBlockState(playerBlockPos.down()).isOf(BlockInit.DUNGEON_PORTAL)) {
+            if (oldWorld.getBlockState(playerBlockPos).isOf(BlockInit.DUNGEON_PORTAL)) {
+                playerBlockPos = playerBlockPos.up();
+            }
+            for (int i = 0; i < 4; i++) {
+                if (oldWorld.getBlockState(playerBlockPos.offset(Direction.fromHorizontal(i), 1).up(0)).isAir()
+                        && oldWorld.getBlockState(playerBlockPos.offset(Direction.fromHorizontal(i), 1).up(1)).isAir()) {
+                    playerBlockPos = playerBlockPos.offset(Direction.fromHorizontal(i), 1);
+                    break;
+                }
+                if (i == 3) {
+                    playerBlockPos = BlockPos.ofFloored(PlayerEntity.findRespawnPosition(oldWorld.getServer().getWorld(serverPlayerEntity.getSpawnPointDimension()),
+                            ((ServerPlayerAccess) serverPlayerEntity).getDungeonSpawnBlockPos(), 0.0f, true, true).get());
+                }
+            }
+        }
+        ((ServerPlayerAccess) serverPlayerEntity).setDungeonInfo(oldWorld, portalPos, playerBlockPos);
         if (disableEffects) {
             serverPlayerEntity.clearStatusEffects();
         }
