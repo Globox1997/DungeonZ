@@ -13,9 +13,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 
 @Mixin(PlayerEntity.class)
@@ -23,6 +25,15 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     public PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
+    }
+
+    @Inject(method = "isBlockBreakingRestricted", at = @At(value = "HEAD"), cancellable = true)
+    private void isBlockBreakingRestrictedMixin(World world, BlockPos pos, GameMode gameMode, CallbackInfoReturnable<Boolean> info) {
+        if (!world.isClient() && this.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD
+                && !DungeonHelper.getCurrentDungeon((ServerPlayerEntity) (Object) this).getBreakableBlockIdList().contains(Registries.BLOCK.getRawId(world.getBlockState(pos).getBlock()))) {
+            info.setReturnValue(true);
+
+        }
     }
 
     @Inject(method = "canPlaceOn", at = @At(value = "HEAD"), cancellable = true)
