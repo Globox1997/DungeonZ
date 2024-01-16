@@ -47,18 +47,18 @@ public class DungeonPortalBlock extends BlockWithEntity {
             DungeonPortalEntity dungeonPortalEntity = (DungeonPortalEntity) player.getWorld().getBlockEntity(pos);
 
             if (player.isCreativeLevelTwoOp() && (dungeonPortalEntity.getDungeon() == null || player.isSneaking())) {
-                if (!world.isClient) {
+                if (!world.isClient()) {
                     DungeonServerPacket.writeS2COpenOpScreenPacket((ServerPlayerEntity) player, dungeonPortalEntity, null);
                 }
-                return ActionResult.success(world.isClient);
+                return ActionResult.success(world.isClient());
             } else if (dungeonPortalEntity.getDungeon() != null) {
-                if (!world.isClient) {
+                if (!world.isClient()) {
                     if (DungeonzMain.isPartyAddonLoaded) {
                         PartyAddonServerPacket.writeS2CSyncGroupManagerPacket((ServerPlayerEntity) player, ((GroupManagerAccess) player).getGroupManager());
                     }
                     player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
                 }
-                return ActionResult.success(world.isClient);
+                return ActionResult.success(world.isClient());
             }
         }
 
@@ -67,7 +67,7 @@ public class DungeonPortalBlock extends BlockWithEntity {
 
     @Override
     public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
-        if (!world.isClient && !entity.hasVehicle() && !entity.hasPassengers() && entity.canUsePortals() && entity instanceof ServerPlayerEntity) {
+        if (!world.isClient() && !entity.hasVehicle() && !entity.hasPassengers() && entity.canUsePortals() && entity instanceof ServerPlayerEntity) {
             if (!entity.hasPortalCooldown()) {
                 DungeonHelper.teleportDungeon((ServerPlayerEntity) entity, pos, entity.getUuid());
                 entity.resetPortalCooldown();
@@ -78,7 +78,7 @@ public class DungeonPortalBlock extends BlockWithEntity {
     @Override
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return DungeonGateBlock.checkType(type, BlockInit.DUNGEON_PORTAL_ENTITY, world.isClient ? DungeonPortalEntity::clientTick : DungeonPortalEntity::serverTick);
+        return DungeonGateBlock.checkType(type, BlockInit.DUNGEON_PORTAL_ENTITY, world.isClient() ? DungeonPortalEntity::clientTick : DungeonPortalEntity::serverTick);
     }
 
 }

@@ -52,7 +52,7 @@ public class DungeonGateBlock extends BlockWithEntity {
     @Override
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return DungeonGateBlock.checkType(type, BlockInit.DUNGEON_GATE_ENTITY, world.isClient ? null : DungeonGateEntity::serverTick);
+        return DungeonGateBlock.checkType(type, BlockInit.DUNGEON_GATE_ENTITY, world.isClient() ? null : DungeonGateEntity::serverTick);
     }
 
     @Override
@@ -64,19 +64,19 @@ public class DungeonGateBlock extends BlockWithEntity {
                     dungeonGateEntity.setBlockId(Registries.BLOCK.getId(((BlockItem) player.getStackInHand(hand).getItem()).getBlock()));
                     dungeonGateEntity.markDirty();
                 } else if (player.isSneaking()) {
-                    if (!world.isClient) {
+                    if (!world.isClient()) {
                         DungeonServerPacket.writeS2COpenOpScreenPacket((ServerPlayerEntity) player, null, dungeonGateEntity);
                     }
                 }
-                return ActionResult.success(world.isClient);
+                return ActionResult.success(world.isClient());
             } else if (dungeonGateEntity.getUnlockItem() != null && player.getStackInHand(hand).isOf(dungeonGateEntity.getUnlockItem())) {
-                if (!world.isClient) {
+                if (!world.isClient()) {
                     if (!player.isCreative()) {
                         player.getStackInHand(hand).decrement(1);
                     }
                     dungeonGateEntity.unlockGate(pos);
                 }
-                return ActionResult.success(world.isClient);
+                return ActionResult.success(world.isClient());
             }
 
         }

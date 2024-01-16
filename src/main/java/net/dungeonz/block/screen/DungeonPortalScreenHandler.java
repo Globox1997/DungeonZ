@@ -104,7 +104,7 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         this.dungeonPortalEntity = dungeonPortalEntity;
         this.pos = dungeonPortalEntity.getPos();
 
-        if (!this.world.isClient) {
+        if (!this.world.isClient()) {
             setDifficulties(this.dungeonPortalEntity.getDungeon().getDifficultyList());
             setRequiredItemStacks(DungeonHelper.getRequiredItemStackList(this.dungeonPortalEntity.getDungeon()));
             setPossibleLootItemStacks(DungeonHelper.getPossibleLootItemStackMap(this.dungeonPortalEntity.getDungeon(), this.world.getServer()));
