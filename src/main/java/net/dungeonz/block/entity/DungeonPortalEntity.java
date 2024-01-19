@@ -21,7 +21,7 @@ import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -37,9 +37,10 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
+public class DungeonPortalEntity extends EndPortalBlockEntity implements ExtendedScreenHandlerFactory {
 
     private Text title = Text.translatable("container.dungeon_portal");
     private String dungeonType = "";
@@ -301,6 +302,11 @@ public class DungeonPortalEntity extends BlockEntity implements ExtendedScreenHa
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
         return new DungeonPortalScreenHandler(syncId, playerInventory, this, ScreenHandlerContext.create(world, pos));
+    }
+
+    @Override
+    public boolean shouldDrawSide(Direction direction) {
+        return true;
     }
 
     @Override
