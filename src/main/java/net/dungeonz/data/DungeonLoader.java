@@ -198,7 +198,7 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                 }
 
                 if (bossEntityType == null) {
-                    DungeonzMain.LOGGER.warn("{} has no set boss", data);
+                    DungeonzMain.LOGGER.error("{} has no set boss", data);
                     return;
                 }
 
