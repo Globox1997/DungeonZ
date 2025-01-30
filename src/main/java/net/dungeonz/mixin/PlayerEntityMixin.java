@@ -1,6 +1,7 @@
 package net.dungeonz.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,13 +24,16 @@ import net.minecraft.world.World;
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity {
 
+    @Shadow
+    public abstract boolean isCreative();
+
     public PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
     }
 
     @Inject(method = "isBlockBreakingRestricted", at = @At(value = "HEAD"), cancellable = true)
     private void isBlockBreakingRestrictedMixin(World world, BlockPos pos, GameMode gameMode, CallbackInfoReturnable<Boolean> info) {
-        if (!world.isClient() && this.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD
+        if (!world.isClient() && !this.isCreative() && this.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD
                 && !DungeonHelper.getCurrentDungeon((ServerPlayerEntity) (Object) this).getBreakableBlockIdList().contains(Registries.BLOCK.getRawId(world.getBlockState(pos).getBlock()))) {
             info.setReturnValue(true);
 

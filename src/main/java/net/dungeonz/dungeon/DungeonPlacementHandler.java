@@ -1,14 +1,5 @@
 package net.dungeonz.dungeon;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Optional;
-
-import org.jetbrains.annotations.Nullable;
-
 import net.dungeonz.DungeonzMain;
 import net.dungeonz.access.BossEntityAccess;
 import net.dungeonz.access.ServerPlayerAccess;
@@ -22,12 +13,8 @@ import net.dungeonz.util.InventoryHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.FallingBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
+import net.minecraft.block.LandingBlock;
+import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
@@ -41,6 +28,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.state.property.Properties;
 import net.minecraft.structure.PoolStructurePiece;
 import net.minecraft.structure.StructurePiece;
 import net.minecraft.structure.StructurePiecesCollector;
@@ -49,21 +37,18 @@ import net.minecraft.structure.pool.StructurePool;
 import net.minecraft.structure.pool.StructurePoolBasedGenerator;
 import net.minecraft.structure.pool.alias.StructurePoolAliasLookup;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockBox;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.structure.JigsawStructure;
 import net.minecraft.world.gen.structure.Structure;
 import net.rpgdifficulty.api.MobStrengthener;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 public class DungeonPlacementHandler {
 
@@ -128,6 +113,8 @@ public class DungeonPlacementHandler {
             ArrayList<BlockPos> chestPosList = new ArrayList<BlockPos>();
             ArrayList<BlockPos> exitPosList = new ArrayList<BlockPos>();
             ArrayList<BlockPos> gatePosList = new ArrayList<BlockPos>();
+            Map<BlockPos, Integer> movingBlockMap = new HashMap<>();
+            Map<BlockPos, DungeonPortalEntity.Powered> poweredBlockMap = new HashMap<>();
             HashMap<BlockPos, Integer> spawnerPosEntityIdMap = new HashMap<BlockPos, Integer>();
             Block exitBlock = Registries.BLOCK.get(dungeon.getExitBlockId());
             Block bossLootBlock = Registries.BLOCK.get(dungeon.getBossLootBlockId());
@@ -176,8 +163,10 @@ public class DungeonPlacementHandler {
                                                 poolStructurePiece.getBoundingBox().getMaxZ());
                                         dungeonGateEntity.markDirty();
                                     }
-                                } else if (state.getBlock() instanceof @SuppressWarnings("unused")FallingBlock fallingBlock) {
-
+                                } else if (state.getBlock() instanceof LandingBlock) {
+                                    movingBlockMap.put(checkPos, blockId);
+                                } else if (state.contains(Properties.POWERED)) {
+                                    poweredBlockMap.put(checkPos, new DungeonPortalEntity.Powered(blockId, state.get(Properties.POWERED), state.contains(Properties.HORIZONTAL_FACING) ? state.get(Properties.HORIZONTAL_FACING).getHorizontal() : 0));
                                 }
                             }
                         }
@@ -186,6 +175,8 @@ public class DungeonPlacementHandler {
             }
             portalEntity.setChestPosList(chestPosList);
             portalEntity.setExitPosList(exitPosList);
+            portalEntity.setMovingBlockMap(movingBlockMap);
+            portalEntity.setPoweredBlockMap(poweredBlockMap);
             portalEntity.setBlockMap(blockIdPosMap);
             portalEntity.setSpawnerPosEntityIdMap(spawnerPosEntityIdMap);
             portalEntity.setGatePosList(gatePosList);
@@ -327,6 +318,38 @@ public class DungeonPlacementHandler {
         // Refresh blocks
         for (Entry<BlockPos, Integer> entry : portalEntity.getReplaceBlockIdMap().entrySet()) {
             world.setBlockState(entry.getKey(), Registries.BLOCK.get(entry.getValue()).getDefaultState(), 3);
+        }
+        // Refresh powered blocks
+        for (Entry<BlockPos, DungeonPortalEntity.Powered> entry : portalEntity.getPoweredBlockMap().entrySet()) {
+            BlockState blockState = Registries.BLOCK.get(entry.getValue().getBlockId()).getDefaultState().with(Properties.POWERED, entry.getValue().getPowered());
+            boolean hasFacing = blockState.contains(Properties.HORIZONTAL_FACING);
+            if (hasFacing) {
+                blockState = blockState.with(Properties.HORIZONTAL_FACING, Direction.fromHorizontal(entry.getValue().getFacing()));
+            }
+            world.setBlockState(entry.getKey(), blockState, 3);
+            world.updateNeighborsAlways(entry.getKey(), world.getBlockState(entry.getKey()).getBlock());
+            if (hasFacing) {
+                world.updateNeighborsAlways(entry.getKey().offset(world.getBlockState(entry.getKey()).get(Properties.HORIZONTAL_FACING).getOpposite()), world.getBlockState(entry.getKey()).getBlock());
+            }
+        }
+        // Refresh moving blocks
+        List<BlockPos> freshPlacedBlockPoses = new ArrayList<>();
+        for (Entry<BlockPos, Integer> entry : portalEntity.getMovingBlockMap().entrySet()) {
+            Block block = Registries.BLOCK.get(entry.getValue());
+            if (!world.getBlockState(entry.getKey()).isOf(block)) {
+                for (int i = 1; i < 50; i++) {
+                    BlockPos checkPos = entry.getKey().down(i);
+                    if (freshPlacedBlockPoses.contains(checkPos)) {
+                        continue;
+                    }
+                    if (world.getBlockState(checkPos).isOf(block)) {
+                        world.removeBlock(checkPos, false);
+                        break;
+                    }
+                }
+                world.setBlockState(entry.getKey(), Registries.BLOCK.get(entry.getValue()).getDefaultState(), 3);
+                freshPlacedBlockPoses.add(entry.getKey());
+            }
         }
         portalEntity.getDungeonPlayerUuids().clear();
         portalEntity.getDeadDungeonPlayerUUIDs().clear();
