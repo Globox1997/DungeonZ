@@ -47,6 +47,7 @@
     "text.dungeonz.missing": "Missing items",
     "text.dungeonz.effects": "Positive Effects",
     "text.dungeonz.private": "Private Group",
+    "text.dungeonz.required_level": "Required Lv. %s",
     "text.dungeonz.nothing_required": "-",
     "text.dungeonz.dead_player": "Rejoin not allowed",
     "text.dungeonz.empty_name": "-",

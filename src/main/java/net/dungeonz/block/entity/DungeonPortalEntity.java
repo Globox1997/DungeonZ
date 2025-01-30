@@ -1,13 +1,9 @@
 package net.dungeonz.block.entity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.Map.Entry;
 
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import net.dungeonz.block.screen.DungeonPortalScreenHandler;
@@ -57,6 +53,7 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
     private int maxGroupSize = 0;
     private int minGroupSize = 0;
     private List<UUID> waitingUuids = new ArrayList<UUID>();
+    private int requiredLevel = 0;
     private int cooldownTime = 0;
     private int autoKickTime = 0;
     private boolean disableEffects = false;
@@ -92,6 +89,7 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
         }
         this.maxGroupSize = nbt.getInt("MaxGroupSize");
         this.minGroupSize = nbt.getInt("MinGroupSize");
+        this.requiredLevel = nbt.getInt("RequiredLevel");
         this.cooldownTime = nbt.getInt("CooldownTime");
         this.autoKickTime = nbt.getInt("AutoKickTime");
         this.disableEffects = nbt.getBoolean("DisableEffects");
@@ -171,17 +169,16 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
         }
         nbt.putInt("MaxGroupSize", this.maxGroupSize);
         nbt.putInt("MinGroupSize", this.minGroupSize);
+        nbt.putInt("RequiredLevel", this.requiredLevel);
         nbt.putInt("CooldownTime", this.cooldownTime);
         nbt.putInt("AutoKickTime", this.autoKickTime);
         nbt.putBoolean("DisableEffects", this.disableEffects);
         nbt.putBoolean("PrivateGroup", this.privateGroup);
 
         nbt.putInt("BlockMapSize", this.blockBlockPosMap.size());
-        if (this.blockBlockPosMap.size() > 0) {
+        if (!this.blockBlockPosMap.isEmpty()) {
             int blockCount = 0;
-            Iterator<Entry<Integer, ArrayList<BlockPos>>> iterator = this.blockBlockPosMap.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Entry<Integer, ArrayList<BlockPos>> entry = iterator.next();
+            for (Entry<Integer, ArrayList<BlockPos>> entry : this.blockBlockPosMap.entrySet()) {
                 nbt.putInt("BlockId" + blockCount, entry.getKey());
                 nbt.putInt("BlockListSize" + blockCount, entry.getValue().size());
                 for (int i = 0; i < entry.getValue().size(); i++) {
@@ -202,7 +199,7 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
         nbt.putInt("BossLootPosZ", this.bossLootBlockPos.getZ());
 
         nbt.putInt("ChestListSize", this.chestPosList.size());
-        if (this.chestPosList.size() > 0) {
+        if (!this.chestPosList.isEmpty()) {
             for (int i = 0; i < this.chestPosList.size(); i++) {
                 nbt.putInt("ChestPosX" + i, this.chestPosList.get(i).getX());
                 nbt.putInt("ChestPosY" + i, this.chestPosList.get(i).getY());
@@ -211,7 +208,7 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
         }
 
         nbt.putInt("ExitListSize", this.exitPosList.size());
-        if (this.exitPosList.size() > 0) {
+        if (!this.exitPosList.isEmpty()) {
             for (int i = 0; i < this.exitPosList.size(); i++) {
                 nbt.putInt("ExitPosX" + i, this.exitPosList.get(i).getX());
                 nbt.putInt("ExitPosY" + i, this.exitPosList.get(i).getY());
@@ -220,7 +217,7 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
         }
 
         nbt.putInt("SpawnerMapSize", this.spawnerPosEntityIdMap.size());
-        if (this.spawnerPosEntityIdMap.size() > 0) {
+        if (!this.spawnerPosEntityIdMap.isEmpty()) {
             Iterator<Entry<BlockPos, Integer>> iterator = this.spawnerPosEntityIdMap.entrySet().iterator();
             int count = 0;
             while (iterator.hasNext()) {
@@ -234,7 +231,7 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
         }
 
         nbt.putInt("ReplacePosSize", this.replacePosBlockIdMap.size());
-        if (this.replacePosBlockIdMap.size() > 0) {
+        if (!this.replacePosBlockIdMap.isEmpty()) {
             Iterator<Entry<BlockPos, Integer>> iterator = this.replacePosBlockIdMap.entrySet().iterator();
             int count = 0;
             while (iterator.hasNext()) {
@@ -248,7 +245,7 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
         }
 
         nbt.putInt("DungeonEdgeSize", this.dungeonEdgeList.size());
-        if (this.dungeonEdgeList.size() > 0) {
+        if (!this.dungeonEdgeList.isEmpty()) {
             for (int i = 0; i < this.dungeonEdgeList.size() / 3; i++) {
                 nbt.putInt("DungeonEdgeX" + i, this.dungeonEdgeList.get(3 * i));
                 nbt.putInt("DungeonEdgeY" + i, this.dungeonEdgeList.get(1 + 3 * i));
@@ -257,7 +254,7 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
         }
 
         nbt.putInt("GateListSize", this.gatePosList.size());
-        if (this.gatePosList.size() > 0) {
+        if (!this.gatePosList.isEmpty()) {
             for (int i = 0; i < this.gatePosList.size(); i++) {
                 nbt.putInt("GatePosX" + i, this.gatePosList.get(i).getX());
                 nbt.putInt("GatePosY" + i, this.gatePosList.get(i).getY());
@@ -348,21 +345,24 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
         List<String> difficulties = new ArrayList<String>();
         Map<String, List<ItemStack>> possibleLoot = new HashMap<>();
         List<ItemStack> requiredItemStacks = new ArrayList<ItemStack>();
-
+        Optional<Identifier> backgroundId = Optional.empty();
+        int requiredLevel = 0;
         if (this.getDungeon() != null) {
             difficulties = this.getDungeon().getDifficultyList();
             possibleLoot = DungeonHelper.getPossibleLootItemStackMap(this.getDungeon(), player.getServer());
             requiredItemStacks = DungeonHelper.getRequiredItemStackList(this.getDungeon());
+            backgroundId = Optional.ofNullable(this.getDungeon().getBackgroundId());
+            requiredLevel = this.getDungeon().getRequiredLevel();
         }
 
         return new DungeonPortalPacket(this.pos, this.getDungeonPlayerUuids(), this.getDeadDungeonPlayerUUIDs(), difficulties, possibleLoot, requiredItemStacks, this.getMaxGroupSize(),
-                this.getMinGroupSize(), this.getWaitingUuids().size(), this.getCooldownTime(), this.getDifficulty(), this.getDisableEffects(), this.getPrivateGroup());
+                this.getMinGroupSize(), this.getWaitingUuids().size(), requiredLevel, this.getCooldownTime(), this.getDifficulty(), this.getDisableEffects(), this.getPrivateGroup(), backgroundId);
     }
 
     public void finishDungeon(ServerWorld world, BlockPos pos) {
         List<PlayerEntity> players = world.getPlayers(TargetPredicate.createAttackable().setBaseMaxDistance(64.0), null, new Box(pos).expand(64.0, 64.0, 64.0));
-        for (int i = 0; i < players.size(); i++) {
-            CriteriaInit.DUNGEON_COMPLETION.trigger((ServerPlayerEntity) players.get(i), this.getDungeonType(), this.getDifficulty());
+        for (PlayerEntity player : players) {
+            CriteriaInit.DUNGEON_COMPLETION.trigger((ServerPlayerEntity) player, this.getDungeonType(), this.getDifficulty());
         }
         world.playSound(null, pos, SoundInit.DUNGEON_COMPLETION_EVENT, SoundCategory.BLOCKS, 1.0f, 0.9f + world.getRandom().nextFloat() * 0.2f);
 
@@ -448,6 +448,14 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
 
     public HashMap<Integer, ArrayList<BlockPos>> getBlockMap() {
         return this.blockBlockPosMap;
+    }
+
+    public void setRequiredLevel(int requiredLevel) {
+        this.requiredLevel = requiredLevel;
+    }
+
+    public int getRequiredLevel() {
+        return this.requiredLevel;
     }
 
     public void setCooldownTime(int cooldownTime) {

@@ -48,8 +48,7 @@ public class DungeonServerPacket {
         ServerPlayNetworking.registerGlobalReceiver(DungeonDifficultyPacket.PACKET_ID, (payload, context) -> {
             BlockPos dungeonPortalPos = payload.portalBlockPos();
             context.server().execute(() -> {
-                if (context.player().getWorld().getBlockEntity(dungeonPortalPos) != null && context.player().getWorld().getBlockEntity(dungeonPortalPos) instanceof DungeonPortalEntity) {
-                    DungeonPortalEntity dungeonPortalEntity = (DungeonPortalEntity) context.player().getWorld().getBlockEntity(dungeonPortalPos);
+                if (context.player().getWorld().getBlockEntity(dungeonPortalPos) != null && context.player().getWorld().getBlockEntity(dungeonPortalPos) instanceof DungeonPortalEntity dungeonPortalEntity) {
 
                     if (dungeonPortalEntity.getDungeonPlayerCount() == 0) {
                         List<String> difficulties = dungeonPortalEntity.getDungeon().getDifficultyList();

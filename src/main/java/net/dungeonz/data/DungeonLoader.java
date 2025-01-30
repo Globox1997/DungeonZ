@@ -46,10 +46,11 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                 }
                 int maxGroupSize = data.get("max_group_size").getAsInt();
                 int minGroupSize = data.has("min_group_size") ? data.get("min_group_size").getAsInt() : 0;
+                int requiredLevel = data.has("required_level") ? data.get("required_level").getAsInt() : 0;
                 int cooldown = data.get("cooldown").getAsInt();
                 boolean allowElytra = data.has("elytra") ? data.get("elytra").getAsBoolean() : false;
                 boolean allowRespawn = data.has("respawn") ? data.get("respawn").getAsBoolean() : true;
-                Identifier dungeonBackgroundId = Identifier.of(data.has("background_texture") ? data.get("background_texture").getAsString() : "");
+                Identifier dungeonBackgroundId = data.has("background_texture") && !data.get("background_texture").getAsString().isEmpty() ? Identifier.of(data.get("background_texture").getAsString()) : null;
                 Identifier dungeonStructurePoolId = Identifier.of(data.get("dungeon_structure_pool_id").getAsString());
 
                 List<String> difficulties = new ArrayList<String>();
@@ -110,8 +111,8 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                         blockIdEntityMap.put(rawBlockId, entityTypes);
 
                         HashMap<String, Float> difficultyChance = new HashMap<String, Float>();
-                        for (int i = 0; i < difficulties.size(); i++) {
-                            difficultyChance.put(difficulties.get(i), specificBlockObject.get("chance").getAsJsonObject().get(difficulties.get(i)).getAsFloat());
+                        for (String difficulty : difficulties) {
+                            difficultyChance.put(difficulty, specificBlockObject.get("chance").getAsJsonObject().get(difficulty).getAsFloat());
                         }
                         blockIdEntitySpawnChance.put(rawBlockId, difficultyChance);
 
@@ -203,7 +204,7 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
 
                 Dungeon.addDungeon(new Dungeon(dungeonTypeId, blockIdEntityMap, blockIdEntitySpawnChance, blockIdBlockReplacement, spawnerEntityIdCountMap, requiredItemCountMap, breakableBlockIds,
                         placeableBlockIds, difficultyMobModificator, difficultyLootTableIds, difficultyBossModificator, difficultyBossLootTable, bossEntityType, bossNbtCompound, bossBlockId,
-                        bossLootBlockId, exitBlockId, allowRespawn, allowElytra, maxGroupSize, minGroupSize, cooldown, dungeonBackgroundId, dungeonStructurePoolId));
+                        bossLootBlockId, exitBlockId, allowRespawn, allowElytra, maxGroupSize, minGroupSize, requiredLevel, cooldown, dungeonBackgroundId, dungeonStructurePoolId));
             } catch (Exception e) {
                 DungeonzMain.LOGGER.error("Error occurred while loading resource {}. {}", id.toString(), e.toString());
             }

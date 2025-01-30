@@ -55,15 +55,14 @@ public class DungeonClientPacket {
             String difficulty = payload.difficulty();
 
             context.client().execute(() -> {
-                if (context.client().world.getBlockEntity(dungeonPortalPos) != null && context.client().world.getBlockEntity(dungeonPortalPos) instanceof DungeonPortalEntity) {
-                    DungeonPortalEntity dungeonPortalEntity = (DungeonPortalEntity) context.client().world.getBlockEntity(dungeonPortalPos);
+                if (context.client().world.getBlockEntity(dungeonPortalPos) != null && context.client().world.getBlockEntity(dungeonPortalPos) instanceof DungeonPortalEntity dungeonPortalEntity) {
                     dungeonPortalEntity.setDifficulty(difficulty);
 
-                    if (context.client().currentScreen instanceof DungeonPortalScreen) {
-                        ((DungeonPortalScreen) context.client().currentScreen).difficultyButton.setText(Text.translatable("dungeonz.difficulty." + difficulty));
+                    if (context.client().currentScreen instanceof DungeonPortalScreen dungeonPortalScreen) {
+                        dungeonPortalScreen.difficultyButton.setText(Text.translatable("dungeonz.difficulty." + difficulty));
                     }
-                    if (context.client().player.currentScreenHandler instanceof DungeonPortalScreenHandler) {
-                        ((DungeonPortalScreenHandler) context.client().player.currentScreenHandler).getDungeonPortalEntity().setDifficulty(difficulty);
+                    if (context.client().player.currentScreenHandler instanceof DungeonPortalScreenHandler dungeonPortalScreenHandler) {
+                        dungeonPortalScreenHandler.getDungeonPortalEntity().setDifficulty(difficulty);
                     }
                 }
             });
@@ -76,13 +75,11 @@ public class DungeonClientPacket {
 
             context.client().execute(() -> {
                 if (context.client().world.getBlockEntity(portalOrGatePos) != null) {
-                    if (context.client().world.getBlockEntity(portalOrGatePos) instanceof DungeonPortalEntity) {
-                        DungeonPortalEntity dungeonPortalEntity = (DungeonPortalEntity) context.client().world.getBlockEntity(portalOrGatePos);
+                    if (context.client().world.getBlockEntity(portalOrGatePos) instanceof DungeonPortalEntity dungeonPortalEntity) {
                         dungeonPortalEntity.setDungeonType(dungeonTypeOrBlockId);
                         dungeonPortalEntity.setDifficulty(difficultyOrParticleId);
                         context.client().setScreen(new DungeonPortalOpScreen(portalOrGatePos));
-                    } else if (context.client().world.getBlockEntity(portalOrGatePos) instanceof DungeonGateEntity) {
-                        DungeonGateEntity dungeonGateEntity = (DungeonGateEntity) context.client().world.getBlockEntity(portalOrGatePos);
+                    } else if (context.client().world.getBlockEntity(portalOrGatePos) instanceof DungeonGateEntity dungeonGateEntity) {
                         dungeonGateEntity.setBlockId(Identifier.of(dungeonTypeOrBlockId));
                         dungeonGateEntity.setParticleEffectId(difficultyOrParticleId);
                         dungeonGateEntity.setUnlockItemId(unlockItemId);
@@ -109,8 +106,7 @@ public class DungeonClientPacket {
                 Iterator<BlockPos> iterator = dungeonGatesPosList.iterator();
                 while (iterator.hasNext()) {
                     BlockPos pos = iterator.next();
-                    if (context.client().world.getBlockEntity(pos) != null && context.client().world.getBlockEntity(pos) instanceof DungeonGateEntity) {
-                        DungeonGateEntity dungeonGateEntity = (DungeonGateEntity) context.client().world.getBlockEntity(pos);
+                    if (context.client().world.getBlockEntity(pos) != null && context.client().world.getBlockEntity(pos) instanceof DungeonGateEntity dungeonGateEntity) {
                         dungeonGateEntity.setBlockId(Identifier.of(blockId));
                         dungeonGateEntity.setParticleEffectId(particleId);
                         dungeonGateEntity.setUnlockItemId(unlockItemId);

@@ -12,6 +12,7 @@ import net.dungeonz.network.DungeonClientPacket;
 import net.dungeonz.util.InventoryHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -57,7 +58,7 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
         this.x = (this.width / 2 - this.backgroundWidth / 2);
         this.y = (this.height / 2 - this.backgroundHeight / 2);
 
-        ((DungeonPortalScreenHandler) this.handler).addListener(this);
+        this.handler.addListener(this);
 
         final boolean playerIsInDungeonWorld = playerEntity.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD;
         Text buttonText = playerIsInDungeonWorld ? LEAVE : JOIN;
@@ -226,6 +227,11 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
             context.drawText(this.textRenderer, Text.translatable("text.dungeonz.waiting_player_list", this.handler.getWaitingGroupSize(), this.handler.getDungeonPortalEntity().getMinGroupSize()),
                     this.x + 159, this.y + 200, 0x3F3F3F, false);
         }
+        // LevelZ
+        if(DungeonzMain.isLevelZLoaded){
+            context.drawText(this.textRenderer, Text.translatable("text.dungeonz.required_level", this.handler.getDungeonPortalEntity().getRequiredLevel()), this.x + 166, this.y + 200, 0x3F3F3F, false);
+        }
+
         this.drawMouseoverTooltip(context, mouseX, mouseY);
     }
 
@@ -280,7 +286,7 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
                     text = Text.translatable("text.dungeonz.dungeon_cooldown_time", hours, minutes, seconds);
                 } else if ((DungeonPortalScreen.this.handler.getDungeonPortalEntity().getDungeonPlayerUuids().size()
                         + DungeonPortalScreen.this.handler.getDungeonPortalEntity().getDeadDungeonPlayerUUIDs().size()) >= DungeonPortalScreen.this.handler.getDungeonPortalEntity()
-                                .getMaxGroupSize()) {
+                        .getMaxGroupSize()) {
                     text = Text.translatable("text.dungeonz.dungeon_full");
                 } else if (client.player != null && !DungeonPortalScreen.this.handler.getDungeonPortalEntity().getDeadDungeonPlayerUUIDs().isEmpty()
                         && DungeonPortalScreen.this.handler.getDungeonPortalEntity().getDeadDungeonPlayerUUIDs().contains(client.player.getUuid())) {
