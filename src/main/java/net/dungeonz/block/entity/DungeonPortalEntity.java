@@ -344,7 +344,7 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
     public DungeonPortalPacket getScreenOpeningData(ServerPlayerEntity player) {
         List<String> difficulties = new ArrayList<String>();
         Map<String, List<ItemStack>> possibleLoot = new HashMap<>();
-        List<ItemStack> requiredItemStacks = new ArrayList<ItemStack>();
+        Map<String, List<ItemStack>> requiredItemStacks = new HashMap<>();
         Optional<Identifier> backgroundId = Optional.empty();
         int requiredLevel = 0;
         if (this.getDungeon() != null) {

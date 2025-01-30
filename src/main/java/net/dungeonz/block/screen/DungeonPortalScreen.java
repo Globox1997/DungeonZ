@@ -97,7 +97,7 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
             this.effectButton.active = false;
             this.privateButton.active = false;
         } else {
-            if (this.handler.getDungeonPortalEntity().getDungeonPlayerUuids().size() > 0) {
+            if (!this.handler.getDungeonPortalEntity().getDungeonPlayerUuids().isEmpty()) {
                 this.difficultyButton.active = false;
                 this.effectButton.active = false;
                 this.privateButton.active = false;
@@ -107,13 +107,13 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
                 this.privateButton.active = true;
             }
             if ((this.handler.getDungeonPortalEntity().getDungeonPlayerUuids().size() + this.handler.getDungeonPortalEntity().getDeadDungeonPlayerUUIDs().size()) < this.handler
-                    .getDungeonPortalEntity().getMaxGroupSize() && InventoryHelper.hasRequiredItemStacks(this.playerEntity.getInventory(), this.handler.getRequiredItemStacks())
+                    .getDungeonPortalEntity().getMaxGroupSize() && InventoryHelper.hasRequiredItemStacks(this.playerEntity.getInventory(), this.handler.getRequiredItemStacks().get(this.handler.getDungeonPortalEntity().getDifficulty()))
                     && !this.handler.getDungeonPortalEntity().getDeadDungeonPlayerUUIDs().contains(this.playerEntity.getUuid())) {
                 this.dungeonButton.active = true;
             } else {
                 this.dungeonButton.active = false;
             }
-            if (this.dungeonButton.active && this.privateButton.enabled && this.handler.getDungeonPortalEntity().getDungeonPlayerUuids().size() > 0) {
+            if (this.dungeonButton.active && this.privateButton.enabled && !this.handler.getDungeonPortalEntity().getDungeonPlayerUuids().isEmpty()) {
                 if (DungeonzMain.isPartyAddonLoaded) {
                     GroupManager groupManager = ((GroupManagerAccess) this.playerEntity).getGroupManager();
                     if (groupManager.getGroupPlayerIdList().isEmpty() || !groupManager.getGroupPlayerIdList().contains(this.handler.getDungeonPortalEntity().getDungeonPlayerUuids().get(0))) {
@@ -182,15 +182,16 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
         // Required items
         context.drawText(this.textRenderer, Text.translatable("text.dungeonz.required"), this.x + 139, this.y + 100, 0x3F3F3F, false);
         context.drawTexture(ICONS, this.x + 142 + this.textRenderer.getWidth(Text.translatable("text.dungeonz.required")), this.y + 97,
-                52 + (InventoryHelper.hasRequiredItemStacks(this.playerEntity.getInventory(), this.handler.getRequiredItemStacks()) ? 0 : 14), 0, 14, 14);
+                52 + (InventoryHelper.hasRequiredItemStacks(this.playerEntity.getInventory(), this.handler.getRequiredItemStacks().get(this.handler.getDungeonPortalEntity().getDifficulty())) ? 0 : 14), 0, 14, 14);
 
-        if (this.handler.getRequiredItemStacks().size() > 0) {
+        if (!this.handler.getRequiredItemStacks().get(this.handler.getDungeonPortalEntity().getDifficulty()).isEmpty()) {
             int l = 0;
-            for (int i = 0; i < this.handler.getRequiredItemStacks().size(); i++) {
-                context.drawItem(this.handler.getRequiredItemStacks().get(i), this.x + 144 + l, this.y + 112);
-                context.drawItemInSlot(this.textRenderer, this.handler.getRequiredItemStacks().get(i), this.x + 144 + l, this.y + 112);
+
+            for (ItemStack stack : this.handler.getRequiredItemStacks().get(this.handler.getDungeonPortalEntity().getDifficulty())) {
+                context.drawItem(stack, this.x + 144 + l, this.y + 112);
+                context.drawItemInSlot(this.textRenderer, stack, this.x + 144 + l, this.y + 112);
                 if (this.isPointWithinBounds(144 + l, 112, 16, 16, mouseX, mouseY)) {
-                    context.drawTooltip(this.textRenderer, this.handler.getRequiredItemStacks().get(i).getName(), mouseX, mouseY);
+                    context.drawTooltip(this.textRenderer, stack.getName(), mouseX, mouseY);
                 }
                 l += 18;
             }
@@ -228,7 +229,7 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
                     this.x + 159, this.y + 200, 0x3F3F3F, false);
         }
         // LevelZ
-        if(DungeonzMain.isLevelZLoaded){
+        if (DungeonzMain.isLevelZLoaded) {
             context.drawText(this.textRenderer, Text.translatable("text.dungeonz.required_level", this.handler.getDungeonPortalEntity().getRequiredLevel()), this.x + 166, this.y + 200, 0x3F3F3F, false);
         }
 
@@ -291,7 +292,7 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
                 } else if (client.player != null && !DungeonPortalScreen.this.handler.getDungeonPortalEntity().getDeadDungeonPlayerUUIDs().isEmpty()
                         && DungeonPortalScreen.this.handler.getDungeonPortalEntity().getDeadDungeonPlayerUUIDs().contains(client.player.getUuid())) {
                     text = Text.translatable("text.dungeonz.dead_player");
-                } else if (!InventoryHelper.hasRequiredItemStacks(client.player.getInventory(), DungeonPortalScreen.this.handler.getRequiredItemStacks())) {
+                } else if (!InventoryHelper.hasRequiredItemStacks(client.player.getInventory(), DungeonPortalScreen.this.handler.getRequiredItemStacks().get(DungeonPortalScreen.this.handler.getDungeonPortalEntity().getDifficulty()))) {
                     text = Text.translatable("text.dungeonz.missing");
                 }
                 if (text != null) {

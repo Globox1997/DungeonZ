@@ -14,7 +14,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
 public record DungeonPortalPacket(BlockPos blockPos, List<UUID> playerUuids, List<UUID> deadPlayerUuids, List<String> difficulties, Map<String, List<ItemStack>> possibleLoot,
-                                  List<ItemStack> requiredItemStacks, int maxGroupSize, int minGroupSize, int waitingPlayerCount, int requiredLevel, int cooldownTime, String difficulty,
+                                  Map<String, List<ItemStack>> requiredItemStacks, int maxGroupSize, int minGroupSize, int waitingPlayerCount, int requiredLevel, int cooldownTime, String difficulty,
                                   boolean disableEffects, boolean privateGroup, Optional<Identifier> backgroundId)
         implements CustomPayload {
 
@@ -26,8 +26,7 @@ public record DungeonPortalPacket(BlockPos blockPos, List<UUID> playerUuids, Lis
         buf.writeCollection(value.deadPlayerUuids, (buffer, uuid) -> buffer.writeUuid(uuid));
         buf.writeCollection(value.difficulties, PacketByteBuf::writeString);
         buf.writeMap(value.possibleLoot, PacketByteBuf::writeString, (buffer, stacks) -> ItemStack.LIST_PACKET_CODEC.encode(buf, stacks));
-
-        ItemStack.LIST_PACKET_CODEC.encode(buf, value.requiredItemStacks);
+        buf.writeMap(value.requiredItemStacks, PacketByteBuf::writeString, (buffer, stacks) -> ItemStack.LIST_PACKET_CODEC.encode(buf, stacks));
         buf.writeInt(value.maxGroupSize);
         buf.writeInt(value.minGroupSize);
         buf.writeInt(value.waitingPlayerCount);
@@ -39,7 +38,8 @@ public record DungeonPortalPacket(BlockPos blockPos, List<UUID> playerUuids, Lis
         buf.writeOptional(value.backgroundId, PacketByteBuf::writeIdentifier);
 
     }, buf -> new DungeonPortalPacket(buf.readBlockPos(), buf.readList((buffer) -> PacketByteBuf.readUuid(buffer)), buf.readList((buffer) -> PacketByteBuf.readUuid(buffer)),
-            buf.readList(PacketByteBuf::readString), buf.readMap(PacketByteBuf::readString, (bufx) -> ItemStack.LIST_PACKET_CODEC.decode(buf)), ItemStack.LIST_PACKET_CODEC.decode(buf), buf.readInt(),
+            buf.readList(PacketByteBuf::readString), buf.readMap(PacketByteBuf::readString, (bufx) -> ItemStack.LIST_PACKET_CODEC.decode(buf)),
+            buf.readMap(PacketByteBuf::readString, (bufx) -> ItemStack.LIST_PACKET_CODEC.decode(buf)), buf.readInt(),
             buf.readInt(), buf.readInt(), buf.readInt(), buf.readInt(), buf.readString(), buf.readBoolean(), buf.readBoolean(), buf.readOptional(PacketByteBuf::readIdentifier)));
 
     @Override

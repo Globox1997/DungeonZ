@@ -184,17 +184,31 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                 JsonObject requiredObject = data.get("required").getAsJsonObject();
                 Iterator<String> requiredIterator = requiredObject.keySet().iterator();
 
-                HashMap<Integer, Integer> requiredItemCountMap = new HashMap<Integer, Integer>();
+                HashMap<String, HashMap<Integer, Integer>> difficultyRequiredItemCountMap = new HashMap<>();
 
                 while (requiredIterator.hasNext()) {
-                    String itemString = requiredIterator.next();
-                    Identifier itemIdentifier = Identifier.of(itemString);
-
-                    if (Registries.ITEM.get(itemIdentifier).toString().equals("air")) {
-                        DungeonzMain.LOGGER.warn("{} is not a valid item identifier", itemString);
+                    String difficulty = requiredIterator.next();
+                    if (!difficulties.contains(difficulty)) {
+                        DungeonzMain.LOGGER.warn("{} is not a valid difficulty at the required list", difficulty);
                         continue;
                     }
-                    requiredItemCountMap.put(Registries.ITEM.getRawId(Registries.ITEM.get(itemIdentifier)), requiredObject.get(itemString).getAsInt());
+
+                    HashMap<Integer, Integer> requiredItemCountMap = new HashMap<>();
+
+                    for (String itemString : requiredObject.get(difficulty).getAsJsonObject().keySet()) {
+                        Identifier itemIdentifier = Identifier.of(itemString);
+                        if (Registries.ITEM.get(itemIdentifier).toString().equals("air")) {
+                            DungeonzMain.LOGGER.warn("{} is not a valid item identifier", itemString);
+                            continue;
+                        }
+                        requiredItemCountMap.put(Registries.ITEM.getRawId(Registries.ITEM.get(itemIdentifier)), requiredObject.get(difficulty).getAsJsonObject().get(itemString).getAsInt());
+                    }
+                    difficultyRequiredItemCountMap.put(difficulty, requiredItemCountMap);
+                }
+                for (String difficulty : difficulties) {
+                    if (!difficultyRequiredItemCountMap.containsKey(difficulty)) {
+                        difficultyRequiredItemCountMap.put(difficulty, new HashMap<>());
+                    }
                 }
 
                 if (bossEntityType == null) {
@@ -202,7 +216,7 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                     return;
                 }
 
-                Dungeon.addDungeon(new Dungeon(dungeonTypeId, blockIdEntityMap, blockIdEntitySpawnChance, blockIdBlockReplacement, spawnerEntityIdCountMap, requiredItemCountMap, breakableBlockIds,
+                Dungeon.addDungeon(new Dungeon(dungeonTypeId, blockIdEntityMap, blockIdEntitySpawnChance, blockIdBlockReplacement, spawnerEntityIdCountMap, difficultyRequiredItemCountMap, breakableBlockIds,
                         placeableBlockIds, difficultyMobModificator, difficultyLootTableIds, difficultyBossModificator, difficultyBossLootTable, bossEntityType, bossNbtCompound, bossBlockId,
                         bossLootBlockId, exitBlockId, allowRespawn, allowElytra, maxGroupSize, minGroupSize, requiredLevel, cooldown, dungeonBackgroundId, dungeonStructurePoolId));
             } catch (Exception e) {

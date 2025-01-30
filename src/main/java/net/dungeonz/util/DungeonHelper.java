@@ -69,21 +69,21 @@ public class DungeonHelper {
         return null;
     }
 
-    public static List<ItemStack> getRequiredItemStackList(Dungeon dungeon) {
-        List<ItemStack> requiredItemStackList = new ArrayList<ItemStack>();
-        Iterator<Entry<Integer, Integer>> requiredItemIterator = dungeon.getRequiredItemCountMap().entrySet().iterator();
-        while (requiredItemIterator.hasNext()) {
-            Entry<Integer, Integer> entry = requiredItemIterator.next();
-            requiredItemStackList.add(new ItemStack(Registries.ITEM.get(entry.getKey()), entry.getValue()));
+    public static Map<String, List<ItemStack>> getRequiredItemStackList(Dungeon dungeon) {
+        Map<String, List<ItemStack>> requiredItemStackList = new HashMap<>();
+        for (Entry<String, HashMap<Integer, Integer>> entry : dungeon.getDifficultyRequiredItemCountMap().entrySet()) {
+            List<ItemStack> stacks = new ArrayList<>();
+            for (Entry<Integer, Integer> itemIdEntry : entry.getValue().entrySet()) {
+                stacks.add(new ItemStack(Registries.ITEM.get(itemIdEntry.getKey()), itemIdEntry.getValue()));
+            }
+            requiredItemStackList.put(entry.getKey(), stacks);
         }
         return requiredItemStackList;
     }
 
     public static Map<String, List<ItemStack>> getPossibleLootItemStackMap(Dungeon dungeon, MinecraftServer server) {
         HashMap<String, List<ItemStack>> possibleLootItemStackMap = new HashMap<String, List<ItemStack>>();
-        Iterator<Entry<String, String>> lootTableIterator = dungeon.getDifficultyBossLootTableMap().entrySet().iterator();
-        while (lootTableIterator.hasNext()) {
-            Entry<String, String> entry = lootTableIterator.next();
+        for (Entry<String, String> entry : dungeon.getDifficultyBossLootTableMap().entrySet()) {
             LootTable lootTable = server.getReloadableRegistries().getLootTable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(entry.getValue())));
             LootContextParameterSet.Builder builder = new LootContextParameterSet.Builder(server.getOverworld()).add(LootContextParameters.ORIGIN,
                     server.getOverworld().getPlayers().get(server.getOverworld().getRandom().nextInt(server.getOverworld().getPlayers().size())).getPos());
@@ -97,9 +97,9 @@ public class DungeonHelper {
                         inventory.getStack(i).setDamage(0);
                     }
                     boolean contains = false;
-                    for (int u = 0; u < itemStacks.size(); u++) {
-                        if (ItemStack.areItemsEqual(itemStacks.get(u), inventory.getStack(i))) {
-                            itemStacks.get(u).increment(inventory.getStack(i).getCount());
+                    for (ItemStack itemStack : itemStacks) {
+                        if (ItemStack.areItemsEqual(itemStack, inventory.getStack(i))) {
+                            itemStack.increment(inventory.getStack(i).getCount());
                             contains = true;
                             break;
                         }
@@ -150,11 +150,13 @@ public class DungeonHelper {
                             }
                         }
                         if (!player.isCreative()) {
-                            if (InventoryHelper.hasRequiredItemStacks(player.getInventory(), DungeonHelper.getRequiredItemStackList(dungeonPortalEntity.getDungeon()))) {
-                                InventoryHelper.decrementRequiredItemStacks(player.getInventory(), DungeonHelper.getRequiredItemStackList(dungeonPortalEntity.getDungeon()));
-                            } else {
-                                player.sendMessage(Text.translatable("text.dungeonz.missing"), false);
-                                return;
+                            if (DungeonHelper.getRequiredItemStackList(dungeonPortalEntity.getDungeon()).containsKey(dungeonPortalEntity.getDifficulty())) {
+                                if (InventoryHelper.hasRequiredItemStacks(player.getInventory(), DungeonHelper.getRequiredItemStackList(dungeonPortalEntity.getDungeon()).get(dungeonPortalEntity.getDifficulty()))) {
+                                    InventoryHelper.decrementRequiredItemStacks(player.getInventory(), DungeonHelper.getRequiredItemStackList(dungeonPortalEntity.getDungeon()).get(dungeonPortalEntity.getDifficulty()));
+                                } else {
+                                    player.sendMessage(Text.translatable("text.dungeonz.missing"), false);
+                                    return;
+                                }
                             }
                         }
                         if (!dungeonPortalEntity.getWaitingUuids().isEmpty() && dungeonPortalEntity.getWaitingUuids().contains(player.getUuid())) {

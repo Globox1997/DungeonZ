@@ -78,8 +78,16 @@ If you know how to create one, the folder path has to be ```data\dungeonz\dungeo
     "placeable": [ // block ids which can be placed in the dungeon by the player
         "minecraft:torch"
     ],
-    "required": { // Items which get consumed after joining the dungeon
-        "minecraft:stick": 3
+    "required": { // Since v1.2.0 items which get consumed after joining the dungeon per difficulty
+      "easy": {
+        "minecraft:diamond": 1
+      },
+      "normal": {
+        "minecraft:diamond": 2
+      },
+      "hard": {
+        "minecraft:diamond": 4
+      }
     },
     "respawn": false,
     "elytra": false,

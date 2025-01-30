@@ -173,7 +173,15 @@
         "minecraft:torch"
     ],
     "required": {
-        "minecraft:diamond": 5
+        "easy": {
+            "minecraft:diamond": 3
+        },
+        "normal": {
+            "minecraft:diamond": 5
+        },
+        "hard": {
+            "minecraft:diamond": 6
+        }
     },
     "respawn":true,
     "elytra": false,

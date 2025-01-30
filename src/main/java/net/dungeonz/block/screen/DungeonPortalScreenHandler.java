@@ -29,7 +29,7 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
 
     private List<String> difficulties = new ArrayList<String>();
     private Map<String, List<ItemStack>> possibleLootDifficultyItemStackMap = new HashMap<String, List<ItemStack>>();
-    private List<ItemStack> requiredItemStacks = new ArrayList<ItemStack>();
+    private Map<String, List<ItemStack>> requiredItemStacks = new HashMap<String, List<ItemStack>>();
     private int waitingGroupSize = 0;
     @Nullable
     private Identifier backgroundId = null;
@@ -111,11 +111,11 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         this.possibleLootDifficultyItemStackMap = possibleLootDifficultyItemStackMap;
     }
 
-    public List<ItemStack> getRequiredItemStacks() {
+    public Map<String, List<ItemStack>> getRequiredItemStacks() {
         return this.requiredItemStacks;
     }
 
-    public void setRequiredItemStacks(List<ItemStack> requiredItemStacks) {
+    public void setRequiredItemStacks(Map<String, List<ItemStack>> requiredItemStacks) {
         this.requiredItemStacks = requiredItemStacks;
     }
 

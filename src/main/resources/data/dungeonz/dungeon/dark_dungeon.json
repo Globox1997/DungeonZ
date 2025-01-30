@@ -121,7 +121,15 @@
         "minecraft:torch"
     ],
     "required": {
-        "minecraft:diamond": 3
+        "easy": {
+            "minecraft:diamond": 1
+        },
+        "normal": {
+            "minecraft:diamond": 2
+        },
+        "hard": {
+            "minecraft:diamond": 4
+        }
     },
     "elytra": false,
     "max_group_size": 5,
