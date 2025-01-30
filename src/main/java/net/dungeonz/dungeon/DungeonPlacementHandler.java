@@ -68,7 +68,7 @@ import net.rpgdifficulty.api.MobStrengthener;
 public class DungeonPlacementHandler {
 
     public static TeleportTarget enter(ServerPlayerEntity serverPlayerEntity, ServerWorld dungeonWorld, ServerWorld oldWorld, DungeonPortalEntity portalEntity, BlockPos portalPos, String difficulty,
-            boolean disableEffects) {
+                                       boolean disableEffects) {
         BlockPos playerBlockPos = serverPlayerEntity.getBlockPos().mutableCopy();
 
         if (oldWorld.getBlockState(playerBlockPos).isOf(BlockInit.DUNGEON_PORTAL) || oldWorld.getBlockState(playerBlockPos.down()).isOf(BlockInit.DUNGEON_PORTAL)) {
@@ -113,7 +113,7 @@ public class DungeonPlacementHandler {
     }
 
     private static boolean generate(ServerWorld world, DungeonPortalEntity portalEntity, Dungeon dungeon, RegistryEntry<StructurePool> structurePool, Identifier id, int size, BlockPos pos,
-            boolean keepJigsaws) {
+                                    boolean keepJigsaws) {
         ChunkGenerator chunkGenerator = world.getChunkManager().getChunkGenerator();
         StructureTemplateManager structureTemplateManager = world.getStructureTemplateManager();
         StructureAccessor structureAccessor = world.getStructureAccessor();
@@ -134,11 +134,10 @@ public class DungeonPlacementHandler {
 
             StructurePiecesCollector structurePiecesCollector = optional.get().generate();
             for (StructurePiece structurePiece : structurePiecesCollector.toList().pieces()) {
-                if (!(structurePiece instanceof PoolStructurePiece)) {
+                if (!(structurePiece instanceof PoolStructurePiece poolStructurePiece)) {
                     continue;
                 }
-                PoolStructurePiece poolStructurePiece = (PoolStructurePiece) structurePiece;
-                poolStructurePiece.generate((StructureWorldAccess) world, structureAccessor, chunkGenerator, random, BlockBox.infinite(), pos, keepJigsaws);
+                poolStructurePiece.generate(world, structureAccessor, chunkGenerator, random, BlockBox.infinite(), pos, keepJigsaws);
 
                 portalEntity.addDungeonEdge(poolStructurePiece.getBoundingBox().getMinX(), poolStructurePiece.getBoundingBox().getMinY(), poolStructurePiece.getBoundingBox().getMinZ());
                 portalEntity.addDungeonEdge(poolStructurePiece.getBoundingBox().getMaxX(), poolStructurePiece.getBoundingBox().getMaxY(), poolStructurePiece.getBoundingBox().getMaxZ());
@@ -177,7 +176,7 @@ public class DungeonPlacementHandler {
                                                 poolStructurePiece.getBoundingBox().getMaxZ());
                                         dungeonGateEntity.markDirty();
                                     }
-                                } else if (state.getBlock() instanceof @SuppressWarnings("unused") FallingBlock fallingBlock) {
+                                } else if (state.getBlock() instanceof @SuppressWarnings("unused")FallingBlock fallingBlock) {
 
                                 }
                             }
@@ -216,8 +215,8 @@ public class DungeonPlacementHandler {
                 }
             }
         }
-        for (int i = 0; i < chunkPosList.size(); i++) {
-            dungeonWorld.getChunkManager().addTicket(ChunkTicketType.PORTAL, chunkPosList.get(i), 1, chunkPosList.get(i).getStartPos());
+        for (ChunkPos chunkPos : chunkPosList) {
+            dungeonWorld.getChunkManager().addTicket(ChunkTicketType.PORTAL, chunkPos, 1, chunkPos.getStartPos());
         }
     }
 
@@ -247,18 +246,16 @@ public class DungeonPlacementHandler {
                     new Box(portalEntity.getDungeonEdgeList().get(6 * u), portalEntity.getDungeonEdgeList().get(1 + 6 * u), portalEntity.getDungeonEdgeList().get(2 + 6 * u),
                             portalEntity.getDungeonEdgeList().get(3 + 6 * u), portalEntity.getDungeonEdgeList().get(4 + 6 * u), portalEntity.getDungeonEdgeList().get(5 + 6 * u)));
 
-            for (int i = 0; i < entities.size(); i++) {
-                if (!(entities.get(i) instanceof ServerPlayerEntity)
-                        && (entities.get(i) instanceof LivingEntity || entities.get(i) instanceof ItemEntity || entities.get(i) instanceof ProjectileEntity)) {
-                    entities.get(i).discard();
+            for (Entity entity : entities) {
+                if (!(entity instanceof ServerPlayerEntity)
+                        && (entity instanceof LivingEntity || entity instanceof ItemEntity || entity instanceof ProjectileEntity)) {
+                    entity.discard();
                 }
             }
         }
         portalEntity.setDifficulty(difficulty);
 
-        Iterator<Entry<Integer, ArrayList<BlockPos>>> iterator = portalEntity.getBlockMap().entrySet().iterator();
-        while (iterator.hasNext()) {
-            Entry<Integer, ArrayList<BlockPos>> entry = iterator.next();
+        for (Entry<Integer, ArrayList<BlockPos>> entry : portalEntity.getBlockMap().entrySet()) {
             for (int i = 0; i < entry.getValue().size(); i++) {
                 if (dungeon.getBlockIdBlockReplacementMap().get(entry.getKey()) != -1) {
                     if (dungeon.getBlockIdBlockReplacementMap().get(entry.getKey()) == 0) {
@@ -322,17 +319,13 @@ public class DungeonPlacementHandler {
                         : Registries.BLOCK.get(dungeon.getBossLootBlockId()).getDefaultState(),
                 3);
         // Refresh spawner
-        Iterator<Entry<BlockPos, Integer>> spawnerPosIterator = portalEntity.getSpawnerPosEntityIdMap().entrySet().iterator();
-        while (spawnerPosIterator.hasNext()) {
-            Entry<BlockPos, Integer> entry = spawnerPosIterator.next();
+        for (Entry<BlockPos, Integer> entry : portalEntity.getSpawnerPosEntityIdMap().entrySet()) {
             world.setBlockState(entry.getKey(), BlockInit.DUNGEON_SPAWNER.getDefaultState(), 3);
             ((DungeonSpawnerEntity) world.getBlockEntity(entry.getKey())).getLogic().setDungeonInfo(dungeon, difficulty,
                     dungeon.getSpawnerEntityIdMap().containsKey(entry.getValue()) ? dungeon.getSpawnerEntityIdMap().get(entry.getValue()) : 0, Registries.ENTITY_TYPE.get(entry.getValue()));
         }
         // Refresh blocks
-        Iterator<Entry<BlockPos, Integer>> replaceBlockIterator = portalEntity.getReplaceBlockIdMap().entrySet().iterator();
-        while (replaceBlockIterator.hasNext()) {
-            Entry<BlockPos, Integer> entry = replaceBlockIterator.next();
+        for (Entry<BlockPos, Integer> entry : portalEntity.getReplaceBlockIdMap().entrySet()) {
             world.setBlockState(entry.getKey(), Registries.BLOCK.get(entry.getValue()).getDefaultState(), 3);
         }
         portalEntity.getDungeonPlayerUuids().clear();
