@@ -13,6 +13,8 @@ import net.dungeonz.util.InventoryHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
+import net.levelz.access.LevelManagerAccess;
+import net.levelz.level.LevelManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -112,6 +114,12 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
                 this.dungeonButton.active = true;
             } else {
                 this.dungeonButton.active = false;
+            }
+            if (this.dungeonButton.active && DungeonzMain.isLevelZLoaded) {
+                LevelManager levelManager = ((LevelManagerAccess) this.playerEntity).getLevelManager();
+                if (levelManager.getOverallLevel() < this.handler.getDungeonPortalEntity().getRequiredLevel()) {
+                    this.dungeonButton.active = false;
+                }
             }
             if (this.dungeonButton.active && this.privateButton.enabled && !this.handler.getDungeonPortalEntity().getDungeonPlayerUuids().isEmpty()) {
                 if (DungeonzMain.isPartyAddonLoaded) {
@@ -294,6 +302,11 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
                     text = Text.translatable("text.dungeonz.dead_player");
                 } else if (!InventoryHelper.hasRequiredItemStacks(client.player.getInventory(), DungeonPortalScreen.this.handler.getRequiredItemStacks().get(DungeonPortalScreen.this.handler.getDungeonPortalEntity().getDifficulty()))) {
                     text = Text.translatable("text.dungeonz.missing");
+                } else if (DungeonzMain.isLevelZLoaded) {
+                    LevelManager levelManager = ((LevelManagerAccess) DungeonPortalScreen.this.playerEntity).getLevelManager();
+                    if (levelManager.getOverallLevel() < DungeonPortalScreen.this.handler.getDungeonPortalEntity().getRequiredLevel()) {
+                        text = Text.translatable("text.dungeonz.required_level", DungeonPortalScreen.this.handler.getDungeonPortalEntity().getRequiredLevel());
+                    }
                 }
                 if (text != null) {
                     context.drawTooltip(textRenderer, text, mouseX, mouseY);

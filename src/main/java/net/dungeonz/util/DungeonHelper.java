@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.Map.Entry;
 
+import net.dungeonz.block.screen.DungeonPortalScreen;
+import net.levelz.access.LevelManagerAccess;
+import net.levelz.level.LevelManager;
 import org.jetbrains.annotations.Nullable;
 
 import net.dungeonz.DungeonzMain;
@@ -162,6 +165,13 @@ public class DungeonHelper {
                         if (!dungeonPortalEntity.getWaitingUuids().isEmpty() && dungeonPortalEntity.getWaitingUuids().contains(player.getUuid())) {
                             player.closeHandledScreen();
                             return;
+                        }
+                        if (DungeonzMain.isLevelZLoaded) {
+                            LevelManager levelManager = ((LevelManagerAccess) player).getLevelManager();
+                            if (levelManager.getOverallLevel() < dungeonPortalEntity.getRequiredLevel()) {
+                                player.sendMessage(Text.translatable("text.dungeonz.required_level", dungeonPortalEntity.getRequiredLevel()), false);
+                                return;
+                            }
                         }
                         if (dungeonPortalEntity.getDungeonPlayerCount() <= 0 && requiredMinGroupUuid != null && dungeonPortalEntity.getMinGroupSize() > 1) {
                             dungeonPortalEntity.addWaitingUuid(requiredMinGroupUuid);
