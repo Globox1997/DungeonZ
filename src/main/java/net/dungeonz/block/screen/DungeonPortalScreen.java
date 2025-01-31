@@ -33,11 +33,11 @@ import net.partyaddon.group.GroupManager;
 @Environment(EnvType.CLIENT)
 public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandler> implements ScreenHandlerListener {
 
-    private static Identifier TEXTURE = Identifier.of("dungeonz:textures/gui/dungeon_portal.png");
     private static final Identifier ICONS = Identifier.of("dungeonz:textures/gui/dungeon_icons.png");
     private static final Text JOIN = Text.translatable("dungeon.task.join");
     private static final Text LEAVE = Text.translatable("dungeon.task.leave");
 
+    private final Identifier texture;
     public DungeonDifficultyButton difficultyButton;
     private DungeonButton dungeonButton;
     private DungeonSliderButton effectButton;
@@ -47,7 +47,7 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
     public DungeonPortalScreen(DungeonPortalScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
         this.playerEntity = inventory.player;
-        TEXTURE = handler.getBackgroundId() != null ? handler.getBackgroundId() : TEXTURE;
+        texture = handler.getBackgroundId() != null ? handler.getBackgroundId() : Identifier.of("dungeonz:textures/gui/dungeon_portal.png");
         this.backgroundWidth = 256;
         this.backgroundHeight = 222;
     }
@@ -238,7 +238,7 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
 
     @Override
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        context.drawTexture(TEXTURE, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        context.drawTexture(texture, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
     }
 
     @Override
