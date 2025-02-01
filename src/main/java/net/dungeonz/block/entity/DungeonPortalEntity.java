@@ -96,70 +96,86 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
             for (int i = 0; i < nbt.getInt("BlockMapSize"); i++) {
                 ArrayList<BlockPos> posList = new ArrayList<>();
                 for (int u = 0; u < nbt.getInt("BlockListSize" + i); u++) {
-                    posList.add(new BlockPos(nbt.getInt("BlockPosX" + i + "" + u), nbt.getInt("BlockPosY" + i + "" + u), nbt.getInt("BlockPosZ" + i + "" + u)));
+                    int[] blockPos = nbt.getIntArray("BlockPos" + i + "" + u);
+                    posList.add(new BlockPos(blockPos[0], blockPos[1], blockPos[2]));
                 }
                 this.blockBlockPosMap.put(nbt.getInt("BlockId" + i), posList);
             }
         }
 
-        this.bossBlockPos = new BlockPos(nbt.getInt("BossPosX"), nbt.getInt("BossPosY"), nbt.getInt("BossPosZ"));
-        this.bossLootBlockPos = new BlockPos(nbt.getInt("BossLootPosX"), nbt.getInt("BossLootPosY"), nbt.getInt("BossLootPosZ"));
+        int[] bossPos = nbt.getIntArray("BossPos");
+        if (bossPos.length > 0) {
+            this.bossBlockPos = new BlockPos(bossPos[0], bossPos[1], bossPos[2]);
+        }
+        int[] bossLootPos = nbt.getIntArray("BossLootPos");
+        if (bossLootPos.length > 0) {
+            this.bossLootBlockPos = new BlockPos(bossLootPos[0], bossLootPos[1], bossLootPos[2]);
+        }
 
         if (nbt.getInt("ChestListSize") > 0) {
             this.chestPosList.clear();
             for (int i = 0; i < nbt.getInt("ChestListSize"); i++) {
-                this.chestPosList.add(new BlockPos(nbt.getInt("ChestPosX" + i), nbt.getInt("ChestPosY" + i), nbt.getInt("ChestPosZ" + i)));
+                int[] chestPos = nbt.getIntArray("ChestPos" + i);
+                this.chestPosList.add(new BlockPos(chestPos[0], chestPos[1], chestPos[2]));
             }
         }
 
         if (nbt.getInt("ExitListSize") > 0) {
             this.exitPosList.clear();
             for (int i = 0; i < nbt.getInt("ExitListSize"); i++) {
-                this.exitPosList.add(new BlockPos(nbt.getInt("ExitPosX" + i), nbt.getInt("ExitPosY" + i), nbt.getInt("ExitPosZ" + i)));
+                int[] exitPos = nbt.getIntArray("ExitPos" + i);
+                this.exitPosList.add(new BlockPos(exitPos[0], exitPos[1], exitPos[2]));
             }
         }
 
         if (nbt.getInt("SpawnerMapSize") > 0) {
             this.spawnerPosEntityIdMap.clear();
             for (int i = 0; i < nbt.getInt("SpawnerListSize"); i++) {
-                this.spawnerPosEntityIdMap.put(new BlockPos(nbt.getInt("SpawnerPosX" + i), nbt.getInt("SpawnerPosY" + i), nbt.getInt("SpawnerPosZ" + i)), nbt.getInt("SpawnerEntityId" + i));
+                int[] spawnerPos = nbt.getIntArray("SpawnerPos" + i);
+                this.spawnerPosEntityIdMap.put(new BlockPos(spawnerPos[0], spawnerPos[1], spawnerPos[2]), spawnerPos[3]);
             }
         }
 
         if (nbt.getInt("ReplacePosSize") > 0) {
             this.replacePosBlockIdMap.clear();
             for (int i = 0; i < nbt.getInt("ReplacePosSize"); i++) {
-                this.replacePosBlockIdMap.put(new BlockPos(nbt.getInt("ReplacePosX" + i), nbt.getInt("ReplacePosY" + i), nbt.getInt("ReplacePosZ" + i)), nbt.getInt("ReplaceBlockId" + i));
+                int[] replacePos = nbt.getIntArray("ReplacePos" + i);
+                this.replacePosBlockIdMap.put(new BlockPos(replacePos[0], replacePos[1], replacePos[2]), replacePos[3]);
             }
         }
 
         if (nbt.getInt("MovingPosSize") > 0) {
             this.movingBlockMap.clear();
             for (int i = 0; i < nbt.getInt("MovingPosSize"); i++) {
-                this.movingBlockMap.put(new BlockPos(nbt.getInt("MovingPosX" + i), nbt.getInt("MovingPosY" + i), nbt.getInt("MovingPosZ" + i)), nbt.getInt("MovingBlockId" + i));
+                int[] movingPos = nbt.getIntArray("MovingPos" + i);
+                this.movingBlockMap.put(new BlockPos(movingPos[0], movingPos[1], movingPos[2]), movingPos[3]);
             }
         }
 
         if (nbt.getInt("PoweredPosSize") > 0) {
             this.poweredBlockMap.clear();
             for (int i = 0; i < nbt.getInt("PoweredPosSize"); i++) {
-                this.poweredBlockMap.put(new BlockPos(nbt.getInt("PoweredPosX" + i), nbt.getInt("PoweredPosY" + i), nbt.getInt("PoweredPosZ" + i)), new Powered(nbt.getInt("PoweredBlockId" + i), nbt.getBoolean("PoweredBlock" + i), nbt.getInt("PoweredBlockFacing" + i)));
+                int[] poweredPos = nbt.getIntArray("PoweredPos" + i);
+                boolean isPowered = poweredPos[4] == 1;
+                this.poweredBlockMap.put(new BlockPos(poweredPos[0], poweredPos[1], poweredPos[2]), new Powered(poweredPos[3], isPowered, poweredPos[5]));
             }
         }
 
         if (nbt.getInt("DungeonEdgeSize") > 0) {
             this.dungeonEdgeList.clear();
             for (int i = 0; i < nbt.getInt("DungeonEdgeSize") / 3; i++) {
-                this.dungeonEdgeList.add(nbt.getInt("DungeonEdgeX" + i));
-                this.dungeonEdgeList.add(nbt.getInt("DungeonEdgeY" + i));
-                this.dungeonEdgeList.add(nbt.getInt("DungeonEdgeZ" + i));
+                int[] dungeonEdgePos = nbt.getIntArray("DungeonEdge" + i);
+                this.dungeonEdgeList.add(dungeonEdgePos[0]);
+                this.dungeonEdgeList.add(dungeonEdgePos[1]);
+                this.dungeonEdgeList.add(dungeonEdgePos[2]);
             }
         }
 
         if (nbt.getInt("GateListSize") > 0) {
             this.gatePosList.clear();
             for (int i = 0; i < nbt.getInt("GateListSize"); i++) {
-                this.gatePosList.add(new BlockPos(nbt.getInt("GatePosX" + i), nbt.getInt("GatePosY" + i), nbt.getInt("GatePosZ" + i)));
+                int[] gatePos = nbt.getIntArray("GatePos" + i);
+                this.gatePosList.add(new BlockPos(gatePos[0], gatePos[1], gatePos[2]));
             }
         }
     }
@@ -193,37 +209,25 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
                 nbt.putInt("BlockId" + blockCount, entry.getKey());
                 nbt.putInt("BlockListSize" + blockCount, entry.getValue().size());
                 for (int i = 0; i < entry.getValue().size(); i++) {
-                    nbt.putInt("BlockPosX" + blockCount + "" + i, entry.getValue().get(i).getX());
-                    nbt.putInt("BlockPosY" + blockCount + "" + i, entry.getValue().get(i).getY());
-                    nbt.putInt("BlockPosZ" + blockCount + "" + i, entry.getValue().get(i).getZ());
+                    nbt.putIntArray("BlockPos" + blockCount + "" + i, List.of(entry.getValue().get(i).getX(), entry.getValue().get(i).getY(), entry.getValue().get(i).getZ()));
                 }
                 blockCount++;
             }
         }
-
-        nbt.putInt("BossPosX", this.bossBlockPos.getX());
-        nbt.putInt("BossPosY", this.bossBlockPos.getY());
-        nbt.putInt("BossPosZ", this.bossBlockPos.getZ());
-
-        nbt.putInt("BossLootPosX", this.bossLootBlockPos.getX());
-        nbt.putInt("BossLootPosY", this.bossLootBlockPos.getY());
-        nbt.putInt("BossLootPosZ", this.bossLootBlockPos.getZ());
+        nbt.putIntArray("BossPos", List.of(this.bossBlockPos.getX(), this.bossBlockPos.getY(), this.bossBlockPos.getZ()));
+        nbt.putIntArray("BossLootPos", List.of(this.bossLootBlockPos.getX(), this.bossLootBlockPos.getY(), this.bossLootBlockPos.getZ()));
 
         nbt.putInt("ChestListSize", this.chestPosList.size());
         if (!this.chestPosList.isEmpty()) {
             for (int i = 0; i < this.chestPosList.size(); i++) {
-                nbt.putInt("ChestPosX" + i, this.chestPosList.get(i).getX());
-                nbt.putInt("ChestPosY" + i, this.chestPosList.get(i).getY());
-                nbt.putInt("ChestPosZ" + i, this.chestPosList.get(i).getZ());
+                nbt.putIntArray("ChestPos" + i, List.of(this.chestPosList.get(i).getX(), this.chestPosList.get(i).getY(), this.chestPosList.get(i).getZ()));
             }
         }
 
         nbt.putInt("ExitListSize", this.exitPosList.size());
         if (!this.exitPosList.isEmpty()) {
             for (int i = 0; i < this.exitPosList.size(); i++) {
-                nbt.putInt("ExitPosX" + i, this.exitPosList.get(i).getX());
-                nbt.putInt("ExitPosY" + i, this.exitPosList.get(i).getY());
-                nbt.putInt("ExitPosZ" + i, this.exitPosList.get(i).getZ());
+                nbt.putIntArray("ExitPos" + i, List.of(this.exitPosList.get(i).getX(), this.exitPosList.get(i).getY(), this.exitPosList.get(i).getZ()));
             }
         }
 
@@ -233,10 +237,7 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
             int count = 0;
             while (iterator.hasNext()) {
                 Entry<BlockPos, Integer> entry = iterator.next();
-                nbt.putInt("SpawnerPosX" + count, entry.getKey().getX());
-                nbt.putInt("SpawnerPosY" + count, entry.getKey().getY());
-                nbt.putInt("SpawnerPosZ" + count, entry.getKey().getZ());
-                nbt.putInt("SpawnerEntityId" + count, entry.getValue());
+                nbt.putIntArray("SpawnerPos" + count, List.of(entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ(), entry.getValue()));
                 count++;
             }
         }
@@ -247,10 +248,7 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
             int count = 0;
             while (iterator.hasNext()) {
                 Entry<BlockPos, Integer> entry = iterator.next();
-                nbt.putInt("ReplacePosX" + count, entry.getKey().getX());
-                nbt.putInt("ReplacePosY" + count, entry.getKey().getY());
-                nbt.putInt("ReplacePosZ" + count, entry.getKey().getZ());
-                nbt.putInt("ReplaceBlockId" + count, entry.getValue());
+                nbt.putIntArray("ReplacePos" + count, List.of(entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ(), entry.getValue()));
                 count++;
             }
         }
@@ -261,10 +259,7 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
             int count = 0;
             while (iterator.hasNext()) {
                 Entry<BlockPos, Integer> entry = iterator.next();
-                nbt.putInt("MovingPosX" + count, entry.getKey().getX());
-                nbt.putInt("MovingPosY" + count, entry.getKey().getY());
-                nbt.putInt("MovingPosZ" + count, entry.getKey().getZ());
-                nbt.putInt("MovingBlockId" + count, entry.getValue());
+                nbt.putIntArray("MovingPos" + count, List.of(entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ(), entry.getValue()));
                 count++;
             }
         }
@@ -275,12 +270,8 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
             int count = 0;
             while (iterator.hasNext()) {
                 Entry<BlockPos, Powered> entry = iterator.next();
-                nbt.putInt("PoweredPosX" + count, entry.getKey().getX());
-                nbt.putInt("PoweredPosY" + count, entry.getKey().getY());
-                nbt.putInt("PoweredPosZ" + count, entry.getKey().getZ());
-                nbt.putInt("PoweredBlockId" + count, entry.getValue().getBlockId());
-                nbt.putBoolean("PoweredBlock" + count, entry.getValue().getPowered());
-                nbt.putInt("PoweredBlockFacing" + count, entry.getValue().getFacing());
+                int isPowered = entry.getValue().getPowered() ? 1 : 0;
+                nbt.putIntArray("PoweredPos" + count, List.of(entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ(), entry.getValue().getBlockId(), isPowered, entry.getValue().getFacing()));
                 count++;
             }
         }
@@ -288,18 +279,14 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
         nbt.putInt("DungeonEdgeSize", this.dungeonEdgeList.size());
         if (!this.dungeonEdgeList.isEmpty()) {
             for (int i = 0; i < this.dungeonEdgeList.size() / 3; i++) {
-                nbt.putInt("DungeonEdgeX" + i, this.dungeonEdgeList.get(3 * i));
-                nbt.putInt("DungeonEdgeY" + i, this.dungeonEdgeList.get(1 + 3 * i));
-                nbt.putInt("DungeonEdgeZ" + i, this.dungeonEdgeList.get(2 + 3 * i));
+                nbt.putIntArray("DungeonEdge" + i, List.of(this.dungeonEdgeList.get(3 * i), this.dungeonEdgeList.get(1 + 3 * i), this.dungeonEdgeList.get(2 + 3 * i)));
             }
         }
 
         nbt.putInt("GateListSize", this.gatePosList.size());
         if (!this.gatePosList.isEmpty()) {
             for (int i = 0; i < this.gatePosList.size(); i++) {
-                nbt.putInt("GatePosX" + i, this.gatePosList.get(i).getX());
-                nbt.putInt("GatePosY" + i, this.gatePosList.get(i).getY());
-                nbt.putInt("GatePosZ" + i, this.gatePosList.get(i).getZ());
+                nbt.putIntArray("GatePos" + i, List.of(this.gatePosList.get(i).getX(), this.gatePosList.get(i).getY(), this.gatePosList.get(i).getZ()));
             }
         }
     }
