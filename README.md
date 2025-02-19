@@ -91,6 +91,7 @@ If you know how to create one, the folder path has to be ```data\dungeonz\dungeo
     },
     "respawn": false,
     "elytra": false,
+    "keep_inventory": false,
     "max_group_size": 5,
     "min_group_size": 0, // Optional
     "required_level": 0, // Optional LevelZ compat

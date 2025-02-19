@@ -1,20 +1,10 @@
 package net.dungeonz.data;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
-import org.jetbrains.annotations.Nullable;
-
 import net.dungeonz.DungeonzMain;
 import net.dungeonz.dungeon.Dungeon;
 import net.dungeonz.init.ConfigInit;
@@ -25,6 +15,14 @@ import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
 
@@ -50,6 +48,7 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
                 int cooldown = data.get("cooldown").getAsInt();
                 boolean allowElytra = data.has("elytra") ? data.get("elytra").getAsBoolean() : false;
                 boolean allowRespawn = data.has("respawn") ? data.get("respawn").getAsBoolean() : true;
+                boolean keepInventory = data.has("keep_inventory") ? data.get("keep_inventory").getAsBoolean() : false;
                 Identifier dungeonBackgroundId = data.has("background_texture") && !data.get("background_texture").getAsString().isEmpty() ? Identifier.of(data.get("background_texture").getAsString()) : null;
                 Identifier dungeonStructurePoolId = Identifier.of(data.get("dungeon_structure_pool_id").getAsString());
 
@@ -218,7 +217,7 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
 
                 Dungeon.addDungeon(new Dungeon(dungeonTypeId, blockIdEntityMap, blockIdEntitySpawnChance, blockIdBlockReplacement, spawnerEntityIdCountMap, difficultyRequiredItemCountMap, breakableBlockIds,
                         placeableBlockIds, difficultyMobModificator, difficultyLootTableIds, difficultyBossModificator, difficultyBossLootTable, bossEntityType, bossNbtCompound, bossBlockId,
-                        bossLootBlockId, exitBlockId, allowRespawn, allowElytra, maxGroupSize, minGroupSize, requiredLevel, cooldown, dungeonBackgroundId, dungeonStructurePoolId));
+                        bossLootBlockId, exitBlockId, allowRespawn, allowElytra, keepInventory, maxGroupSize, minGroupSize, requiredLevel, cooldown, dungeonBackgroundId, dungeonStructurePoolId));
             } catch (Exception e) {
                 DungeonzMain.LOGGER.error("Error occurred while loading resource {}. {}", id.toString(), e.toString());
             }

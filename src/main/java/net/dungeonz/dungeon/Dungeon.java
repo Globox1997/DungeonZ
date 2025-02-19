@@ -1,15 +1,14 @@
 package net.dungeonz.dungeon;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import org.jetbrains.annotations.Nullable;
-
 import net.dungeonz.DungeonzMain;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class Dungeon {
 
@@ -41,6 +40,7 @@ public class Dungeon {
 
     private final boolean allowRespawn;
     private final boolean allowElytra;
+    private final boolean keepInventory;
 
     private final int maxGroupSize;
     private final int minGroupSize;
@@ -55,7 +55,7 @@ public class Dungeon {
                    HashMap<Integer, Integer> blockIdBlockReplacement, HashMap<Integer, Integer> spawnerEntityIdCountMap, HashMap<String, HashMap<Integer, Integer>> difficultyRequiredItemCountMap, List<Integer> breakableBlockIds,
                    List<Integer> placeableBlockIds, HashMap<String, Float> difficultyMobModificator, HashMap<String, List<String>> difficultyLootTableIds, HashMap<String, Float> difficultyBossModificator,
                    HashMap<String, String> difficultyBossLootTable, EntityType<?> bossEntityType, @Nullable NbtCompound bossNbtCompound, int bossBlockId, int bossLootBlockId, int exitBlockId, boolean allowRespawn,
-                   boolean allowElytra, int maxGroupSize, int minGroupSize, int requiredLevel, int cooldown, @Nullable Identifier dungeonBackgroundId, Identifier dungeonStructurePoolId) {
+                   boolean allowElytra, boolean keepInventory, int maxGroupSize, int minGroupSize, int requiredLevel, int cooldown, @Nullable Identifier dungeonBackgroundId, Identifier dungeonStructurePoolId) {
         this.dungeonTypeId = dungeonTypeId;
         this.blockIdEntityMap = blockIdEntityMap;
         this.blockIdEntitySpawnChance = blockIdEntitySpawnChance;
@@ -75,6 +75,7 @@ public class Dungeon {
         this.exitBlockId = exitBlockId;
         this.allowRespawn = allowRespawn;
         this.allowElytra = allowElytra;
+        this.keepInventory = keepInventory;
         this.maxGroupSize = maxGroupSize;
         this.minGroupSize = minGroupSize;
         this.requiredLevel = requiredLevel;
@@ -187,6 +188,10 @@ public class Dungeon {
 
     public boolean isRespawnAllowed() {
         return this.allowRespawn;
+    }
+
+    public boolean isKeepInventory() {
+        return keepInventory;
     }
 
     public boolean containsBlockId(int blockId) {

@@ -1,7 +1,6 @@
 ### Added:
-- Added required levelz lvl compat
-- Added per difficulty required items
+- Added keep inventory option
 ### Fixed:
-- Fixed dungeon puzzle refresh
+- 
 ### Changed:
 - 
