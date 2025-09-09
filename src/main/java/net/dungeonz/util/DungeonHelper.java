@@ -89,7 +89,8 @@ public class DungeonHelper {
         for (Entry<String, String> entry : dungeon.getDifficultyBossLootTableMap().entrySet()) {
             LootTable lootTable = server.getReloadableRegistries().getLootTable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(entry.getValue())));
             LootContextParameterSet.Builder builder = new LootContextParameterSet.Builder(server.getOverworld()).add(LootContextParameters.ORIGIN,
-                    server.getOverworld().getPlayers().get(server.getOverworld().getRandom().nextInt(server.getOverworld().getPlayers().size())).getPos());
+                    server.getPlayerManager().getPlayerList().get(server.getOverworld().getRandom().nextInt(server.getPlayerManager().getPlayerList().size())).getPos());
+
             Inventory inventory = new SimpleInventory(27);
             lootTable.supplyInventory(inventory, builder.build(LootContextTypes.CHEST), server.getOverworld().getRandom().nextLong());
 

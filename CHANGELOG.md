@@ -1,6 +1,6 @@
 ### Added:
-- Added keep inventory option
-### Fixed:
 - 
+### Fixed:
+- Fixed open screen in other dimensions than overworld
 ### Changed:
 - 
