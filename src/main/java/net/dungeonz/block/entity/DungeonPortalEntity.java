@@ -157,7 +157,7 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
             for (int i = 0; i < nbt.getInt("PoweredPosSize"); i++) {
                 int[] poweredPos = nbt.getIntArray("PoweredPos" + i);
                 boolean isPowered = poweredPos[4] == 1;
-                this.poweredBlockMap.put(new BlockPos(poweredPos[0], poweredPos[1], poweredPos[2]), new Powered(poweredPos[3], isPowered, poweredPos[5]));
+                this.poweredBlockMap.put(new BlockPos(poweredPos[0], poweredPos[1], poweredPos[2]), new Powered(poweredPos[3], isPowered, poweredPos[5], poweredPos[6]));
             }
         }
 
@@ -271,7 +271,7 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
             while (iterator.hasNext()) {
                 Entry<BlockPos, Powered> entry = iterator.next();
                 int isPowered = entry.getValue().getPowered() ? 1 : 0;
-                nbt.putIntArray("PoweredPos" + count, List.of(entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ(), entry.getValue().getBlockId(), isPowered, entry.getValue().getFacing()));
+                nbt.putIntArray("PoweredPos" + count, List.of(entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ(), entry.getValue().getBlockId(), isPowered, entry.getValue().getFacing(), entry.getValue().getBlockFacing()));
                 count++;
             }
         }
@@ -652,11 +652,13 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
         private final int blockId;
         private final boolean powered;
         private final int facing;
+        private final int blockFacing;
 
-        public Powered(int blockId, boolean powered, int facing) {
+        public Powered(int blockId, boolean powered, int facing, int blockFacing) {
             this.blockId = blockId;
             this.powered = powered;
             this.facing = facing;
+            this.blockFacing = blockFacing;
         }
 
         public int getBlockId() {
@@ -667,8 +669,15 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
             return powered;
         }
 
+        // Horizontal facing
         public int getFacing() {
             return facing;
+        }
+
+        // Block facing for example: cealing
+        // 0 = none, 1 = ("floor"), 2 = WALL("wall"), 3 = CEILING("ceiling");
+        public int getBlockFacing() {
+            return blockFacing;
         }
     }
 

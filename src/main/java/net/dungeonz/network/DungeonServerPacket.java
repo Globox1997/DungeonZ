@@ -121,6 +121,7 @@ public class DungeonServerPacket {
                                 dungeonPortalEntity.setDifficulty(defaultDifficulty);
                                 dungeonPortalEntity.setMaxGroupSize(dungeon.getMaxGroupSize());
                                 dungeonPortalEntity.setMinGroupSize(dungeon.getMinGroupSize());
+                                dungeonPortalEntity.setRequiredLevel(dungeon.getRequiredLevel());
                                 dungeonPortalEntity.markDirty();
                                 context.player().sendMessage(Text.of("Set dungeon type successfully!"), false);
                                 return;

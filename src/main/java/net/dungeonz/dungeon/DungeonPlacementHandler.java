@@ -10,7 +10,11 @@ import net.dungeonz.block.entity.DungeonSpawnerEntity;
 import net.dungeonz.init.BlockInit;
 import net.dungeonz.init.TagInit;
 import net.dungeonz.util.InventoryHelper;
-import net.minecraft.block.*;
+import net.dungeonz.util.PropertyUtil;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.LandingBlock;
 import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
@@ -163,7 +167,7 @@ public class DungeonPlacementHandler {
                                 } else if (state.getBlock() instanceof LandingBlock) {
                                     movingBlockMap.put(checkPos, blockId);
                                 } else if (state.contains(Properties.POWERED)) {
-                                    poweredBlockMap.put(checkPos, new DungeonPortalEntity.Powered(blockId, state.get(Properties.POWERED), state.contains(Properties.HORIZONTAL_FACING) ? state.get(Properties.HORIZONTAL_FACING).getHorizontal() : 0));
+                                    poweredBlockMap.put(checkPos, new DungeonPortalEntity.Powered(blockId, state.get(Properties.POWERED), PropertyUtil.getHorizontalFacing(state), PropertyUtil.getBlockFacing(state)));
                                 }
                             }
                         }
@@ -184,7 +188,7 @@ public class DungeonPlacementHandler {
     }
 
     public static void prepareDungeon(ServerWorld dungeonWorld, DungeonPortalEntity portalEntity) {
-        List<ChunkPos> chunkPosList = new ArrayList<ChunkPos>();
+        List<ChunkPos> chunkPosList = new ArrayList<>();
         for (int i = 0; i < portalEntity.getDungeonEdgeList().size() / 6; i++) {
             int x1 = portalEntity.getDungeonEdgeList().get(6 * i);
             int z1 = portalEntity.getDungeonEdgeList().get(2 + 6 * i);
@@ -322,6 +326,9 @@ public class DungeonPlacementHandler {
             boolean hasFacing = blockState.contains(Properties.HORIZONTAL_FACING);
             if (hasFacing) {
                 blockState = blockState.with(Properties.HORIZONTAL_FACING, Direction.fromHorizontal(entry.getValue().getFacing()));
+            }
+            if (blockState.contains(Properties.BLOCK_FACE)) {
+                blockState = blockState.with(Properties.BLOCK_FACE, PropertyUtil.getBlockFacing(entry.getValue().getBlockFacing()));
             }
             world.setBlockState(entry.getKey(), blockState, 3);
             world.updateNeighborsAlways(entry.getKey(), world.getBlockState(entry.getKey()).getBlock());
