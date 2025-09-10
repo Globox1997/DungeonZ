@@ -2,6 +2,13 @@ package net.dungeonz.block;
 
 import java.util.Iterator;
 
+import net.minecraft.block.FluidFillable;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.world.BlockView;
+import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
 import com.mojang.serialization.MapCodec;
@@ -27,7 +34,7 @@ import net.minecraft.world.World;
 import net.partyaddon.access.GroupManagerAccess;
 import net.partyaddon.network.PartyAddonServerPacket;
 
-public class DungeonPortalBlock extends BlockWithEntity {
+public class DungeonPortalBlock extends BlockWithEntity implements FluidFillable {
 
     public static final MapCodec<DungeonPortalBlock> CODEC = DungeonPortalBlock.createCodec(DungeonPortalBlock::new);
 
@@ -81,6 +88,11 @@ public class DungeonPortalBlock extends BlockWithEntity {
                 entity.resetPortalCooldown();
             }
         }
+    }
+
+    @Override
+    protected boolean canBucketPlace(BlockState state, Fluid fluid) {
+        return false;
     }
 
     @Override
@@ -141,4 +153,14 @@ public class DungeonPortalBlock extends BlockWithEntity {
         return CODEC;
     }
 
+    // Used for not getting removed by water
+    @Override
+    public boolean canFillWithFluid(@Nullable PlayerEntity player, BlockView world, BlockPos pos, BlockState state, Fluid fluid) {
+        return false;
+    }
+
+    @Override
+    public boolean tryFillWithFluid(WorldAccess world, BlockPos pos, BlockState state, FluidState fluidState) {
+        return false;
+    }
 }

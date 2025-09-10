@@ -33,9 +33,6 @@ public class BlockInit {
     public static final ScreenHandlerType<DungeonPortalScreenHandler> PORTAL = new ExtendedScreenHandlerType<DungeonPortalScreenHandler, DungeonPortalPacket>(
             (syncId, playerInventory, buf) -> new DungeonPortalScreenHandler(syncId, playerInventory, buf), DungeonPortalPacket.PACKET_CODEC);
 
-    // public static final ScreenHandlerType<ChunkLoaderScreenHandler> CHUNK_LOADER_SCREEN_HANDLER = new ExtendedScreenHandlerType<ChunkLoaderScreenHandler, ChunkLoaderBlockPacket>(
-    // (syncId, playerInventory, buf) -> new ChunkLoaderScreenHandler(syncId, playerInventory, buf), ChunkLoaderBlockPacket.PACKET_CODEC);
-
     private static Block register(String id, Block block) {
         return register(Identifier.of("dungeonz", id), block);
     }
