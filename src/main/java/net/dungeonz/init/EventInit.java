@@ -31,6 +31,10 @@ public class EventInit {
                 ((ServerPlayerAccess) newPlayer).setDungeonInfo(((ServerPlayerAccess) oldPlayer).getOldServerWorld(), ((ServerPlayerAccess) oldPlayer).getDungeonPortalBlockPos(),
                         ((ServerPlayerAccess) oldPlayer).getDungeonSpawnBlockPos());
             }
+            if (oldPlayer.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD && DungeonHelper.getCurrentDungeon(oldPlayer) != null
+                    && DungeonHelper.getCurrentDungeon(oldPlayer).isKeepInventory()) {
+                newPlayer.getInventory().clone(oldPlayer.getInventory());
+            }
         });
     }
 
