@@ -1,5 +1,8 @@
 package net.dungeonz.mixin.misc;
 
+import net.dungeonz.util.DungeonHelper;
+import net.minecraft.entity.Entity;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,8 +25,11 @@ public abstract class EnderPearlEntityMixin extends ThrownItemEntity {
     @Inject(method = "onCollision", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;hasVehicle()Z"), cancellable = true)
     protected void onCollisionMixin(HitResult hitResult, CallbackInfo info) {
         if (this.getWorld().getRegistryKey() == DimensionInit.DUNGEON_WORLD) {
-            this.discard();
-            info.cancel();
+            Entity entity = this.getOwner();
+            if (entity instanceof ServerPlayerEntity serverPlayerEntity && DungeonHelper.getCurrentDungeon(serverPlayerEntity) != null && !DungeonHelper.getCurrentDungeon(serverPlayerEntity).isEnderPearlAllowed()) {
+                this.discard();
+                info.cancel();
+            }
         }
     }
 }

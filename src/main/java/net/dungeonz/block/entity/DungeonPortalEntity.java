@@ -48,10 +48,8 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
     private int maxGroupSize = 0;
     private int minGroupSize = 0;
     private List<UUID> waitingUuids = new ArrayList<UUID>();
-    private int requiredLevel = 0;
     private int cooldownTime = 0;
     private int autoKickTime = 0;
-    private boolean disableEffects = false;
     private boolean privateGroup = false;
     private HashMap<Integer, ArrayList<BlockPos>> blockBlockPosMap = new HashMap<Integer, ArrayList<BlockPos>>();
     private List<BlockPos> chestPosList = new ArrayList<BlockPos>();
@@ -86,10 +84,8 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
         }
         this.maxGroupSize = nbt.getInt("MaxGroupSize");
         this.minGroupSize = nbt.getInt("MinGroupSize");
-        this.requiredLevel = nbt.getInt("RequiredLevel");
         this.cooldownTime = nbt.getInt("CooldownTime");
         this.autoKickTime = nbt.getInt("AutoKickTime");
-        this.disableEffects = nbt.getBoolean("DisableEffects");
         this.privateGroup = nbt.getBoolean("PrivateGroup");
         this.blockBlockPosMap.clear();
         if (nbt.getInt("BlockMapSize") > 0) {
@@ -196,10 +192,8 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
         }
         nbt.putInt("MaxGroupSize", this.maxGroupSize);
         nbt.putInt("MinGroupSize", this.minGroupSize);
-        nbt.putInt("RequiredLevel", this.requiredLevel);
         nbt.putInt("CooldownTime", this.cooldownTime);
         nbt.putInt("AutoKickTime", this.autoKickTime);
-        nbt.putBoolean("DisableEffects", this.disableEffects);
         nbt.putBoolean("PrivateGroup", this.privateGroup);
 
         nbt.putInt("BlockMapSize", this.blockBlockPosMap.size());
@@ -332,7 +326,7 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
 //                CompletableFuture.runAsync(() -> DungeonPlacementHandler.refreshDungeon(((ServerWorld) blockEntity.getWorld()).getServer(), blockEntity.getWorld().getServer().getWorld(DimensionInit.DUNGEON_WORLD), blockEntity,
 //                        blockEntity.getDungeon(), blockEntity.getDifficulty(), blockEntity.getDisableEffects()));
                 DungeonPlacementHandler.refreshDungeon(((ServerWorld) blockEntity.getWorld()).getServer(), blockEntity.getWorld().getServer().getWorld(DimensionInit.DUNGEON_WORLD), blockEntity,
-                        blockEntity.getDungeon(), blockEntity.getDifficulty(), blockEntity.getDisableEffects());
+                        blockEntity.getDungeon(), blockEntity.getDifficulty());
             }
 
             if (blockEntity.dungeonTeleportCountdown == 0) {
@@ -376,17 +370,26 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
         Map<String, List<ItemStack>> possibleLoot = new HashMap<>();
         Map<String, List<ItemStack>> requiredItemStacks = new HashMap<>();
         Optional<Identifier> backgroundId = Optional.empty();
+
         int requiredLevel = 0;
-        if (this.getDungeon() != null) {
-            difficulties = this.getDungeon().getDifficultyList();
-            possibleLoot = DungeonHelper.getPossibleLootItemStackMap(this.getDungeon(), player.getServer());
-            requiredItemStacks = DungeonHelper.getRequiredItemStackList(this.getDungeon());
-            backgroundId = Optional.ofNullable(this.getDungeon().getBackgroundId());
-            requiredLevel = this.getDungeon().getRequiredLevel();
+        boolean allowRespawn = false;
+        boolean allowPositiveEffects = false;
+        boolean allowEnderPearl = false;
+        boolean allowElytra = false;
+        if (this.getDungeon() instanceof Dungeon dungeon) {
+            difficulties = dungeon.getDifficultyList();
+            possibleLoot = DungeonHelper.getPossibleLootItemStackMap(dungeon, player.getServer());
+            requiredItemStacks = DungeonHelper.getRequiredItemStackList(dungeon);
+            backgroundId = Optional.ofNullable(dungeon.getBackgroundId());
+            requiredLevel = dungeon.getRequiredLevel();
+            allowEnderPearl = dungeon.isEnderPearlAllowed();
+            allowPositiveEffects = dungeon.isPositiveEffectsAllowed();
+            allowRespawn = dungeon.isRespawnAllowed();
+            allowElytra = dungeon.isElytraAllowed();
         }
 
-        return new DungeonPortalPacket(this.pos, this.getDungeonPlayerUuids(), this.getDeadDungeonPlayerUUIDs(), difficulties, possibleLoot, requiredItemStacks, this.getMaxGroupSize(),
-                this.getMinGroupSize(), this.getWaitingUuids().size(), requiredLevel, this.getCooldownTime(), this.getDifficulty(), this.getDisableEffects(), this.getPrivateGroup(), backgroundId);
+        return new DungeonPortalPacket(this.getDungeonType(), this.pos, this.getDungeonPlayerUuids(), this.getDeadDungeonPlayerUUIDs(), difficulties, possibleLoot, requiredItemStacks, this.getMaxGroupSize(),
+                this.getMinGroupSize(), this.getWaitingUuids().size(), requiredLevel, this.getCooldownTime(), this.getDifficulty(), allowEnderPearl, allowPositiveEffects, allowElytra, allowRespawn, this.getPrivateGroup(), backgroundId);
     }
 
     public void finishDungeon(ServerWorld world, BlockPos pos) {
@@ -401,8 +404,7 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
         }
 
         world.setBlockState(this.getBossLootBlockPos(), Blocks.CHEST.getDefaultState(), 3);
-        InventoryHelper.fillInventoryWithLoot(world.getServer(), world, this.getBossLootBlockPos(), this.getDungeon().getDifficultyBossLootTableMap().get(this.getDifficulty()),
-                this.getDisableEffects());
+        InventoryHelper.fillInventoryWithLoot(world.getServer(), world, this.getBossLootBlockPos(), this.getDungeon().getDifficultyBossLootTableMap().get(this.getDifficulty()));
 
         this.setCooldownTime(this.getDungeon().getCooldown() + (int) this.getWorld().getTime());
         markDirty();
@@ -480,14 +482,6 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
         return this.blockBlockPosMap;
     }
 
-    public void setRequiredLevel(int requiredLevel) {
-        this.requiredLevel = requiredLevel;
-    }
-
-    public int getRequiredLevel() {
-        return this.requiredLevel;
-    }
-
     public void setCooldownTime(int cooldownTime) {
         this.cooldownTime = cooldownTime;
     }
@@ -527,14 +521,6 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
 
     public int getMinGroupSize() {
         return this.minGroupSize;
-    }
-
-    public void setDisableEffects(boolean disableEffects) {
-        this.disableEffects = disableEffects;
-    }
-
-    public boolean getDisableEffects() {
-        return this.disableEffects;
     }
 
     public void setPrivateGroup(boolean privateGroup) {

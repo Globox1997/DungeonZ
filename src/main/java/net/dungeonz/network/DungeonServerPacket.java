@@ -38,7 +38,6 @@ public class DungeonServerPacket {
         PayloadTypeRegistry.playS2C().register(DungeonPortalPacket.PACKET_ID, DungeonPortalPacket.PACKET_CODEC);
 
         PayloadTypeRegistry.playC2S().register(DungeonDifficultyPacket.PACKET_ID, DungeonDifficultyPacket.PACKET_CODEC);
-        PayloadTypeRegistry.playC2S().register(DungeonEffectPacket.PACKET_ID, DungeonEffectPacket.PACKET_CODEC);
         PayloadTypeRegistry.playC2S().register(DungeonGroupPacket.PACKET_ID, DungeonGroupPacket.PACKET_CODEC);
         PayloadTypeRegistry.playC2S().register(DungeonTeleportPacket.PACKET_ID, DungeonTeleportPacket.PACKET_CODEC);
         PayloadTypeRegistry.playC2S().register(DungeonTypePacket.PACKET_ID, DungeonTypePacket.PACKET_CODEC);
@@ -75,19 +74,6 @@ public class DungeonServerPacket {
                 DungeonHelper.teleportDungeon(context.player(), dungeonPortalPos, uuid);
             });
         });
-        ServerPlayNetworking.registerGlobalReceiver(DungeonEffectPacket.PACKET_ID, (payload, context) -> {
-            BlockPos dungeonPortalPos = payload.portalBlockPos();
-            boolean disableEffects = payload.disableEffects();
-            context.server().execute(() -> {
-                if (context.player().getWorld().getBlockEntity(dungeonPortalPos) != null
-                        && context.player().getWorld().getBlockEntity(dungeonPortalPos) instanceof DungeonPortalEntity dungeonPortalEntity) {
-                    if (dungeonPortalEntity.getDungeonPlayerCount() == 0) {
-                        dungeonPortalEntity.setDisableEffects(disableEffects);
-                        dungeonPortalEntity.markDirty();
-                    }
-                }
-            });
-        });
         ServerPlayNetworking.registerGlobalReceiver(DungeonGroupPacket.PACKET_ID, (payload, context) -> {
             BlockPos dungeonPortalPos = payload.portalBlockPos();
             boolean privateGroup = payload.privateGroup();
@@ -121,7 +107,6 @@ public class DungeonServerPacket {
                                 dungeonPortalEntity.setDifficulty(defaultDifficulty);
                                 dungeonPortalEntity.setMaxGroupSize(dungeon.getMaxGroupSize());
                                 dungeonPortalEntity.setMinGroupSize(dungeon.getMinGroupSize());
-                                dungeonPortalEntity.setRequiredLevel(dungeon.getRequiredLevel());
                                 dungeonPortalEntity.markDirty();
                                 context.player().sendMessage(Text.of("Set dungeon type successfully!"), false);
                                 return;

@@ -41,6 +41,8 @@ public class Dungeon {
     private final boolean allowRespawn;
     private final boolean allowElytra;
     private final boolean keepInventory;
+    private final boolean allowEnderPearl;
+    private final boolean allowPositiveEffects;
 
     private final int maxGroupSize;
     private final int minGroupSize;
@@ -55,7 +57,7 @@ public class Dungeon {
                    HashMap<Integer, Integer> blockIdBlockReplacement, HashMap<Integer, Integer> spawnerEntityIdCountMap, HashMap<String, HashMap<Integer, Integer>> difficultyRequiredItemCountMap, List<Integer> breakableBlockIds,
                    List<Integer> placeableBlockIds, HashMap<String, Float> difficultyMobModificator, HashMap<String, List<String>> difficultyLootTableIds, HashMap<String, Float> difficultyBossModificator,
                    HashMap<String, String> difficultyBossLootTable, EntityType<?> bossEntityType, @Nullable NbtCompound bossNbtCompound, int bossBlockId, int bossLootBlockId, int exitBlockId, boolean allowRespawn,
-                   boolean allowElytra, boolean keepInventory, int maxGroupSize, int minGroupSize, int requiredLevel, int cooldown, @Nullable Identifier dungeonBackgroundId, Identifier dungeonStructurePoolId) {
+                   boolean allowElytra, boolean keepInventory, boolean allowEnderPearl, boolean allowPositiveEffects, int maxGroupSize, int minGroupSize, int requiredLevel, int cooldown, @Nullable Identifier dungeonBackgroundId, Identifier dungeonStructurePoolId) {
         this.dungeonTypeId = dungeonTypeId;
         this.blockIdEntityMap = blockIdEntityMap;
         this.blockIdEntitySpawnChance = blockIdEntitySpawnChance;
@@ -76,6 +78,8 @@ public class Dungeon {
         this.allowRespawn = allowRespawn;
         this.allowElytra = allowElytra;
         this.keepInventory = keepInventory;
+        this.allowEnderPearl = allowEnderPearl;
+        this.allowPositiveEffects = allowPositiveEffects;
         this.maxGroupSize = maxGroupSize;
         this.minGroupSize = minGroupSize;
         this.requiredLevel = requiredLevel;
@@ -192,6 +196,14 @@ public class Dungeon {
 
     public boolean isKeepInventory() {
         return keepInventory;
+    }
+
+    public boolean isEnderPearlAllowed() {
+        return allowEnderPearl;
+    }
+
+    public boolean isPositiveEffectsAllowed() {
+        return allowPositiveEffects;
     }
 
     public boolean containsBlockId(int blockId) {

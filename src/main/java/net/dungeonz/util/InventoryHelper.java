@@ -19,15 +19,12 @@ import net.minecraft.util.math.Vec3d;
 
 public class InventoryHelper {
 
-    public static void fillInventoryWithLoot(MinecraftServer server, ServerWorld world, BlockPos pos, String lootTableString, boolean luck) {
+    public static void fillInventoryWithLoot(MinecraftServer server, ServerWorld world, BlockPos pos, String lootTableString) {
         // Clear inventory
         ((Inventory) world.getBlockEntity(pos)).clear();
         // Generate loot
         LootTable lootTable = server.getReloadableRegistries().getLootTable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(lootTableString)));
         LootContextParameterSet.Builder builder = new LootContextParameterSet.Builder(world).add(LootContextParameters.ORIGIN, new Vec3d(pos.getX(), pos.getY(), pos.getZ()));
-        if (luck) {
-            builder.luck(1.1f);
-        }
         lootTable.supplyInventory((Inventory) world.getBlockEntity(pos), builder.build(LootContextTypes.CHEST), world.getRandom().nextLong());
     }
 

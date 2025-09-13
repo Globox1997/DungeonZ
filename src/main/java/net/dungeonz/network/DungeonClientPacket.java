@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import net.dungeonz.network.packet.*;
 import org.jetbrains.annotations.Nullable;
 
 import net.dungeonz.access.ClientPlayerAccess;
@@ -17,18 +18,6 @@ import net.dungeonz.block.screen.DungeonPortalScreen;
 import net.dungeonz.block.screen.DungeonPortalScreenHandler;
 import net.dungeonz.init.SoundInit;
 import net.dungeonz.item.screen.DungeonCompassScreen;
-import net.dungeonz.network.packet.DungeonCompassPacket;
-import net.dungeonz.network.packet.DungeonCompassScreenPacket;
-import net.dungeonz.network.packet.DungeonDifficultyPacket;
-import net.dungeonz.network.packet.DungeonEffectPacket;
-import net.dungeonz.network.packet.DungeonGatePacket;
-import net.dungeonz.network.packet.DungeonInfoPacket;
-import net.dungeonz.network.packet.DungeonOpScreenPacket;
-import net.dungeonz.network.packet.DungeonSyncGatePacket;
-import net.dungeonz.network.packet.DungeonSyncScreenPacket;
-import net.dungeonz.network.packet.DungeonTeleportCountdownPacket;
-import net.dungeonz.network.packet.DungeonTeleportPacket;
-import net.dungeonz.network.packet.DungeonTypePacket;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -127,12 +116,8 @@ public class DungeonClientPacket {
         ClientPlayNetworking.send(new DungeonDifficultyPacket(portalBlockPos));
     }
 
-    public static void writeC2SChangeEffectsPacket(MinecraftClient client, BlockPos portalBlockPos, boolean disableEffects) {
-        ClientPlayNetworking.send(new DungeonEffectPacket(portalBlockPos, disableEffects));
-    }
-
     public static void writeC2SChangePrivateGroupPacket(MinecraftClient client, BlockPos portalBlockPos, boolean privateGroup) {
-        ClientPlayNetworking.send(new DungeonEffectPacket(portalBlockPos, privateGroup));
+        ClientPlayNetworking.send(new DungeonGroupPacket(portalBlockPos, privateGroup));
     }
 
     public static void writeC2SDungeonTeleportPacket(MinecraftClient client, BlockPos portalBlockPos, @Nullable UUID requiredMinGroupUuid) {

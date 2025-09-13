@@ -31,11 +31,19 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
     private Map<String, List<ItemStack>> possibleLootDifficultyItemStackMap = new HashMap<String, List<ItemStack>>();
     private Map<String, List<ItemStack>> requiredItemStacks = new HashMap<String, List<ItemStack>>();
     private int waitingGroupSize = 0;
+
+    private int requiredLevel = 0;
+    private boolean allowRespawn = false;
+    private boolean allowPositiveEffects = false;
+    private boolean allowEnderPearl = false;
+    private boolean allowElytra = false;
+
     @Nullable
     private Identifier backgroundId = null;
 
     public DungeonPortalScreenHandler(int syncId, PlayerInventory playerInventory, DungeonPortalPacket packet) {
         this(syncId, playerInventory, new DungeonPortalEntity(packet.blockPos(), playerInventory.player.getWorld().getBlockState(packet.blockPos())), ScreenHandlerContext.EMPTY);
+        this.getDungeonPortalEntity().setDungeonType(packet.dungeonType());
         this.pos = packet.blockPos();
 
         this.setDifficulties(packet.difficulties());
@@ -48,11 +56,15 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         this.getDungeonPortalEntity().setDeadDungeonPlayerUuids(packet.deadPlayerUuids());
         this.getDungeonPortalEntity().setMaxGroupSize(packet.maxGroupSize());
         this.getDungeonPortalEntity().setMinGroupSize(packet.minGroupSize());
-        this.getDungeonPortalEntity().setRequiredLevel(packet.requiredLevel());
         this.getDungeonPortalEntity().setCooldownTime(packet.cooldownTime());
         this.getDungeonPortalEntity().setDifficulty(packet.difficulty());
-        this.getDungeonPortalEntity().setDisableEffects(packet.disableEffects());
         this.getDungeonPortalEntity().setPrivateGroup(packet.privateGroup());
+
+        this.requiredLevel = packet.requiredLevel();
+        this.allowRespawn = packet.allowRespawn();
+        this.allowPositiveEffects = packet.allowPositiveEffects();
+        this.allowEnderPearl = packet.allowEnderPearl();
+        this.allowElytra = packet.allowElytra();
 
         this.backgroundId = packet.backgroundId().orElse(null);
     }
@@ -129,5 +141,25 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
 
     public BlockPos getPos() {
         return this.pos;
+    }
+
+    public int getRequiredLevel() {
+        return this.requiredLevel;
+    }
+
+    public boolean isAllowRespawn() {
+        return allowRespawn;
+    }
+
+    public boolean isAllowPositiveEffects() {
+        return allowPositiveEffects;
+    }
+
+    public boolean isAllowEnderPearl() {
+        return allowEnderPearl;
+    }
+
+    public boolean isAllowElytra() {
+        return allowElytra;
     }
 }

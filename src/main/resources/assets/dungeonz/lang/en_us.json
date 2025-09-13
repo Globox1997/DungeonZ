@@ -26,6 +26,27 @@
     "dungeon.dark_dungeon": "Dark Dungeon",
     "dungeon.temple_dungeon": "Temple Dungeon",
 
+    "dungeon.dark_dungeon.description.1": "A cold, oppressive place",
+    "dungeon.dark_dungeon.description.2": "of stone and shadow",
+    "dungeon.dark_dungeon.description.3": "",
+    "dungeon.dark_dungeon.description.4": "Rules:",
+
+    "dungeon.temple_dungeon.description.1": "An ancient, sacred ruin",
+    "dungeon.temple_dungeon.description.2": "buried in silence with",
+    "dungeon.temple_dungeon.description.3": "secret mechanics",
+    "dungeon.temple_dungeon.description.4": "",
+    "dungeon.temple_dungeon.description.5": "Rules:",
+
+    "dungeonz.dungeon.info": "Dungeon Info",
+    "dungeonz.dungeon.info.respawn": "- Respawn Enabled",
+    "dungeonz.dungeon.info.respawn.disabled": "- Respawn Disabled",
+    "dungeonz.dungeon.info.positive_effects": "- Positive Effects Enabled",
+    "dungeonz.dungeon.info.positive_effects.disabled": "- Positive Effects Disabled",
+    "dungeonz.dungeon.info.ender_pearl": "- Ender Pearl Enabled",
+    "dungeonz.dungeon.info.ender_pearl.disabled": "- Ender Pearl Disabled",
+    "dungeonz.dungeon.info.elytra": "- Elytra Enabled",
+    "dungeonz.dungeon.info.elytra.disabled": "- Elytra Disabled",
+
     "dungeon.shadow_crypt": "Shadow Crypt",
     "dungeon.ancient_catacombs": "Ancient Catacombs",
     "dungeon.bloodstone_keep": "Bloodstone Keep",

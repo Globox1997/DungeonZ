@@ -1,18 +1,5 @@
 package net.dungeonz.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.Map.Entry;
-
-import net.dungeonz.block.screen.DungeonPortalScreen;
-import net.levelz.access.LevelManagerAccess;
-import net.levelz.level.LevelManager;
-import org.jetbrains.annotations.Nullable;
-
 import net.dungeonz.DungeonzMain;
 import net.dungeonz.access.ServerPlayerAccess;
 import net.dungeonz.block.entity.DungeonPortalEntity;
@@ -20,6 +7,8 @@ import net.dungeonz.dungeon.Dungeon;
 import net.dungeonz.dungeon.DungeonPlacementHandler;
 import net.dungeonz.init.DimensionInit;
 import net.dungeonz.network.DungeonServerPacket;
+import net.levelz.access.LevelManagerAccess;
+import net.levelz.level.LevelManager;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
@@ -41,6 +30,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.TeleportTarget;
 import net.partyaddon.access.GroupManagerAccess;
 import net.partyaddon.group.GroupManager;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 public class DungeonHelper {
 
@@ -153,6 +146,10 @@ public class DungeonHelper {
                                 return;
                             }
                         }
+                        if (!dungeonPortalEntity.getWaitingUuids().isEmpty() && dungeonPortalEntity.getWaitingUuids().contains(player.getUuid())) {
+                            player.closeHandledScreen();
+                            return;
+                        }
                         if (!player.isCreative()) {
                             if (DungeonHelper.getRequiredItemStackList(dungeonPortalEntity.getDungeon()).containsKey(dungeonPortalEntity.getDifficulty())) {
                                 if (InventoryHelper.hasRequiredItemStacks(player.getInventory(), DungeonHelper.getRequiredItemStackList(dungeonPortalEntity.getDungeon()).get(dungeonPortalEntity.getDifficulty()))) {
@@ -163,14 +160,10 @@ public class DungeonHelper {
                                 }
                             }
                         }
-                        if (!dungeonPortalEntity.getWaitingUuids().isEmpty() && dungeonPortalEntity.getWaitingUuids().contains(player.getUuid())) {
-                            player.closeHandledScreen();
-                            return;
-                        }
                         if (DungeonzMain.isLevelZLoaded) {
                             LevelManager levelManager = ((LevelManagerAccess) player).getLevelManager();
-                            if (levelManager.getOverallLevel() < dungeonPortalEntity.getRequiredLevel()) {
-                                player.sendMessage(Text.translatable("text.dungeonz.required_level", dungeonPortalEntity.getRequiredLevel()), false);
+                            if (levelManager.getOverallLevel() < dungeonPortalEntity.getDungeon().getRequiredLevel()) {
+                                player.sendMessage(Text.translatable("text.dungeonz.required_level", dungeonPortalEntity.getDungeon().getRequiredLevel()), false);
                                 return;
                             }
                         }
@@ -209,7 +202,7 @@ public class DungeonHelper {
 
     public static void teleportPlayer(ServerPlayerEntity serverPlayerEntity, ServerWorld dungeonWorld, DungeonPortalEntity dungeonPortalEntity, BlockPos dungeonPortalPos) {
         ServerPlayerEntity playerEntity = (ServerPlayerEntity) serverPlayerEntity.teleportTo(DungeonPlacementHandler.enter(serverPlayerEntity, dungeonWorld, serverPlayerEntity.getServerWorld(),
-                dungeonPortalEntity, dungeonPortalPos, dungeonPortalEntity.getDifficulty(), dungeonPortalEntity.getDisableEffects()));
+                dungeonPortalEntity, dungeonPortalPos, dungeonPortalEntity.getDifficulty(), dungeonPortalEntity.getDungeon().isPositiveEffectsAllowed()));
 
         DungeonServerPacket.writeS2CDungeonInfoPacket(playerEntity, dungeonPortalEntity.getDungeon().getBreakableBlockIdList(), dungeonPortalEntity.getDungeon().getplaceableBlockIdList(),
                 dungeonPortalEntity.getDungeon().isElytraAllowed());

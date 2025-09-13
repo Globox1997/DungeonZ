@@ -54,7 +54,7 @@ import java.util.Map.Entry;
 public class DungeonPlacementHandler {
 
     public static TeleportTarget enter(ServerPlayerEntity serverPlayerEntity, ServerWorld dungeonWorld, ServerWorld oldWorld, DungeonPortalEntity portalEntity, BlockPos portalPos, String difficulty,
-                                       boolean disableEffects) {
+                                       boolean positiveEffects) {
         BlockPos playerBlockPos = serverPlayerEntity.getBlockPos().mutableCopy();
 
         if (oldWorld.getBlockState(playerBlockPos).isOf(BlockInit.DUNGEON_PORTAL) || oldWorld.getBlockState(playerBlockPos.down()).isOf(BlockInit.DUNGEON_PORTAL)) {
@@ -74,7 +74,7 @@ public class DungeonPlacementHandler {
             }
         }
         ((ServerPlayerAccess) serverPlayerEntity).setDungeonInfo(oldWorld, portalPos, playerBlockPos);
-        if (disableEffects) {
+        if (!positiveEffects) {
             serverPlayerEntity.clearStatusEffects();
         }
 
@@ -166,7 +166,7 @@ public class DungeonPlacementHandler {
                                     }
                                 } else if (state.getBlock() instanceof LandingBlock) {
                                     movingBlockMap.put(checkPos, blockId);
-                                } else if (state.contains(Properties.POWERED)) {
+                                } else if (state.contains(Properties.POWERED) && !state.isOf(Blocks.OBSERVER)) {
                                     poweredBlockMap.put(checkPos, new DungeonPortalEntity.Powered(blockId, state.get(Properties.POWERED), PropertyUtil.getHorizontalFacing(state), PropertyUtil.getBlockFacing(state)));
                                 }
                             }
@@ -212,7 +212,7 @@ public class DungeonPlacementHandler {
         }
     }
 
-    public static void refreshDungeon(MinecraftServer server, ServerWorld world, DungeonPortalEntity portalEntity, Dungeon dungeon, String difficulty, boolean luck) {
+    public static void refreshDungeon(MinecraftServer server, ServerWorld world, DungeonPortalEntity portalEntity, Dungeon dungeon, String difficulty) {
 
         // Could be tested with create = true
         // world.getChunkManager().threadedAnvilChunkStorage.getChunk(holder, requiredStatus).thenApply(either -> {
@@ -291,7 +291,7 @@ public class DungeonPlacementHandler {
         // Refresh chests
         for (int i = 0; i < portalEntity.getChestPosList().size(); i++) {
             String lootTableString = dungeon.getDifficultyLootTableIdMap().get(difficulty).get(world.getRandom().nextInt(dungeon.getDifficultyLootTableIdMap().get(difficulty).size()));
-            InventoryHelper.fillInventoryWithLoot(server, world, portalEntity.getChestPosList().get(i), lootTableString, luck);
+            InventoryHelper.fillInventoryWithLoot(server, world, portalEntity.getChestPosList().get(i), lootTableString);
         }
         // Refresh exit
         for (int i = 0; i < portalEntity.getExitPosList().size(); i++) {
