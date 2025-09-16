@@ -92,6 +92,8 @@ If you know how to create one, the folder path has to be ```data\dungeonz\dungeo
     "respawn": false,
     "elytra": false,
     "keep_inventory": false,
+    "ender_pearl": false,
+    "positive_effects": false,
     "max_group_size": 5,
     "min_group_size": 0, // Optional
     "required_level": 0, // Optional LevelZ compat
@@ -101,7 +103,8 @@ If you know how to create one, the folder path has to be ```data\dungeonz\dungeo
 }
 ```
 
-Make sure your first structure piece (`"dungeon_structure_pool_id"`) has a jigsaw block named `dungeonz:spawn`. This is the block where the player will teleport to.
+Make sure your first structure piece (`"dungeon_structure_pool_id"`) has a jigsaw block named `dungeonz:spawn`. This is the block where the player will teleport to.  
+To add information about your dungeon add `"dungeon.your_dungeon_type.description.1":"..."` (add up to 9 lines) translations keys at your lang file.
 
 An example part for the overworld structure which leads to the dungeon:
 
