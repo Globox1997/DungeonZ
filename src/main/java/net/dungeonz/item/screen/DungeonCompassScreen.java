@@ -210,7 +210,8 @@ public class DungeonCompassScreen extends Screen {
         }
 
         public void renderTooltip(DrawContext context, int mouseX, int mouseY) {
-            if (this.hovered) {
+            if (this.hovered
+                    && this.index + DungeonCompassScreen.this.indexStartOffset < DungeonCompassScreen.this.dungeonIds.size()) {
                 Text text = Text.translatable("dungeon." + DungeonCompassScreen.this.dungeonIds.get(this.index + DungeonCompassScreen.this.indexStartOffset));
                 if (client.textRenderer.getWidth(text) > 78) {
                     context.drawTooltip(textRenderer, text, mouseX, mouseY);
