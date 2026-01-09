@@ -16,22 +16,34 @@ If you know how to create one, the folder path has to be ```data\dungeonz\dungeo
     "dungeon_type": "dark_dungeon", // unique dungeon id, create a lang file in a resource pack "dungeon.unique_id" to have proper translation
     "difficulty": { // set difficulties here, can be any name but have to get translated with a resource pack if you don't use "easy","normal","hard" or "extreme"
         "easy": {
-            "mob_modificator": 1.0, // modificator to increase mob strength
+            "mob_health_modificator": 1.0, // modificator to increase mob base health
+            "mob_damage_modificator": 1.0, // modificator to increase mob base attack damage
+            "mob_protection_modificator": 1.0, // modificator to increase mob base armor
+            "mob_speed_modificator": 1.0, // modificator to increase mob base mouvement speed
             "loot_table_ids": [ // a list of different loot tables chests and barrels will get filled with
                 "dungeonz:chests/dark_dungeon_low_tier_chest_loot",
                 "dungeonz:chests/dark_dungeon_mid_tier_chest_loot"
             ],
-            "boss_modificator": 1.0,
+            "boss_health_modificator": 1.0, // modificator to increase boss base health
+            "boss_damage_modificator": 1.0, // modificator to increase boss base attack damage
+            "boss_protection_modificator": 1.0, // modificator to increase boss base armor
+            "boss_speed_modificator": 1.0, // modificator to increase boss base mouvement speed
             "boss_loot_table_id": "dungeonz:chests/dark_dungeon_easy_boss_loot"
         },
         "normal": {
-            "mob_modificator": 1.5,
+            "mob_health_modificator": 1.5,
+            "mob_damage_modificator": 1.5,
+            "mob_protection_modificator": 1.5,
+            "mob_speed_modificator": 1.15,
             "loot_table_ids": [
                 "dungeonz:chests/dark_dungeon_low_tier_chest_loot",
                 "dungeonz:chests/dark_dungeon_mid_tier_chest_loot",
                 "dungeonz:chests/dark_dungeon_high_tier_chest_loot"
             ],
-            "boss_modificator": 2.0,
+            "boss_health_modificator": 2.0,
+            "boss_damage_modificator": 2.0,
+            "boss_protection_modificator": 2.0,
+            "boss_speed_modificator": 1.15,
             "boss_loot_table_id": "dungeonz:chests/dark_dungeon_normal_boss_loot"
         }
     },
