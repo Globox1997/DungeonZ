@@ -373,6 +373,7 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
 
         int requiredLevel = 0;
         boolean allowRespawn = false;
+        boolean keepInventory = false;
         boolean allowPositiveEffects = false;
         boolean allowEnderPearl = false;
         boolean allowElytra = false;
@@ -385,11 +386,12 @@ public class DungeonPortalEntity extends EndPortalBlockEntity implements Extende
             allowEnderPearl = dungeon.isEnderPearlAllowed();
             allowPositiveEffects = dungeon.isPositiveEffectsAllowed();
             allowRespawn = dungeon.isRespawnAllowed();
+            keepInventory = dungeon.isKeepInventory();
             allowElytra = dungeon.isElytraAllowed();
         }
 
         return new DungeonPortalPacket(this.getDungeonType(), this.pos, this.getDungeonPlayerUuids(), this.getDeadDungeonPlayerUUIDs(), difficulties, possibleLoot, requiredItemStacks, this.getMaxGroupSize(),
-                this.getMinGroupSize(), this.getWaitingUuids().size(), requiredLevel, this.getCooldownTime(), this.getDifficulty(), allowEnderPearl, allowPositiveEffects, allowElytra, allowRespawn, this.getPrivateGroup(), backgroundId);
+                this.getMinGroupSize(), this.getWaitingUuids().size(), requiredLevel, this.getCooldownTime(), this.getDifficulty(), allowEnderPearl, allowPositiveEffects, allowElytra, allowRespawn, keepInventory, this.getPrivateGroup(), backgroundId);
     }
 
     public void finishDungeon(ServerWorld world, BlockPos pos) {

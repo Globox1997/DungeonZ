@@ -248,6 +248,7 @@ public class DungeonPortalScreen extends HandledScreen<DungeonPortalScreenHandle
             }
 
             dungeonInfo.add(Text.translatable("dungeonz.dungeon.info.respawn" + (this.handler.isAllowRespawn() ? "" : ".disabled")));
+            dungeonInfo.add(Text.translatable("dungeonz.dungeon.info.keep_inventory" + (this.handler.isKeepInventory() ? "" : ".disabled")));
             dungeonInfo.add(Text.translatable("dungeonz.dungeon.info.positive_effects" + (this.handler.isAllowPositiveEffects() ? "" : ".disabled")));
             dungeonInfo.add(Text.translatable("dungeonz.dungeon.info.ender_pearl" + (this.handler.isAllowEnderPearl() ? "" : ".disabled")));
             dungeonInfo.add(Text.translatable("dungeonz.dungeon.info.elytra" + (this.handler.isAllowElytra() ? "" : ".disabled")));
