@@ -89,16 +89,16 @@ If you know how to create one, the folder path has to be ```data\dungeonz\dungeo
         "minecraft:diamond": 4
       }
     },
-    "respawn": false,
-    "elytra": false,
-    "keep_inventory": false,
-    "ender_pearl": false,
-    "positive_effects": false,
+    "respawn": true, // Optional, true by default
+    "elytra": false, // Optional, false by default
+    "keep_inventory": false, // Optional, false by default
+    "ender_pearl": false, // Optional, false by default
+    "positive_effects": false, // Optional, false by default
     "max_group_size": 5,
-    "min_group_size": 0, // Optional
-    "required_level": 0, // Optional LevelZ compat
+    "min_group_size": 0, // Optional, 0 by default
+    "required_level": 0, // Optional, LevelZ compat, 0 by default
     "cooldown": 108000, // Cooldown after the dungeon is completed or failed in ticks
-    "background_texture": "", // Optional for custom dungeon portal backgrounds, set your texture path here
+    "background_texture": "", // Optional, custom dungeon portal backgrounds, set your texture path here
     "dungeon_structure_pool_id": "dungeonz:dark_dungeon/dungeon_spawn" // Structure part which the dungeon generates start of
 }
 ```

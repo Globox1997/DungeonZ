@@ -2,35 +2,59 @@
     "dungeon_type": "temple_dungeon",
     "difficulty": {
         "easy": {
-            "mob_modificator": 1.0,
+            "mob_health_modificator": 1.0,
+            "mob_damage_modificator": 1.0,
+            "mob_protection_modificator": 1.0,
+            "mob_speed_modificator": 1.0,
             "loot_table_ids": [
                 "dungeonz:chests/temple_dungeon_easy_tier_chest_loot"
             ],
-            "boss_modificator": 4.0,
+            "boss_health_modificator": 5.0,
+            "boss_damage_modificator": 1.5,
+            "boss_protection_modificator": 5.0,
+            "boss_speed_modificator": 1.0,
             "boss_loot_table_id": "dungeonz:chests/temple_dungeon_easy_boss_loot"
         },
         "normal": {
-            "mob_modificator": 2.0,
+            "mob_health_modificator": 2.0,
+            "mob_damage_modificator": 2.0,
+            "mob_protection_modificator": 2.0,
+            "mob_speed_modificator": 1.15,
             "loot_table_ids": [
                 "dungeonz:chests/temple_dungeon_normal_tier_chest_loot"
             ],
-            "boss_modificator": 8.0,
+            "boss_health_modificator": 7.5,
+            "boss_damage_modificator": 2.0,
+            "boss_protection_modificator": 7.5,
+            "boss_speed_modificator": 1.15,
             "boss_loot_table_id": "dungeonz:chests/temple_dungeon_normal_boss_loot"
         },
         "hard": {
-            "mob_modificator": 4.0,
+            "mob_health_modificator": 4.0,
+            "mob_damage_modificator": 4.0,
+            "mob_protection_modificator": 4.0,
+            "mob_speed_modificator": 1.30,
             "loot_table_ids": [
                 "dungeonz:chests/temple_dungeon_hard_tier_chest_loot"
             ],
-            "boss_modificator": 16.0,
+            "boss_health_modificator": 10.0,
+            "boss_damage_modificator": 3.0,
+            "boss_protection_modificator": 10.0,
+            "boss_speed_modificator": 1.30,
             "boss_loot_table_id": "dungeonz:chests/temple_dungeon_hard_boss_loot"
         },
         "extreme": {
-            "mob_modificator": 15.0,
+            "mob_health_modificator": 15.0,
+            "mob_damage_modificator": 15.0,
+            "mob_protection_modificator": 15.0,
+            "mob_speed_modificator": 1.30,
             "loot_table_ids": [
                 "dungeonz:chests/temple_dungeon_extreme_tier_chest_loot"
             ],
-            "boss_modificator": 25.0,
+            "boss_health_modificator": 25.0,
+            "boss_damage_modificator": 10.0,
+            "boss_protection_modificator": 10.0,
+            "boss_speed_modificator": 1.30,
             "boss_loot_table_id": "dungeonz:chests/temple_dungeon_extreme_boss_loot"
         }
     },
@@ -181,10 +205,16 @@
         },
         "hard": {
             "minecraft:diamond": 6
+        },
+        "extreme": {
+            "minecraft:diamond": 10
         }
     },
     "respawn":true,
     "elytra": false,
+    "keep_inventory": false,
+    "ender_pearl": false,
+    "positive_effects": true,
     "max_group_size": 5,
     "min_group_size": 0,
     "cooldown": 36000,

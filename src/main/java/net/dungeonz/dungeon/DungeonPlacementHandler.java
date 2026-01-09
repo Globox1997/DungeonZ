@@ -391,9 +391,11 @@ public class DungeonPlacementHandler {
         double mobHealth = mobEntity.getAttributeValue(EntityAttributes.GENERIC_MAX_HEALTH);
         double mobDamage = 0.0D;
         double mobProtection = 0.0D;
+        double mobSpeed = 0.0D;
 
         boolean hasAttackDamageAttribute = mobEntity.getAttributes().hasAttribute(EntityAttributes.GENERIC_ATTACK_DAMAGE);
         boolean hasArmorAttribute = mobEntity.getAttributes().hasAttribute(EntityAttributes.GENERIC_ARMOR);
+        boolean hasSpeedAttribute = mobEntity.getAttributes().hasAttribute(EntityAttributes.GENERIC_MOVEMENT_SPEED);
 
         if (hasAttackDamageAttribute) {
             mobDamage = mobEntity.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE);
@@ -401,20 +403,37 @@ public class DungeonPlacementHandler {
         if (hasArmorAttribute) {
             mobProtection = mobEntity.getAttributeValue(EntityAttributes.GENERIC_ARMOR);
         }
-        float strengthFactor = 0.0f;
-        if (isBossEntity) {
-            strengthFactor = dungeon.getDifficultyBossModificatorMap().get(difficulty);
-        } else {
-            strengthFactor = dungeon.getDifficultyMobModificatorMap().get(difficulty);
+        if (hasSpeedAttribute) {
+            mobSpeed = mobEntity.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED);
         }
-        mobHealth *= strengthFactor;
-        mobDamage *= strengthFactor;
-        mobProtection *= strengthFactor;
+
+        float healthFactor = 0.0f;
+        float damageFactor = 0.0f;
+        float protectionFactor = 0.0f;
+        float speedFactor = 0.0f;
+
+        if (isBossEntity) {
+            healthFactor = dungeon.getDifficultyBossHealthModificatorMap().get(difficulty);
+            damageFactor = dungeon.getDifficultyBossDamageModificatorMap().get(difficulty);
+            protectionFactor = dungeon.getDifficultyBossProtectionModificatorMap().get(difficulty);
+            speedFactor = dungeon.getDifficultyBossSpeedModificatorMap().get(difficulty);
+        } else {
+            healthFactor = dungeon.getDifficultyMobHealthModificatorMap().get(difficulty);
+            damageFactor = dungeon.getDifficultyMobDamageModificatorMap().get(difficulty);
+            protectionFactor = dungeon.getDifficultyMobProtectionModificatorMap().get(difficulty);
+            speedFactor = dungeon.getDifficultyMobSpeedModificatorMap().get(difficulty);
+        }
+
+        mobHealth *= healthFactor;
+        mobDamage *= damageFactor;
+        mobProtection *= protectionFactor;
+        mobSpeed *= speedFactor;
 
         // round factor
         mobHealth = Math.round(mobHealth * 100.0D) / 100.0D;
         mobDamage = Math.round(mobDamage * 100.0D) / 100.0D;
         mobProtection = Math.round(mobProtection * 100.0D) / 100.0D;
+        mobSpeed = Math.round(mobSpeed * 100.0D) / 100.0D;
 
         // Set Values
         mobEntity.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(mobHealth);
@@ -425,8 +444,11 @@ public class DungeonPlacementHandler {
         if (hasArmorAttribute) {
             mobEntity.getAttributeInstance(EntityAttributes.GENERIC_ARMOR).setBaseValue(mobProtection);
         }
+        if (hasSpeedAttribute) {
+            mobEntity.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(mobSpeed);
+        }
         if (DungeonzMain.isRpgDifficultyLoaded) {
-            MobStrengthener.setMobHealthMultiplier(mobEntity, strengthFactor);
+            MobStrengthener.setMobHealthMultiplier(mobEntity, healthFactor);
         }
 
     }

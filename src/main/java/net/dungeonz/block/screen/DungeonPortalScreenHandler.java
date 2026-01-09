@@ -34,6 +34,7 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
 
     private int requiredLevel = 0;
     private boolean allowRespawn = false;
+    private boolean keepInventory = false;
     private boolean allowPositiveEffects = false;
     private boolean allowEnderPearl = false;
     private boolean allowElytra = false;
@@ -46,26 +47,26 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
         this.getDungeonPortalEntity().setDungeonType(packet.dungeonType());
         this.pos = packet.blockPos();
 
+        this.getDungeonPortalEntity().setDungeonPlayerUuids(packet.playerUuids());
+        this.getDungeonPortalEntity().setDeadDungeonPlayerUuids(packet.deadPlayerUuids());
         this.setDifficulties(packet.difficulties());
+
         this.setPossibleLootItemStacks(packet.possibleLoot());
         this.setRequiredItemStacks(packet.requiredItemStacks());
 
-        this.setWaitingGroupSize(packet.waitingPlayerCount());
-
-        this.getDungeonPortalEntity().setDungeonPlayerUuids(packet.playerUuids());
-        this.getDungeonPortalEntity().setDeadDungeonPlayerUuids(packet.deadPlayerUuids());
         this.getDungeonPortalEntity().setMaxGroupSize(packet.maxGroupSize());
         this.getDungeonPortalEntity().setMinGroupSize(packet.minGroupSize());
+        this.setWaitingGroupSize(packet.waitingPlayerCount());
+        this.requiredLevel = packet.requiredLevel();
         this.getDungeonPortalEntity().setCooldownTime(packet.cooldownTime());
         this.getDungeonPortalEntity().setDifficulty(packet.difficulty());
-        this.getDungeonPortalEntity().setPrivateGroup(packet.privateGroup());
-
-        this.requiredLevel = packet.requiredLevel();
-        this.allowRespawn = packet.allowRespawn();
-        this.allowPositiveEffects = packet.allowPositiveEffects();
+        
         this.allowEnderPearl = packet.allowEnderPearl();
+        this.allowPositiveEffects = packet.allowPositiveEffects();
         this.allowElytra = packet.allowElytra();
-
+        this.allowRespawn = packet.allowRespawn();
+        this.keepInventory = packet.keepInventory();
+        this.getDungeonPortalEntity().setPrivateGroup(packet.privateGroup());
         this.backgroundId = packet.backgroundId().orElse(null);
     }
 
@@ -149,6 +150,10 @@ public class DungeonPortalScreenHandler extends ScreenHandler {
 
     public boolean isAllowRespawn() {
         return allowRespawn;
+    }
+
+    public boolean isKeepInventory() {
+        return keepInventory;
     }
 
     public boolean isAllowPositiveEffects() {
