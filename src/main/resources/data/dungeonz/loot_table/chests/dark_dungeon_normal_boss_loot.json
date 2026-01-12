@@ -49,8 +49,7 @@
                                 "type": "minecraft:uniform",
                                 "max": 50.0,
                                 "min": 30.0
-                            },
-                            "treasure": true
+                            }
                         }
                     ],
                     "name": "minecraft:diamond_sword",
@@ -79,8 +78,7 @@
                                 "type": "minecraft:uniform",
                                 "max": 50.0,
                                 "min": 30.0
-                            },
-                            "treasure": true
+                            }
                         }
                     ],
                     "name": "minecraft:diamond_shovel",
@@ -109,8 +107,7 @@
                                 "type": "minecraft:uniform",
                                 "max": 50.0,
                                 "min": 30.0
-                            },
-                            "treasure": true
+                            }
                         }
                     ],
                     "name": "minecraft:diamond_pickaxe",
@@ -139,8 +136,7 @@
                                 "type": "minecraft:uniform",
                                 "max": 50.0,
                                 "min": 30.0
-                            },
-                            "treasure": true
+                            }
                         }
                     ],
                     "name": "minecraft:diamond_axe",
@@ -169,8 +165,7 @@
                                 "type": "minecraft:uniform",
                                 "max": 50.0,
                                 "min": 30.0
-                            },
-                            "treasure": true
+                            }
                         }
                     ],
                     "name": "minecraft:diamond_hoe",
@@ -199,8 +194,7 @@
                                 "type": "minecraft:uniform",
                                 "max": 50.0,
                                 "min": 30.0
-                            },
-                            "treasure": true
+                            }
                         }
                     ],
                     "name": "minecraft:diamond_helmet",
@@ -229,8 +223,7 @@
                                 "type": "minecraft:uniform",
                                 "max": 50.0,
                                 "min": 30.0
-                            },
-                            "treasure": true
+                            }
                         }
                     ],
                     "name": "minecraft:diamond_chestplate",
@@ -259,8 +252,7 @@
                                 "type": "minecraft:uniform",
                                 "max": 50.0,
                                 "min": 30.0
-                            },
-                            "treasure": true
+                            }
                         }
                     ],
                     "name": "minecraft:diamond_leggings",
@@ -289,8 +281,7 @@
                                 "type": "minecraft:uniform",
                                 "max": 50.0,
                                 "min": 30.0
-                            },
-                            "treasure": true
+                            }
                         }
                     ],
                     "name": "minecraft:diamond_boots",
@@ -311,8 +302,7 @@
                     "functions": [
                         {
                             "function": "minecraft:enchant_with_levels",
-                            "levels": 30.0,
-                            "treasure": true
+                            "levels": 30.0
                         }
                     ],
                     "name": "minecraft:book"
