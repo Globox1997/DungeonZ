@@ -42,8 +42,7 @@
                                 "type": "minecraft:uniform",
                                 "max": 50.0,
                                 "min": 30.0
-                            },
-                            "treasure": true
+                            }
                         }
                     ],
                     "name": "minecraft:iron_sword",
@@ -72,8 +71,7 @@
                                 "type": "minecraft:uniform",
                                 "max": 50.0,
                                 "min": 30.0
-                            },
-                            "treasure": true
+                            }
                         }
                     ],
                     "name": "minecraft:iron_shovel",
@@ -102,8 +100,7 @@
                                 "type": "minecraft:uniform",
                                 "max": 50.0,
                                 "min": 30.0
-                            },
-                            "treasure": true
+                            }
                         }
                     ],
                     "name": "minecraft:iron_pickaxe",
@@ -132,8 +129,7 @@
                                 "type": "minecraft:uniform",
                                 "max": 50.0,
                                 "min": 30.0
-                            },
-                            "treasure": true
+                            }
                         }
                     ],
                     "name": "minecraft:iron_axe",
@@ -162,8 +158,7 @@
                                 "type": "minecraft:uniform",
                                 "max": 50.0,
                                 "min": 30.0
-                            },
-                            "treasure": true
+                            }
                         }
                     ],
                     "name": "minecraft:iron_hoe",
@@ -192,8 +187,7 @@
                                 "type": "minecraft:uniform",
                                 "max": 50.0,
                                 "min": 30.0
-                            },
-                            "treasure": true
+                            }
                         }
                     ],
                     "name": "minecraft:iron_helmet",
@@ -222,8 +216,7 @@
                                 "type": "minecraft:uniform",
                                 "max": 50.0,
                                 "min": 30.0
-                            },
-                            "treasure": true
+                            }
                         }
                     ],
                     "name": "minecraft:iron_chestplate",
@@ -252,8 +245,7 @@
                                 "type": "minecraft:uniform",
                                 "max": 50.0,
                                 "min": 30.0
-                            },
-                            "treasure": true
+                            }
                         }
                     ],
                     "name": "minecraft:iron_leggings",
@@ -282,8 +274,7 @@
                                 "type": "minecraft:uniform",
                                 "max": 50.0,
                                 "min": 30.0
-                            },
-                            "treasure": true
+                            }
                         }
                     ],
                     "name": "minecraft:iron_boots",
@@ -304,8 +295,7 @@
                     "functions": [
                         {
                             "function": "minecraft:enchant_with_levels",
-                            "levels": 30.0,
-                            "treasure": true
+                            "levels": 30.0
                         }
                     ],
                     "name": "minecraft:book"

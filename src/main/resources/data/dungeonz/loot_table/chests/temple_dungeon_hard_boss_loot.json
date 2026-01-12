@@ -38,10 +38,10 @@
           "weight": 1,
           "functions": [
             {
-              "enchantments": [
+              "function": "minecraft:enchant_randomly",
+              "options": [
                 "minecraft:mending"
-              ],
-              "function": "minecraft:enchant_randomly"
+              ]
             }
           ]
         }
@@ -78,8 +78,7 @@
                 "type": "minecraft:uniform",
                 "max": 50.0,
                 "min": 30.0
-              },
-              "treasure": true
+              }
             }
           ],
           "name": "minecraft:netherite_sword",
@@ -108,8 +107,7 @@
                 "type": "minecraft:uniform",
                 "max": 50.0,
                 "min": 30.0
-              },
-              "treasure": true
+              }
             }
           ],
           "name": "minecraft:netherite_shovel",
@@ -138,8 +136,7 @@
                 "type": "minecraft:uniform",
                 "max": 50.0,
                 "min": 30.0
-              },
-              "treasure": true
+              }
             }
           ],
           "name": "minecraft:netherite_pickaxe",
@@ -168,8 +165,7 @@
                 "type": "minecraft:uniform",
                 "max": 50.0,
                 "min": 30.0
-              },
-              "treasure": true
+              }
             }
           ],
           "name": "minecraft:netherite_axe",
@@ -198,8 +194,7 @@
                 "type": "minecraft:uniform",
                 "max": 50.0,
                 "min": 30.0
-              },
-              "treasure": true
+              }
             }
           ],
           "name": "minecraft:netherite_hoe",
@@ -228,8 +223,7 @@
                 "type": "minecraft:uniform",
                 "max": 50.0,
                 "min": 30.0
-              },
-              "treasure": true
+              }
             }
           ],
           "name": "minecraft:netherite_helmet",
@@ -258,8 +252,7 @@
                 "type": "minecraft:uniform",
                 "max": 50.0,
                 "min": 30.0
-              },
-              "treasure": true
+              }
             }
           ],
           "name": "minecraft:netherite_chestplate",
@@ -288,8 +281,7 @@
                 "type": "minecraft:uniform",
                 "max": 50.0,
                 "min": 30.0
-              },
-              "treasure": true
+              }
             }
           ],
           "name": "minecraft:netherite_leggings",
@@ -318,8 +310,7 @@
                 "type": "minecraft:uniform",
                 "max": 50.0,
                 "min": 30.0
-              },
-              "treasure": true
+              }
             }
           ],
           "name": "minecraft:netherite_boots",
@@ -340,8 +331,7 @@
           "functions": [
             {
               "function": "minecraft:enchant_with_levels",
-              "levels": 30.0,
-              "treasure": true
+              "levels": 30.0
             }
           ],
           "name": "minecraft:book"
