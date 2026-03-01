@@ -1,10 +1,6 @@
 package net.dungeonz.network.packet;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-
+import net.dungeonz.DungeonzMain;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.RegistryByteBuf;
@@ -13,12 +9,17 @@ import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
 public record DungeonPortalPacket(String dungeonType, BlockPos blockPos, List<UUID> playerUuids, List<UUID> deadPlayerUuids, List<String> difficulties, Map<String, List<ItemStack>> possibleLoot,
                                   Map<String, List<ItemStack>> requiredItemStacks, int maxGroupSize, int minGroupSize, int waitingPlayerCount, int requiredLevel, int cooldownTime, String difficulty,
                                   boolean allowEnderPearl, boolean allowPositiveEffects, boolean allowElytra, boolean allowRespawn, boolean keepInventory, boolean privateGroup, Optional<Identifier> backgroundId)
         implements CustomPayload {
 
-    public static final CustomPayload.Id<DungeonPortalPacket> PACKET_ID = new CustomPayload.Id<>(Identifier.of("dungeonz", "dungeon_portal_packet"));
+    public static final CustomPayload.Id<DungeonPortalPacket> PACKET_ID = new CustomPayload.Id<>(DungeonzMain.identifierOf("dungeon_portal_packet"));
 
     public static final PacketCodec<RegistryByteBuf, DungeonPortalPacket> PACKET_CODEC = PacketCodec.of((value, buf) -> {
         buf.writeString(value.dungeonType);

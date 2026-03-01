@@ -1,8 +1,6 @@
 package net.dungeonz.item;
 
-import java.util.List;
-import java.util.Optional;
-
+import net.dungeonz.DungeonzMain;
 import net.dungeonz.init.ItemInit;
 import net.dungeonz.item.component.DungeonCompassComponent;
 import net.dungeonz.network.DungeonServerPacket;
@@ -19,11 +17,13 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Optional;
 
 public class DungeonCompassItem extends Item {
 
@@ -93,7 +93,7 @@ public class DungeonCompassItem extends Item {
 
     @Nullable
     private static BlockPos getDungeonStructurePos(ServerWorld world, String dungeonType, BlockPos playerPos) {
-        return world.locateStructure(TagKey.of(RegistryKeys.STRUCTURE, Identifier.of("dungeonz", dungeonType)), playerPos, 100, false);
+        return world.locateStructure(TagKey.of(RegistryKeys.STRUCTURE, DungeonzMain.identifierOf(dungeonType)), playerPos, 100, false);
     }
 
     @Override

@@ -95,7 +95,7 @@ public class DungeonPlacementHandler {
         Registry<StructurePool> registry = world.getRegistryManager().get(RegistryKeys.TEMPLATE_POOL);
 
         RegistryEntry<StructurePool> registryEntry = registry.entryOf(RegistryKey.of(RegistryKeys.TEMPLATE_POOL, portalEntity.getDungeon().getStructurePoolId()));
-        generate(world, portalEntity, portalEntity.getDungeon(), registryEntry, Identifier.of("dungeonz:spawn"), 64, pos, false);
+        generate(world, portalEntity, portalEntity.getDungeon(), registryEntry, DungeonzMain.identifierOf("spawn"), 64, pos, false);
     }
 
     private static boolean generate(ServerWorld world, DungeonPortalEntity portalEntity, Dungeon dungeon, RegistryEntry<StructurePool> structurePool, Identifier id, int size, BlockPos pos,

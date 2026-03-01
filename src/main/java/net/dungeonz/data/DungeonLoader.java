@@ -32,7 +32,7 @@ public class DungeonLoader implements SimpleSynchronousResourceReloadListener {
 
     @Override
     public Identifier getFabricId() {
-        return Identifier.of("dungeonz", "dungeon_loader");
+        return DungeonzMain.identifierOf("dungeon_loader");
     }
 
     @Override

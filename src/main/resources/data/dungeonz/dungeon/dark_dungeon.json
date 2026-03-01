@@ -157,6 +157,8 @@
     "max_group_size": 5,
     "min_group_size": 0,
     "cooldown": 108000,
+    "respawn": true,
+    "keep_inventory": true,
     "background_texture": "",
     "dungeon_structure_pool_id": "dungeonz:dark_dungeon/dungeon_spawn"
 }

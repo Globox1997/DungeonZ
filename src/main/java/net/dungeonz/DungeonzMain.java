@@ -3,6 +3,7 @@ package net.dungeonz;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,6 +47,10 @@ public class DungeonzMain implements ModInitializer {
         EventInit.init();
         TagInit.init();
         CommandInit.init();
+    }
+
+    public static Identifier identifierOf(String name) {
+        return Identifier.of("dungeonz", name);
     }
 
 }

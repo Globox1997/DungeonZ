@@ -1,7 +1,12 @@
 package net.dungeonz.init;
 
-import net.dungeonz.block.*;
-import net.dungeonz.block.entity.*;
+import net.dungeonz.DungeonzMain;
+import net.dungeonz.block.DungeonGateBlock;
+import net.dungeonz.block.DungeonPortalBlock;
+import net.dungeonz.block.DungeonSpawnerBlock;
+import net.dungeonz.block.entity.DungeonGateEntity;
+import net.dungeonz.block.entity.DungeonPortalEntity;
+import net.dungeonz.block.entity.DungeonSpawnerEntity;
 import net.dungeonz.block.screen.DungeonPortalScreenHandler;
 import net.dungeonz.network.packet.DungeonPortalPacket;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -28,13 +33,13 @@ public class BlockInit {
     public static BlockEntityType<DungeonSpawnerEntity> DUNGEON_SPAWNER_ENTITY;
     public static BlockEntityType<DungeonGateEntity> DUNGEON_GATE_ENTITY;
 
-  //  public static final ScreenHandlerType<DungeonPortalScreenHandler> PORTAL = new ExtendedScreenHandlerType<>(DungeonPortalScreenHandler::new);
+    //  public static final ScreenHandlerType<DungeonPortalScreenHandler> PORTAL = new ExtendedScreenHandlerType<>(DungeonPortalScreenHandler::new);
 
     public static final ScreenHandlerType<DungeonPortalScreenHandler> PORTAL = new ExtendedScreenHandlerType<DungeonPortalScreenHandler, DungeonPortalPacket>(
             (syncId, playerInventory, buf) -> new DungeonPortalScreenHandler(syncId, playerInventory, buf), DungeonPortalPacket.PACKET_CODEC);
 
     private static Block register(String id, Block block) {
-        return register(Identifier.of("dungeonz", id), block);
+        return register(DungeonzMain.identifierOf(id), block);
     }
 
     private static Block register(Identifier id, Block block) {
@@ -45,11 +50,11 @@ public class BlockInit {
     }
 
     public static void init() {
-        DUNGEON_PORTAL_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, "dungeonz:dungeon_portal_entity",
+        DUNGEON_PORTAL_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, DungeonzMain.identifierOf("dungeon_portal_entity"),
                 BlockEntityType.Builder.create(DungeonPortalEntity::new, DUNGEON_PORTAL).build(null));
-        DUNGEON_SPAWNER_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, "dungeonz:dungeon_spawner_entity",
+        DUNGEON_SPAWNER_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, DungeonzMain.identifierOf("dungeon_spawner_entity"),
                 BlockEntityType.Builder.create(DungeonSpawnerEntity::new, DUNGEON_SPAWNER).build(null));
-        DUNGEON_GATE_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, "dungeonz:dungeon_gate_entity", BlockEntityType.Builder.create(DungeonGateEntity::new, DUNGEON_GATE).build(null));
+        DUNGEON_GATE_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, DungeonzMain.identifierOf("dungeon_gate_entity"), BlockEntityType.Builder.create(DungeonGateEntity::new, DUNGEON_GATE).build(null));
 
         Registry.register(Registries.SCREEN_HANDLER, "dungeonz:portal", PORTAL);
     }
