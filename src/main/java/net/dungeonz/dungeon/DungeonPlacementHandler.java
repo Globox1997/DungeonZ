@@ -271,11 +271,11 @@ public class DungeonPlacementHandler {
             }
         }
 
-        // Refresh boss
         MobEntity bossEntity = createMob(world, dungeon.getBossEntityType(), dungeon.getBossNbtCompound());
         bossEntity.initialize(world, world.getLocalDifficulty(portalEntity.getBossBlockPos()), SpawnReason.STRUCTURE, null);
         bossEntity.setPersistent();
         ((BossEntityAccess) bossEntity).setBoss(portalEntity.getPos(), portalEntity.getWorld().getRegistryKey().getValue().toString());
+        ((BossEntityAccess) bossEntity).setDungeonData(dungeon.getDungeonTypeId(), difficulty);
         strengthenMob(bossEntity, dungeon, difficulty, true);
 
         if (dungeon.getBlockIdBlockReplacementMap().get(dungeon.getBossBlockId()) != -1) {
