@@ -167,7 +167,21 @@ public class DungeonPlacementHandler {
                                 } else if (state.getBlock() instanceof LandingBlock) {
                                     movingBlockMap.put(checkPos, blockId);
                                 } else if (state.contains(Properties.POWERED) && !state.isOf(Blocks.OBSERVER)) {
-                                    poweredBlockMap.put(checkPos, new DungeonPortalEntity.Powered(blockId, state.get(Properties.POWERED), PropertyUtil.getHorizontalFacing(state), PropertyUtil.getBlockFacing(state)));
+                                    // ★★★ УЛУЧШЕННОЕ СОХРАНЕНИЕ ДЛЯ ДВЕРЕЙ И ЛЮКОВ ★★★
+                                    int facingHorizontal = -1;
+                                    int facingBlock = -1;
+                                    
+                                    // Безопасно читаем HORIZONTAL_FACING (для дверей)
+                                    if (state.contains(Properties.HORIZONTAL_FACING)) {
+                                        facingHorizontal = state.get(Properties.HORIZONTAL_FACING).getHorizontal();
+                                    }
+                                    // Безопасно читаем FACING (для люков и других блоков)
+                                    // Сохраняем как int через getBlockFacing(BlockState)
+                                    if (state.contains(Properties.FACING)) {
+                                        facingBlock = PropertyUtil.getBlockFacing(state);
+                                    }
+                                    
+                                    poweredBlockMap.put(checkPos, new DungeonPortalEntity.Powered(blockId, state.get(Properties.POWERED), facingHorizontal, facingBlock));
                                 }
                             }
                         }
@@ -214,24 +228,6 @@ public class DungeonPlacementHandler {
 
     public static void refreshDungeon(MinecraftServer server, ServerWorld world, DungeonPortalEntity portalEntity, Dungeon dungeon, String difficulty) {
 
-        // Could be tested with create = true
-        // world.getChunkManager().threadedAnvilChunkStorage.getChunk(holder, requiredStatus).thenApply(either -> {
-        // // This block will be executed when the CompletableFuture completes
-        // // either contains the result of the getChunk method
-        // return either.map(chunk -> {
-        // // Do something with the Chunk
-        // System.out.println("Got chunk: " + chunk);
-        // return chunk;
-        // }, unloaded -> {
-        // // Handle the Unloaded case
-        // System.out.println("Chunk is unloaded");
-        // return null;
-        // });
-        // }).thenAccept(result -> {
-        // // This block will be executed after the thenApply block
-        // System.out.println("Completed processing of chunk");
-        // });
-
         // Refresh mobs
         for (int u = 0; u < portalEntity.getDungeonEdgeList().size() / 6; u++) {
             List<Entity> entities = world.getOtherEntities(null,
@@ -256,11 +252,9 @@ public class DungeonPlacementHandler {
                         world.setBlockState(entry.getValue().get(i), Registries.BLOCK.get(dungeon.getBlockIdBlockReplacementMap().get(entry.getKey())).getDefaultState(), 3);
                     }
                 }
-                // dungeon.getBlockIdEntitySpawnChanceMap().containsKey(blockId) &&
                 if (world.getRandom().nextFloat() <= dungeon.getBlockIdEntitySpawnChanceMap().get(entry.getKey()).get(difficulty)) {
                     MobEntity mobEntity = createMob(world, dungeon.getBlockIdEntityMap().get(entry.getKey()).get(world.getRandom().nextInt(dungeon.getBlockIdEntityMap().get(entry.getKey()).size())),
                             null);
-                    // hopefully initialize doesn't lead to problems
                     mobEntity.initialize(world, world.getLocalDifficulty(entry.getValue().get(i)), SpawnReason.STRUCTURE, null);
                     mobEntity.setPersistent();
                     strengthenMob(mobEntity, dungeon, difficulty, false);
@@ -271,6 +265,7 @@ public class DungeonPlacementHandler {
             }
         }
 
+        // Refresh boss
         MobEntity bossEntity = createMob(world, dungeon.getBossEntityType(), dungeon.getBossNbtCompound());
         bossEntity.initialize(world, world.getLocalDifficulty(portalEntity.getBossBlockPos()), SpawnReason.STRUCTURE, null);
         bossEntity.setPersistent();
@@ -290,59 +285,142 @@ public class DungeonPlacementHandler {
 
         // Refresh chests
         for (int i = 0; i < portalEntity.getChestPosList().size(); i++) {
+            BlockPos chestPos = portalEntity.getChestPosList().get(i);
+            if (world.getBlockState(chestPos).isAir()) {
+                DungeonzMain.LOGGER.warn("Chest at {} is missing (air), skipping loot fill", chestPos);
+                continue;
+            }
             String lootTableString = dungeon.getDifficultyLootTableIdMap().get(difficulty).get(world.getRandom().nextInt(dungeon.getDifficultyLootTableIdMap().get(difficulty).size()));
-            InventoryHelper.fillInventoryWithLoot(server, world, portalEntity.getChestPosList().get(i), lootTableString);
+            InventoryHelper.fillInventoryWithLoot(server, world, chestPos, lootTableString);
         }
+        
         // Refresh exit
         for (int i = 0; i < portalEntity.getExitPosList().size(); i++) {
-            world.setBlockState(portalEntity.getExitPosList().get(i),
+            BlockPos exitPos = portalEntity.getExitPosList().get(i);
+            if (world.getBlockState(exitPos).isAir()) {
+                DungeonzMain.LOGGER.warn("Exit block at {} is missing (air), skipping", exitPos);
+                continue;
+            }
+            world.setBlockState(exitPos,
                     dungeon.getBlockIdBlockReplacementMap().containsKey(dungeon.getExitBlockId()) && dungeon.getBlockIdBlockReplacementMap().get(dungeon.getExitBlockId()) != -1
                             ? Registries.BLOCK.get(dungeon.getBlockIdBlockReplacementMap().get(dungeon.getExitBlockId())).getDefaultState()
                             : Registries.BLOCK.get(dungeon.getExitBlockId()).getDefaultState(),
                     3);
-        } // Refresh gates
-        for (int i = 0; i < portalEntity.getGatePosList().size(); i++) {
-            world.setBlockState(portalEntity.getGatePosList().get(i), world.getBlockState(portalEntity.getGatePosList().get(i)).cycle(DungeonGateBlock.ENABLED));
         }
+        
+        // Refresh gates
+        for (int i = 0; i < portalEntity.getGatePosList().size(); i++) {
+            BlockPos gatePos = portalEntity.getGatePosList().get(i);
+            if (world.getBlockState(gatePos).isAir()) {
+                DungeonzMain.LOGGER.warn("Gate at {} is missing (air), skipping", gatePos);
+                continue;
+            }
+            world.setBlockState(gatePos, world.getBlockState(gatePos).cycle(DungeonGateBlock.ENABLED));
+        }
+        
         // Refresh boss loot
-        world.setBlockState(portalEntity.getBossLootBlockPos(),
-                dungeon.getBlockIdBlockReplacementMap().containsKey(dungeon.getBossLootBlockId()) && dungeon.getBlockIdBlockReplacementMap().get(dungeon.getBossLootBlockId()) != -1
-                        ? Registries.BLOCK.get(dungeon.getBlockIdBlockReplacementMap().get(dungeon.getBossLootBlockId())).getDefaultState()
-                        : Registries.BLOCK.get(dungeon.getBossLootBlockId()).getDefaultState(),
-                3);
+        BlockPos bossLootPos = portalEntity.getBossLootBlockPos();
+        if (bossLootPos != null && !world.getBlockState(bossLootPos).isAir()) {
+            world.setBlockState(bossLootPos,
+                    dungeon.getBlockIdBlockReplacementMap().containsKey(dungeon.getBossLootBlockId()) && dungeon.getBlockIdBlockReplacementMap().get(dungeon.getBossLootBlockId()) != -1
+                            ? Registries.BLOCK.get(dungeon.getBlockIdBlockReplacementMap().get(dungeon.getBossLootBlockId())).getDefaultState()
+                            : Registries.BLOCK.get(dungeon.getBossLootBlockId()).getDefaultState(),
+                    3);
+        } else if (bossLootPos != null) {
+            DungeonzMain.LOGGER.warn("Boss loot block at {} is missing (air), skipping", bossLootPos);
+        }
+        
         // Refresh spawner
         for (Entry<BlockPos, Integer> entry : portalEntity.getSpawnerPosEntityIdMap().entrySet()) {
-            world.setBlockState(entry.getKey(), BlockInit.DUNGEON_SPAWNER.getDefaultState(), 3);
-            ((DungeonSpawnerEntity) world.getBlockEntity(entry.getKey())).getLogic().setDungeonInfo(dungeon, difficulty,
+            BlockPos spawnerPos = entry.getKey();
+            if (world.getBlockState(spawnerPos).isAir()) {
+                DungeonzMain.LOGGER.warn("Spawner at {} is missing (air), skipping", spawnerPos);
+                continue;
+            }
+            world.setBlockState(spawnerPos, BlockInit.DUNGEON_SPAWNER.getDefaultState(), 3);
+            ((DungeonSpawnerEntity) world.getBlockEntity(spawnerPos)).getLogic().setDungeonInfo(dungeon, difficulty,
                     dungeon.getSpawnerEntityIdMap().containsKey(entry.getValue()) ? dungeon.getSpawnerEntityIdMap().get(entry.getValue()) : 0, Registries.ENTITY_TYPE.get(entry.getValue()));
         }
+        
         // Refresh blocks
         for (Entry<BlockPos, Integer> entry : portalEntity.getReplaceBlockIdMap().entrySet()) {
-            world.setBlockState(entry.getKey(), Registries.BLOCK.get(entry.getValue()).getDefaultState(), 3);
+            BlockPos replacePos = entry.getKey();
+            if (!world.getBlockState(replacePos).isAir()) {
+                world.setBlockState(replacePos, Registries.BLOCK.get(entry.getValue()).getDefaultState(), 3);
+            }
         }
-        // Refresh powered blocks
+        
+        // ★★★ ПОЛНОСТЬЮ ПЕРЕРАБОТАННОЕ ВОССТАНОВЛЕНИЕ ДЛЯ ДВЕРЕЙ И ЛЮКОВ ★★★
         for (Entry<BlockPos, DungeonPortalEntity.Powered> entry : portalEntity.getPoweredBlockMap().entrySet()) {
-            BlockState blockState = Registries.BLOCK.get(entry.getValue().getBlockId()).getDefaultState().with(Properties.POWERED, entry.getValue().getPowered());
-            boolean hasFacing = blockState.contains(Properties.HORIZONTAL_FACING);
-            if (hasFacing) {
-                blockState = blockState.with(Properties.HORIZONTAL_FACING, Direction.fromHorizontal(entry.getValue().getFacing()));
+            BlockPos poweredPos = entry.getKey();
+            DungeonPortalEntity.Powered data = entry.getValue();
+            
+            // Проверяем, существует ли блок в мире
+            BlockState currentState = world.getBlockState(poweredPos);
+            
+            // Если блока нет в мире или это воздух, восстанавливаем его из сохранённых данных
+            if (currentState.isAir()) {
+                DungeonzMain.LOGGER.info("Restoring missing powered block at {}", poweredPos);
+                Block targetBlock = Registries.BLOCK.get(data.getBlockId());
+                if (targetBlock != Blocks.AIR) {
+                    world.setBlockState(poweredPos, targetBlock.getDefaultState(), 3);
+                    currentState = world.getBlockState(poweredPos);
+                } else {
+                    DungeonzMain.LOGGER.warn("Cannot restore powered block at {}: target block is AIR", poweredPos);
+                    continue;
+                }
             }
-            if (blockState.contains(Properties.BLOCK_FACE)) {
-                blockState = blockState.with(Properties.BLOCK_FACE, PropertyUtil.getBlockFacing(entry.getValue().getBlockFacing()));
+            
+            // Применяем сохранённые свойства к блоку
+            BlockState newState = currentState;
+            
+            // Восстанавливаем состояние POWERED (включён/выключен)
+            if (newState.contains(Properties.POWERED)) {
+                newState = newState.with(Properties.POWERED, data.getPowered());
             }
-            world.setBlockState(entry.getKey(), blockState, 3);
-            world.updateNeighborsAlways(entry.getKey(), world.getBlockState(entry.getKey()).getBlock());
-            if (hasFacing) {
-                world.updateNeighborsAlways(entry.getKey().offset(world.getBlockState(entry.getKey()).get(Properties.HORIZONTAL_FACING).getOpposite()), world.getBlockState(entry.getKey()).getBlock());
+            
+            // Восстанавливаем горизонтальное направление (для дверей)
+            if (newState.contains(Properties.HORIZONTAL_FACING) && data.getFacing() >= 0 && data.getFacing() <= 3) {
+                newState = newState.with(Properties.HORIZONTAL_FACING, Direction.fromHorizontal(data.getFacing()));
+            }
+            
+            // Восстанавливаем полное направление (для люков и блоков, смотрящих вверх/вниз)
+            // PropertyUtil.getBlockFacing(int) возвращает Direction (по крайней мере, должен)
+            if (newState.contains(Properties.FACING) && data.getBlockFacing() >= 0) {
+                Direction facing = null;
+                // Пробуем получить Direction из int значения
+                if (data.getBlockFacing() >= 0 && data.getBlockFacing() <= 5) {
+                    // В Minecraft Direction хранит значения в массиве, получаем по индексу
+                    facing = Direction.values()[data.getBlockFacing()];
+                }
+                if (facing != null) {
+                    newState = newState.with(Properties.FACING, facing);
+                }
+            }
+            
+            // Устанавливаем блок с правильными свойствами
+            try {
+                world.setBlockState(poweredPos, newState, 3);
+                world.updateNeighborsAlways(poweredPos, newState.getBlock());
+                if (newState.contains(Properties.HORIZONTAL_FACING)) {
+                    world.updateNeighborsAlways(poweredPos.offset(newState.get(Properties.HORIZONTAL_FACING).getOpposite()), newState.getBlock());
+                }
+            } catch (Exception e) {
+                DungeonzMain.LOGGER.error("Failed to restore powered block at {}: {}", poweredPos, e.getMessage());
             }
         }
+        
         // Refresh moving blocks
         List<BlockPos> freshPlacedBlockPoses = new ArrayList<>();
         for (Entry<BlockPos, Integer> entry : portalEntity.getMovingBlockMap().entrySet()) {
+            BlockPos movingPos = entry.getKey();
+            if (movingPos == null || world.getBlockState(movingPos).isAir()) {
+                continue;
+            }
             Block block = Registries.BLOCK.get(entry.getValue());
-            if (!world.getBlockState(entry.getKey()).isOf(block)) {
+            if (!world.getBlockState(movingPos).isOf(block)) {
                 for (int i = 1; i < 50; i++) {
-                    BlockPos checkPos = entry.getKey().down(i);
+                    BlockPos checkPos = movingPos.down(i);
                     if (freshPlacedBlockPoses.contains(checkPos)) {
                         continue;
                     }
@@ -351,8 +429,8 @@ public class DungeonPlacementHandler {
                         break;
                     }
                 }
-                world.setBlockState(entry.getKey(), Registries.BLOCK.get(entry.getValue()).getDefaultState(), 3);
-                freshPlacedBlockPoses.add(entry.getKey());
+                world.setBlockState(movingPos, Registries.BLOCK.get(entry.getValue()).getDefaultState(), 3);
+                freshPlacedBlockPoses.add(movingPos);
             }
         }
         portalEntity.getDungeonPlayerUuids().clear();
@@ -429,13 +507,11 @@ public class DungeonPlacementHandler {
         mobProtection *= protectionFactor;
         mobSpeed *= speedFactor;
 
-        // round factor
         mobHealth = Math.round(mobHealth * 100.0D) / 100.0D;
         mobDamage = Math.round(mobDamage * 100.0D) / 100.0D;
         mobProtection = Math.round(mobProtection * 100.0D) / 100.0D;
         mobSpeed = Math.round(mobSpeed * 100.0D) / 100.0D;
 
-        // Set Values
         mobEntity.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(mobHealth);
         mobEntity.heal(mobEntity.getMaxHealth());
         if (hasAttackDamageAttribute) {
